@@ -8,11 +8,11 @@ export default function ContactoPage() {
       <ContactoHero />
       <section className="bg-bg-section py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-5">
-            <div className="lg:col-span-3">
+          <div className="flex flex-col gap-10 lg:flex-row">
+            <div className="lg:flex-[3]">
               <ContactForm />
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:flex-[2]">
               <ContactInfo />
             </div>
           </div>

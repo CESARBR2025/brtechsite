@@ -35,20 +35,20 @@ const socialLinks = [
 
 export function ContactInfo() {
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
         <h3 className="text-base font-bold text-text-primary">
           Información de contacto
         </h3>
-        <div className="mt-5 space-y-4">
+        <div className="mt-5 flex flex-col gap-4">
           {contactInfo.map((item) => (
-            <div key={item.label} className="group">
+            <div key={item.label}>
               {item.href ? (
                 <a
                   href={item.href}
                   className="flex items-center gap-4 rounded-xl bg-bg-section p-4 transition-colors hover:bg-primary-light/50"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -58,7 +58,7 @@ export function ContactInfo() {
                     </p>
                   </div>
                   {item.action && (
-                    <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="hidden sm:flex items-center gap-1 text-xs font-medium text-primary sm:opacity-0 sm:group-hover:opacity-100">
                       {item.action}
                       <ExternalLink className="h-3 w-3" />
                     </span>
@@ -66,7 +66,7 @@ export function ContactInfo() {
                 </a>
               ) : (
                 <div className="flex items-center gap-4 rounded-xl bg-bg-section p-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -89,14 +89,32 @@ export function ContactInfo() {
         <div className="mt-5 grid grid-cols-3 gap-4">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
-              <p className="text-xl font-bold text-primary">{s.value}</p>
-              <p className="mt-0.5 text-xs text-text-muted">{s.label}</p>
+              <p className="text-lg font-bold text-primary sm:text-xl">
+                {s.value}
+              </p>
+              <p className="mt-0.5 text-[11px] leading-tight text-text-muted sm:text-xs">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-
+      <div className="rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
+        <h3 className="text-base font-bold text-text-primary">Redes</h3>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          {socialLinks.map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              className="flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5 text-sm text-text-secondary transition-colors hover:border-primary/30 hover:bg-primary-light/30 hover:text-primary"
+            >
+              {s.label}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

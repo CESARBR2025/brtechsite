@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={inter.variable}>
-      <body className="min-h-screen bg-background font-sans antialiased" style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif" }}>
+      <body className="min-h-screen bg-background font-sans antialiased overflow-x-hidden" style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif" }}>
         {children}
       </body>
     </html>
