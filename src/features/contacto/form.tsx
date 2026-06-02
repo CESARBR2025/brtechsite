@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Send, User, Mail, MessageSquare, CheckCircle, Sparkles, ArrowRight } from "lucide-react"
+import { Send, User, Mail, MessageSquare, CheckCircle, Sparkles, ArrowRight, Loader2 } from "lucide-react"
+// 1. IMPORTA TU BACKEND (Asegúrate de ajustar la ruta si guardaste el archivo en otro lado)
+import { sendContactEmail } from "../emails/actions/send-email"
 
 const reasons = [
   "Diagnóstico gratis de tu negocio",
@@ -11,10 +13,31 @@ const reasons = [
 
 export function ContactForm() {
   const [sent, setSent] = useState(false)
+  // Estado para bloquear el botón y mostrar un spinner mientras se envía
+  const [isPending, setIsPending] = useState(false)
+  // Estado opcional por si quieres capturar y mostrar un error si falla Resend
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 2. MODIFICA EL MANEJADOR DEL FORMULARIO
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setSent(true)
+    setIsPending(true)
+    setError(null)
+
+    // Obtenemos de forma nativa todos los inputs del formulario
+    const formData = new FormData(e.currentTarget)
+
+    // Invocamos de forma segura la Server Action de Resend
+    const result = await sendContactEmail(formData)
+
+    setIsPending(false)
+
+    if (result.success) {
+      setSent(true)
+    } else {
+      // Si la API key está mal o falló algo en Vercel, capturamos el error
+      setError(result.error || "Hubo un error al enviar el mensaje.")
+    }
   }
 
   if (sent) {
@@ -73,8 +96,10 @@ export function ContactForm() {
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <User className="h-4 w-4 text-text-muted" />
             </div>
+            {/* 3. AÑADIDO: name="name" */}
             <input
               id="name"
+              name="name"
               type="text"
               required
               placeholder="Nombre completo"
@@ -85,8 +110,10 @@ export function ContactForm() {
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <Mail className="h-4 w-4 text-text-muted" />
             </div>
+            {/* 3. AÑADIDO: name="email" */}
             <input
               id="email"
+              name="email"
               type="email"
               required
               placeholder="Correo electrónico"
@@ -99,8 +126,10 @@ export function ContactForm() {
           <div className="pointer-events-none absolute left-0 top-0 flex items-start pt-3 pl-3">
             <MessageSquare className="h-4 w-4 text-text-muted" />
           </div>
+          {/* 3. AÑADIDO: name="message" */}
           <textarea
             id="message"
+            name="message"
             required
             rows={4}
             placeholder="Cuéntanos sobre tu proyecto o lo que necesitas..."
@@ -108,17 +137,34 @@ export function ContactForm() {
           />
         </div>
 
+        {/* Alerta visual en caso de que ocurra un error con Resend en Vercel */}
+        {error && (
+          <div className="p-3 text-xs font-medium rounded-lg bg-red-500/10 border border-red-500/20 text-red-500">
+            {error}
+          </div>
+        )}
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-text-muted">
             Te responderemos en menos de 24 horas
           </p>
           <button
             type="submit"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] sm:w-auto"
+            disabled={isPending} // Deshabilitar mientras envía
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] sm:w-auto disabled:opacity-70 disabled:pointer-events-none"
           >
-            <Send className="h-4 w-4" />
-            Enviar Mensaje
-            <ArrowRight className="h-4 w-4" />
+            {isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Enviar Mensaje
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
           </button>
         </div>
       </form>
