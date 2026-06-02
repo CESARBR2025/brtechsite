@@ -31,15 +31,23 @@ const services = [
   },
 ]
 
+const serviceIconsList = [
+  { icon: ShoppingCart, label: "POS" },
+  { icon: Settings, label: "Inventarios" },
+  { icon: Globe, label: "Web" },
+]
+
 export function ServicesSection() {
   return (
-    <section className="py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden py-16 sm:py-24">
+      <div className="absolute -right-32 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary-light px-4 py-1.5 text-xs font-medium text-primary">
             Nuestro Portafolio
-          </p>
-          <h2 className="mt-2 text-[22px] font-bold text-text-primary sm:text-3xl">
+          </div>
+          <h2 className="mt-4 text-[22px] font-bold text-text-primary sm:text-3xl">
             Servicios que Transforman
           </h2>
         </div>
@@ -47,41 +55,44 @@ export function ServicesSection() {
           {services.map((service) => (
             <div
               key={service.title}
-              className="group flex flex-col rounded-xl border border-border bg-surface p-6 shadow-card transition-all hover:border-primary/30 hover:shadow-hover"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-card transition-all hover:border-primary/30 hover:shadow-hover"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-light text-primary">
+              <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary-light/30 transition-all group-hover:scale-150" />
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary/10 text-primary shadow-sm">
                 <service.icon className="h-6 w-6" />
               </div>
-              <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-primary">
+              <p className="relative mt-4 text-xs font-semibold uppercase tracking-wider text-primary">
                 {service.tagline}
               </p>
-              <h3 className="mt-1 text-lg font-semibold text-text-primary">
+              <h3 className="relative mt-1 text-lg font-semibold text-text-primary">
                 {service.title}
               </h3>
-              <p className="mt-2 flex-1 text-sm text-text-secondary">
+              <p className="relative mt-2 flex-1 text-sm leading-relaxed text-text-secondary">
                 {service.description}
               </p>
-              <ul className="mt-4 space-y-1.5">
+              <ul className="relative mt-4 space-y-1.5">
                 {service.features.map((f) => (
                   <li
                     key={f}
                     className="flex items-center gap-1.5 text-xs text-text-secondary"
                   >
-                    <Check className="h-3.5 w-3.5 text-success" />
+                    <div className="flex h-4 w-4 items-center justify-center rounded-full bg-success-light">
+                      <Check className="h-2.5 w-2.5 text-success" />
+                    </div>
                     {f}
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+              <div className="relative mt-4 flex items-center justify-between border-t border-border pt-4">
                 <p className="text-lg font-bold text-text-primary">
                   {service.price}
                 </p>
                 <Link
-                  href="/servicios"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors group-hover:text-primary-hover"
+                  href={`/servicios#${service.title.toLowerCase().replace(/\s+/g, "-")}`}
+                  className="inline-flex items-center gap-1 rounded-lg bg-primary-light px-3 py-1.5 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white"
                 >
                   Más detalles
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>
             </div>

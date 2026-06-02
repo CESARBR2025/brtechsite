@@ -23,7 +23,7 @@ const contactInfo = [
 const stats = [
   { label: "Proyectos entregados", value: "+50" },
   { label: "Clientes satisfechos", value: "95%" },
-  { label: "Respuesta promedio", value: "&lt; 4 h" },
+  { label: "Respuesta promedio", value: "24 h" },
 ]
 
 const socialLinks = [

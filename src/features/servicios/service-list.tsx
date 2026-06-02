@@ -184,7 +184,10 @@ export function ServiceList() {
         const mutedColor = isDark ? "text-text-muted" : "text-text-secondary"
 
         return (
-          <div key={service.title} className={`relative overflow-hidden ${bg}`}>
+          <div
+              key={service.title}
+              id={service.title.toLowerCase().replace(/\s+/g, "-")}
+              className={`relative overflow-hidden ${bg}`}>
             {isDark && (
               <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:64px_64px]" />
             )}
