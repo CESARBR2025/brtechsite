@@ -29,7 +29,7 @@ export function HeroSection() {
               href="/contacto"
               className="inline-flex w-full items-center justify-center gap-1.5 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/30 sm:w-auto"
             >
-              Contactanos
+              Agendar Consulta Gratuita
               <ChevronRight className="h-4 w-4" />
             </Link>
             <Link

@@ -196,3 +196,80 @@ src/
 ├── types/
 │
 └── styles/
+
+### PÁGINA 2: SERVICIOS (DESDE HOME)
+
+Enlace a página que detalla cada uno de 3 servicios. Estructura para cada servicio:
+
+**[Servicio] - E-Commerce Profesional**
+
+**Hero:**
+
+- Imagen/video corto del dashboard o tienda funcionando
+- Título: "E-Commerce Profesional"
+- Subtítulo: "Vende online sin complejidad técnica"
+
+**Problema (Empatía):** "¿Por qué necesitas?
+
+- Vendes solo presencial, pierdes oportunidad online
+- Competencia vende online y te gana mercado
+- Necesitas presente en donde buscan tus clientes"
+
+**Qué Incluye:** Lista clara: ✓ Plataforma e-commerce completamente funcional ✓ Gestión de catálogo sin límite de productos ✓ Carrito de compras y checkout seguro ✓ Integración de pagos (Stripe, PayPal, locales) ✓ Gestión de inventario en tiempo real ✓ Dashboard de ventas y reportería automática ✓ 6 meses de soporte técnico ✓ Capacitación de tu equipo
+
+**Qué NO Incluye:**
+
+- Diseño gráfico extensivo (mencionas que es aparte)
+- Marketing o ads management
+- Hosting 24/7 profesional (ofrecido como add-on)
+
+**Proceso Específico Para Este Servicio:** Paso a paso de cómo desarrollas el e-commerce
+
+**Timeline:** Semana 1-2: Descubrimiento Semana 2-3: Diseño de mockups Semana 3-5: Desarrollo tienda Semana 5-6: Testing e integraciones Semana 6: Capacitación y go-live
+
+**Resultado Esperado:** "Al final tendrás:
+
+- Tienda online que genera ventas 24/7
+- Tu equipo capaz de mantenerla
+- Datos en tiempo real de qué vende
+- Crecimiento medible en 3 primeros meses"
+
+**Casos de Éxito Específicos para E-commerce:** Incluye 2-3 casos donde implementaste e-commerce
+
+**Precio:** Base: $12,000 Variables (explicadas): +$2,000 si tiene +100 productos +$1,500 si integración con sistema POS existente +$1,000 si requiere customizaciones adicionales
+
+**CTA:** "Cotiza tu e-commerce" → Formulario
+
+(Repite estructura para Automatización y Sitio Web)
+
+### PÁGINA 5: CONTACTO / AGENDAR
+
+**Simple. Dos opciones:**
+
+**Opción 1: Formulario de Contacto** Campos:
+
+- Nombre (requerido)
+- Email (requerido)
+- Empresa (requerido)
+- Teléfono (opcional)
+- Descripción de proyecto (textarea, requerido)
+- Presupuesto aproximado (dropdown: <5K, 5-10K, 10-20K, 20K+)
+- Botón: "Enviar"
+
+Automáticamente:
+
+- Email de confirmación al usuario
+- Email a ti con detalles
+- Añade a lista de contactos para seguimiento
+
+**Opción 2: Calendario para Agendar (Recomendado)** Usa Calendly o Similar:
+
+- Embed calendario en la página
+- Opciones: "Consulta Gratuita 30 min" y "Reunión Técnica 60 min"
+- Solo horarios disponibles tuyos (no hagas el usuario buscar)
+- Genera video link automático (Zoom/Google Meet)
+- Confirmación automática + reminder 24h antes
+
+**Encabezado:** "¿Listo para Empezar? Agendar es Fácil"
+
+**Copy:** "Selecciona un horario que funcione para ti. Hablaremos sobre tu proyecto, desafíos y cómo podemos ayudar. Sin presión de venta. Solo una conversación honesta."

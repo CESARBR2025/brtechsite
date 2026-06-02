@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Mail, Phone, MapPin } from "lucide-react"
+import { Mail, MapPin } from "lucide-react"
 
 const socialLinks = [
   { label: "Facebook", href: "#" },
@@ -64,15 +64,6 @@ export function Footer() {
                 >
                   <Mail className="h-4 w-4" />
                   barcenasrosalescesarivan@gmail.com
-                </a>
-              </li>
-              <li>
-                <a
-                  href="tel:+525512345678"
-                  className="flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
-                >
-                  <Phone className="h-4 w-4" />
-                  +52 4272011625
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-text-secondary">
