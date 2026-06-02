@@ -4,27 +4,26 @@ import { TrendingDown, Clock, PlugZap, ArrowRight, Archive } from "lucide-react"
 const problems = [
   {
     icon: TrendingDown,
-    title: "Tu negocio pierde dinero sin que lo notes",
+    title: "Fugas de dinero incontrolables",
     description:
-      "Cada error administrativo, retraso operativo o proceso manual representa dinero que se escapa silenciosamente de tu empresa.",
+      "Errores en registros, procesos manuales y falta de control provocan pérdidas que se acumulan sin que las detectes a tiempo.",
     cta: "Ver cómo solucionarlo",
     href: "/servicios",
-  }
-  ,
+  },
   {
     icon: Archive,
-    title: "Inventarios desactualizados",
+    title: "Inventario sin control",
     description:
-      "Sin información en tiempo real es imposible saber qué comprar, vender o reabastecer en el momento correcto.",
-    cta: "Digitalizar inventario",
+      "No sabes con precisión qué hay en stock, qué se está perdiendo o qué necesitas reabastecer hasta que ya es tarde.",
+    cta: "Controlar inventario",
     href: "/servicios",
   },
   {
     icon: PlugZap,
-    title: "Tus sistemas no conversan entre sí",
+    title: "Tu operación está desconectada",
     description:
-      "Información duplicada, actualizaciones manuales, reportes tardíos. Decisiones basadas en datos obsoletos.",
-    cta: "Descubrir integración",
+      "Ventas, inventario y procesos administrativos no están integrados, obligando a trabajar con información incompleta o duplicada.",
+    cta: "Integrar sistemas",
     href: "/servicios",
   },
 ]
@@ -38,7 +37,7 @@ export function ProblemSection() {
             ¿Te identificas?
           </p>
           <h2 className="mt-2 text-[22px] font-bold text-text-primary sm:text-3xl">
-            ¿Tu Empresa Enfrenta Estos Retos?
+            ¿Enfrentando Alguno de Estos Retos?
           </h2>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

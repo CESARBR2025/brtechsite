@@ -6,11 +6,11 @@ import { ChevronDown } from "lucide-react"
 const faqs = [
   {
     q: "¿Cuánto cuesta un proyecto?",
-    a: "Depende de complejidad. Nuestro rango es $6,000 — $25,000 por proyecto. Ofrecemos cotización gratuita.",
+    a: "Depende de complejidad. Nuestro rango es $3,000 — $15,000 por proyecto. Ofrecemos cotización gratuita.",
   },
   {
     q: "¿Cuánto toma?",
-    a: "30-60 días típicamente. Dependiendo de scope y tu disponibilidad.",
+    a: "30-60 días típicamente. Dependiendo de problema y tu disponibilidad.",
   },
   {
     q: "¿Necesito conocimientos técnicos?",
@@ -55,9 +55,8 @@ export function FAQSection() {
                     {faq.q}
                   </span>
                   <ChevronDown
-                    className={`h-4 w-4 flex-shrink-0 text-text-secondary transition-transform ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
+                    className={`h-4 w-4 flex-shrink-0 text-text-secondary transition-transform ${isOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
                 {isOpen && (
