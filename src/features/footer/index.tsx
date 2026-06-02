@@ -60,10 +60,10 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:hola@brtech.com"
-                  className="flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
+                  className="flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary min-w-0"
                 >
-                  <Mail className="h-4 w-4" />
-                  barcenasrosalescesarivan@gmail.com
+                  <Mail className="h-4 w-4 flex-shrink-0" />
+                  <span className="break-all">barcenasrosalescesarivan@gmail.com</span>
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-text-secondary">
