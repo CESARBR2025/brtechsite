@@ -100,21 +100,7 @@ export function ContactInfo() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
-        <h3 className="text-base font-bold text-text-primary">Redes</h3>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          {socialLinks.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              className="flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5 text-sm text-text-secondary transition-colors hover:border-primary/30 hover:bg-primary-light/30 hover:text-primary"
-            >
-              {s.label}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </a>
-          ))}
-        </div>
-      </div>
+
     </div>
   )
 }

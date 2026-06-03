@@ -22,52 +22,7 @@ import {
 } from "lucide-react"
 
 const services = [
-  {
-    icon: ShoppingCart,
-    title: "Sistema POS para Restaurantes",
-    tagline: "Obten el control de tu operación",
-    description:
-      "Creamos tu herramienta diseñada a tu restaurante gestionando: mesas, pedidos, cocina e inventario integrados en una sola plataforma.",
-    price: "$7,000 MXN",
-    problem: [
-      "Aún tomas pedidos en papel y se pierden comandas",
-      "No sabes cuánto vendes hoy vs ayer en tiempo real",
-      "El inventario se descontrola y no sabes qué falta",
-    ],
-    includes: [
-      "Control de caja completo",
-      "Gestión de mesas y comandas",
-      "Órdenes en tiempo real a cocina",
-      "Ticket impresora integrada",
-      "Reportes de ventas diarios",
-      "Dashboard con métricas clave",
-      "Capacitación del equipo",
-    ],
-    excludes: [
-      "Hardware (pantallas, impresoras)",
-      "Diseño de menús o branding",
-      "Pasarela de pagos integrada",
-    ],
-    process: [
-      { step: "Te conoceremos", desc: "Analizamos tu operación actual", time: "3 días" },
-      { step: "Identificación de tu problema", desc: "Buscaremos hasta encontrar el problema principal de tu negocio", time: "1 semana" },
-      { step: "Propuesta de desarrollo", desc: "Con tu validación, te presentaremos la funcionalidad de tu herramienta", time: "3 días" },
-      { step: "Desarrollo de tu herramienta", desc: "Desarrollaremos modulos y semana semana nos reuniremos contigo para presentarte avances realizados", time: "4 - 8 semanas" },
-      { step: "Tu capacitación", desc: "Nos encargaremos de capacitarte para que exprimas al maximo tu sistema", time: "1 día" },
-      { step: "Puesta en marcha", desc: "Cuando arranque, estaremos contigo para verificar que el funcionamiento sea el adecuado", time: "1 día" },
-      { step: "Entrega", desc: "Te brindaremos acceso a las funcionalidades finales del sistema y haremos entrega formal de tu herramienta", time: "1 día" },
-    ],
-    results: [
-      "Elimina errores en comandas",
-      "Agiliza el servicio al cliente",
-      "Reduce tiempos de espera",
-      "Reportes de ventas automáticos",
-    ],
-    variables: [
-      { label: "Multi-sucursal", add: "+$1,200" },
-      { label: "Vista para comensales", add: "+$1,000" },
-    ],
-  },
+
   {
     icon: Settings,
     title: "Control de Inventarios",
@@ -114,6 +69,52 @@ const services = [
       { label: "Integración con POS existente", add: "+$1,500" },
       { label: "Alertas Email", add: "+$500" },
       { label: "Multi-sucursal", add: "+$2,000" },
+    ],
+  },
+  {
+    icon: ShoppingCart,
+    title: "Sistema POS para Restaurantes",
+    tagline: "Obten el control de tu operación",
+    description:
+      "Creamos tu herramienta diseñada a tu restaurante gestionando: mesas, pedidos, cocina e inventario integrados en una sola plataforma.",
+    price: "$7,000 MXN",
+    problem: [
+      "Aún tomas pedidos en papel y se pierden comandas",
+      "No sabes cuánto vendes hoy vs ayer en tiempo real",
+      "El inventario se descontrola y no sabes qué falta",
+    ],
+    includes: [
+      "Control de caja completo",
+      "Gestión de mesas y comandas",
+      "Órdenes en tiempo real a cocina",
+      "Conexión con ticket impresora externa",
+      "Reportes de ventas diarios",
+      "Dashboard con métricas clave",
+      "Capacitación del equipo",
+    ],
+    excludes: [
+      "Hardware (pantallas, impresoras)",
+      "Diseño de menús o branding",
+      "Pasarela de pagos integrada",
+    ],
+    process: [
+      { step: "Te conoceremos", desc: "Analizamos tu operación actual", time: "3 días" },
+      { step: "Identificación de tu problema", desc: "Buscaremos hasta encontrar el problema principal de tu negocio", time: "1 semana" },
+      { step: "Propuesta de desarrollo", desc: "Con tu validación, te presentaremos la funcionalidad de tu herramienta", time: "3 días" },
+      { step: "Desarrollo de tu herramienta", desc: "Desarrollaremos modulos y semana semana nos reuniremos contigo para presentarte avances realizados", time: "4 - 8 semanas" },
+      { step: "Tu capacitación", desc: "Nos encargaremos de capacitarte para que exprimas al maximo tu sistema", time: "1 día" },
+      { step: "Puesta en marcha", desc: "Cuando arranque, estaremos contigo para verificar que el funcionamiento sea el adecuado", time: "1 día" },
+      { step: "Entrega", desc: "Te brindaremos acceso a las funcionalidades finales del sistema y haremos entrega formal de tu herramienta", time: "1 día" },
+    ],
+    results: [
+      "Elimina errores en comandas",
+      "Agiliza el servicio al cliente",
+      "Reduce tiempos de espera",
+      "Reportes de ventas automáticos",
+    ],
+    variables: [
+      { label: "Multi-sucursal", add: "+$1,200" },
+      { label: "Vista para comensales", add: "+$1,000" },
     ],
   },
   {
@@ -178,16 +179,16 @@ export function ServiceList() {
   return (
     <section>
       {services.map((service, i) => {
-        const isDark = i % 2 === 0
+        const isDark = i % 2 !== 0
         const bg = isDark ? "bg-bg-dark" : "bg-surface"
         const textColor = isDark ? "text-white" : "text-text-primary"
         const mutedColor = isDark ? "text-text-muted" : "text-text-secondary"
 
         return (
           <div
-              key={service.title}
-              id={service.title.toLowerCase().replace(/\s+/g, "-")}
-              className={`relative overflow-hidden ${bg}`}>
+            key={service.title}
+            id={service.title.toLowerCase().replace(/\s+/g, "-")}
+            className={`relative overflow-hidden ${bg}`}>
             {isDark && (
               <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:64px_64px]" />
             )}
