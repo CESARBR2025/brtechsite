@@ -1,19 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { TrendingDown, CalendarDays, BarChart3, AlertCircle } from "lucide-react"
+import { TrendingDown, DollarSign, CalendarDays, ArrowRight } from "lucide-react"
 
 export function PropCalculator() {
   const [merma, setMerma] = useState(40)
 
   const mensual = merma * 30
   const anual = merma * 365
-  const tresAnios = merma * 365 * 3
-
-  const ahorroMensual = merma * 30 * 0.8
-  const costoTotal = 7000 + 400 * 12
-  const mesesRecuperar = Math.ceil((7000 + 400 * 12) / ahorroMensual)
-  const beneficioAnual = ahorroMensual * 12 - 400 * 12
+  const costoSistema = 7000
+  const hostingAnual = 400 * 12
+  const mesesRecuperar = Math.ceil(costoSistema / mensual)
+  const ahorroRealAnual = anual - hostingAnual
 
   const format = (n: number) =>
     "$" + n.toLocaleString("es-MX", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " MXN"
@@ -33,6 +31,7 @@ export function PropCalculator() {
           </h2>
         </div>
 
+        {/* Slider */}
         <div className="mt-10 rounded-2xl border border-amber-200 bg-white p-6 shadow-lg sm:p-8">
           <label className="text-sm font-semibold text-gray-700">
             Merma diaria estimada
@@ -65,45 +64,47 @@ export function PropCalculator() {
           </div>
         </div>
 
+        {/* Row 1: Costo del sistema | Pérdida mensual | Meses recuperar inversión */}
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-red-100 bg-white p-6 shadow-sm">
-            <CalendarDays className="h-6 w-6 text-red-500" />
+          <div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-sm">
+            <DollarSign className="h-6 w-6 text-sky-500" />
             <p className="mt-3 text-xs font-medium text-gray-500">
-              Pérdida mensual
+              Costo del sistema
+            </p>
+            <p className="mt-1 text-2xl font-bold text-sky-700">
+              {format(costoSistema)}
+            </p>
+            <p className="mt-0.5 text-xs text-gray-400">
+              + $400/mes de hosting
+            </p>
+          </div>
+          <div className="rounded-2xl border border-red-100 bg-white p-6 shadow-sm">
+            <TrendingDown className="h-6 w-6 text-red-500" />
+            <p className="mt-3 text-xs font-medium text-gray-500">
+              Pérdida mensual actual
             </p>
             <p className="mt-1 text-2xl font-bold text-red-600">
               {format(mensual)}
             </p>
             <p className="mt-0.5 text-xs text-gray-400">
-              {merma} × 30 días
+              ${merma} × 30 días
             </p>
           </div>
-          <div className="rounded-2xl border border-red-200 bg-white p-6 shadow-sm">
-            <BarChart3 className="h-6 w-6 text-red-500" />
+          <div className="rounded-2xl border border-amber-200 bg-white p-6 shadow-sm">
+            <CalendarDays className="h-6 w-6 text-amber-500" />
             <p className="mt-3 text-xs font-medium text-gray-500">
-              Pérdida anual
+              Meses para recuperar inversión
             </p>
-            <p className="mt-1 text-2xl font-bold text-red-600">
-              {format(anual)}
+            <p className="mt-1 text-2xl font-bold text-amber-700">
+              {mesesRecuperar > 0 ? mesesRecuperar : "—"} meses
             </p>
             <p className="mt-0.5 text-xs text-gray-400">
-              {merma} × 365 días
-            </p>
-          </div>
-          <div className="rounded-2xl border border-red-200 bg-white p-6 shadow-sm">
-            <AlertCircle className="h-6 w-6 text-red-500" />
-            <p className="mt-3 text-xs font-medium text-gray-500">
-              Pérdida a 3 años
-            </p>
-            <p className="mt-1 text-2xl font-bold text-red-600">
-              {format(tresAnios)}
-            </p>
-            <p className="mt-0.5 text-xs text-gray-400">
-              {merma} × 365 × 3
+              {format(costoSistema)} ÷ {format(mensual)}
             </p>
           </div>
         </div>
 
+        {/* Awareness banner */}
         <div className="mx-auto mt-8 max-w-2xl text-center">
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <p className="text-sm font-medium text-amber-800">
@@ -115,62 +116,74 @@ export function PropCalculator() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-lg sm:p-8">
+        {/* Row 2: Hosting anual vs Merma anual */}
+        <div className="mt-8 rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-6 shadow-lg sm:p-8">
           <h3 className="text-center text-lg font-bold text-[#1A1A2E]">
-            ¿Cuándo se paga el sistema solo?
+            Hosting anual vs Merma anual
           </h3>
           <p className="mt-1 text-center text-sm text-gray-500">
-            Con una reducción del 80% en merma
+            Lo que pagas de hosting al año frente a lo que pierdes actualmente
           </p>
-
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-emerald-200 bg-white p-5 text-center">
+            <div className="rounded-xl border border-purple-200 bg-white p-5 text-center">
               <p className="text-xs font-medium text-gray-500">
-                Costo del sistema
+                Hosting anual
               </p>
-              <p className="mt-1 text-2xl font-bold text-emerald-700">
-                $7,000 MXN
+              <p className="mt-1 text-2xl font-bold text-purple-700">
+                {format(hostingAnual)}
               </p>
-              <p className="text-xs text-gray-400">+ $400/mes hosting</p>
+              <p className="text-xs text-gray-400">$400 × 12 meses</p>
             </div>
-            <div className="rounded-xl border border-emerald-200 bg-white p-5 text-center">
+            <div className="rounded-xl border border-red-200 bg-white p-5 text-center">
               <p className="text-xs font-medium text-gray-500">
-                Ahorro mensual estimado
+                Merma anual actual
               </p>
-              <p className="mt-1 text-2xl font-bold text-emerald-700">
-                {format(ahorroMensual)}
+              <p className="mt-1 text-2xl font-bold text-red-600">
+                {format(anual)}
               </p>
               <p className="text-xs text-gray-400">
-                {merma} × 30 × 80%
+                ${merma} × 365 días
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-emerald-100/50 p-4 text-center">
-              <p className="text-xs font-medium text-gray-500">
-                Meses para recuperar inversión
-              </p>
-              <p className="mt-1 text-xl font-bold text-emerald-700">
-                {mesesRecuperar > 0 ? mesesRecuperar : "—"} meses
+        {/* Row 3: Ahorro real anual */}
+        <div className="mt-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-lg sm:p-8">
+          <h3 className="text-center text-lg font-bold text-[#1A1A2E]">
+            Ahorro real anual
+          </h3>
+          <p className="mt-1 text-center text-sm text-gray-500">
+            Lo que dejas de perder menos el costo del hosting
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <div className="text-center">
+              <p className="text-xs font-medium text-gray-500">Merma anual</p>
+              <p className="text-xl font-bold text-red-600">{format(anual)}</p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-gray-400" />
+            <div className="text-center">
+              <p className="text-xs font-medium text-gray-500">Hosting anual</p>
+              <p className="text-xl font-bold text-purple-700">{format(hostingAnual)}</p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-gray-400" />
+            <div className="text-center">
+              <p className="text-xs font-medium text-emerald-600">Ahorro real</p>
+              <p className="text-2xl font-bold text-emerald-700">
+                {format(ahorroRealAnual)}
               </p>
             </div>
-            <div className="rounded-xl bg-emerald-100/50 p-4 text-center">
-              <p className="text-xs font-medium text-gray-500">
-                Ahorro en 1 año
-              </p>
-              <p className="mt-1 text-xl font-bold text-emerald-700">
-                {format(ahorroMensual * 12)}
-              </p>
-            </div>
-            <div className="rounded-xl bg-emerald-100/50 p-4 text-center">
-              <p className="text-xs font-medium text-gray-500">
-                Beneficio neto anual
-              </p>
-              <p className="mt-1 text-xl font-bold text-emerald-700">
-                {format(beneficioAnual)}
-              </p>
-            </div>
+          </div>
+          <div className="mx-auto mt-4 max-w-md rounded-xl bg-emerald-100/50 p-4 text-center">
+            <p className="text-xs font-medium text-gray-500">
+              Beneficio neto anual
+            </p>
+            <p className="mt-0.5 text-3xl font-bold text-emerald-700">
+              {format(ahorroRealAnual)}
+            </p>
+            <p className="mt-0.5 text-xs text-gray-400">
+              {format(anual)} − {format(hostingAnual)}
+            </p>
           </div>
         </div>
       </div>
