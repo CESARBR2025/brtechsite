@@ -48,7 +48,7 @@ export function PropCTA() {
         </div>
 
         <p className="mt-8 text-xs text-orange-200">
-          Esta propuesta tiene vigencia de 15 dias. Después de ese tiempo,
+          Esta propuesta tiene vigencia de 15 dias - 15 Junio del 2026. Después de ese tiempo,
           los precios y condiciones pueden cambiar.
         </p>
       </div>

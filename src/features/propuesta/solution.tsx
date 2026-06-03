@@ -1,19 +1,41 @@
-import { Smartphone, ClipboardCheck, CookingPot, Banknote, Eye, CheckCircle } from "lucide-react"
+import { ClipboardCheck, DollarSign, CookingPot, BarChart3, Eye, CheckCircle, Table2, ListOrdered, TrendingUp } from "lucide-react"
 
 const modulos = [
-  { icon: Smartphone, label: "Captura digital de pedidos" },
-  { icon: ClipboardCheck, label: "Gestión de mesas" },
-  { icon: CookingPot, label: "Pantalla de cocina en tiempo real" },
-  { icon: Banknote, label: "Control de caja diaria" },
-  { icon: Eye, label: "Visibilidad de ocupación del restaurante" },
-]
-
-const beneficios = [
-  "Todo pedido sea digital",
-  "Nada salga si no está registrado",
-  "Cocina reciba órdenes en tiempo real",
-  "Caja tenga control exacto del dinero",
-  "Tú tengas visibilidad total del negocio",
+  {
+    icon: Table2,
+    title: "Gestión de mesas",
+    desc: "Asigna, mueve y libera mesas con solo un par de toques. Visualiza el estado de cada mesa en tiempo real.",
+  },
+  {
+    icon: DollarSign,
+    title: "Control de caja",
+    desc: "Registra cada transacción con total precisión. Cortes de caja diarios automáticos sin discrepancias.",
+  },
+  {
+    icon: CookingPot,
+    title: "Órdenes en cocina y barra",
+    desc: "Las comandas llegan al instante a la cocina y a la barra de bebidas. Sin papeles, sin gritos, sin errores.",
+  },
+  {
+    icon: ListOrdered,
+    title: "Control de cuentas diarias",
+    desc: "Cada cuenta se asigna automáticamente a su mesa. Sabes exactamente qué se consumió, quién atendió y cuánto se pagó.",
+  },
+  {
+    icon: BarChart3,
+    title: "Dashboard de datos diarios",
+    desc: "Cortes diarios automáticos con totales por mesero, producto vendido, forma de pago y más.",
+  },
+  {
+    icon: Eye,
+    title: "Visualización operativa",
+    desc: "Panel de control en vivo con todo lo que necesitas saber del restaurante en un solo vistazo.",
+    sub: [
+      "Mesas ocupadas y disponibles",
+      "Pedidos en cola y en preparación",
+      "Datos financieros del día",
+    ],
+  },
 ]
 
 export function PropSolution() {
@@ -31,31 +53,8 @@ export function PropSolution() {
             Parrilla Norteña Soft
           </h2>
           <p className="mt-3 text-lg text-gray-600">
-            Un sistema diseñado para que:
+            Todo lo que tu restaurante necesita para operar sin fugas
           </p>
-        </div>
-
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {beneficios.slice(0, 3).map((b) => (
-            <div
-              key={b}
-              className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-white p-4 shadow-sm"
-            >
-              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-              <span className="text-sm text-gray-700">{b}</span>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {beneficios.slice(3).map((b) => (
-            <div
-              key={b}
-              className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-white p-4 shadow-sm"
-            >
-              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
-              <span className="text-sm text-gray-700">{b}</span>
-            </div>
-          ))}
         </div>
 
         <div className="mx-auto mt-8 max-w-xl">
@@ -70,18 +69,34 @@ export function PropSolution() {
           <h3 className="text-center text-lg font-bold text-[#1A1A2E]">
             Módulos principales
           </h3>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <p className="mt-2 text-center text-sm text-gray-500">
+            Seis pilares que eliminan la merma y te dan control total
+          </p>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {modulos.map((m) => (
               <div
-                key={m.label}
-                className="rounded-xl border border-emerald-200 bg-white p-5 text-center shadow-sm transition-all hover:border-emerald-400 hover:shadow-md"
+                key={m.title}
+                className="group rounded-xl border border-emerald-200 bg-white p-6 shadow-sm transition-all hover:border-emerald-400 hover:shadow-md"
               >
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                  <m.icon className="h-6 w-6" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 transition-colors group-hover:bg-emerald-200">
+                  <m.icon className="h-5.5 w-5.5" />
                 </div>
-                <p className="mt-3 text-xs font-medium text-gray-700">
-                  {m.label}
+                <h4 className="mt-4 text-sm font-bold text-gray-900">
+                  {m.title}
+                </h4>
+                <p className="mt-1.5 text-xs leading-relaxed text-gray-500">
+                  {m.desc}
                 </p>
+                {m.sub && (
+                  <ul className="mt-3 space-y-1.5">
+                    {m.sub.map((s) => (
+                      <li key={s} className="flex items-start gap-2 text-xs text-gray-600">
+                        <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>

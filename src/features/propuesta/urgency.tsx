@@ -20,8 +20,8 @@ export function PropUrgency() {
             Disponibilidad limitada
           </h2>
           <p className="mt-4 text-lg font-semibold text-yellow-700">
-            Esta propuesta tiene vigencia de{" "}
-            <span className="text-[#E1430E]">15 dias</span>
+            Esta propuesta tiene vigencia hasta el{" "}
+            <span className="text-[#E1430E]">15 Junio del 2026</span>
           </p>
         </div>
 
