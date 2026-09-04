@@ -72,7 +72,7 @@ export default async function PaginaTicket({ params }: Props) {
               Nota de servicio · {ticket.folio}
             </div>
 
-            <h1 className="mt-4 text-2xl font-bold leading-tight text-white sm:text-3xl">
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
               Resumen del{" "}
               <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
                 servicio
