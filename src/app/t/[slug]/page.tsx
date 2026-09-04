@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { Sparkles } from "lucide-react"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import { tickets } from "@/src/modules/tickets/infrastructure/contenedor"
 import { formatearDinero } from "@/src/ui/formato"
+import { BadgePago } from "@/src/ui/primitivos/badge-estado"
 import { BloqueConoceMas } from "@/src/ui/tickets/bloque-conoce-mas"
 import { BotonImprimir } from "@/src/ui/tickets/boton-imprimir"
 import { DocumentoTicket } from "@/src/ui/tickets/documento-ticket"
@@ -74,9 +74,8 @@ export default async function PaginaTicket({ params }: Props) {
               </span>
             </h1>
 
-            <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Nota de servicio · {ticket.folio}
+            <div className="ml-auto">
+              <BadgePago pagado={ticket.pagado} />
             </div>
           </div>
         </div>
