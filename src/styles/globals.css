@@ -48,7 +48,10 @@
   }
 
   article {
+    margin-top: 0 !important;
     box-shadow: none !important;
     border: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

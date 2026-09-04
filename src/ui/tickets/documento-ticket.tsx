@@ -1,26 +1,88 @@
 import Image from "next/image"
+import {
+  CalendarDays,
+  ClipboardList,
+  Laptop,
+  Lightbulb,
+  Phone,
+  ShieldCheck,
+  Stethoscope,
+  User,
+  Wrench,
+} from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import type { TicketPublicoDTO } from "@/src/modules/tickets/application/dtos"
 import { formatearDinero, formatearFecha } from "@/src/ui/formato"
 import { BadgePago } from "@/src/ui/primitivos/badge-estado"
-import { BotonImprimir } from "./boton-imprimir"
 
-function Dato({ etiqueta, valor }: { etiqueta: string; valor: string | null }) {
-  if (!valor) return null
+function DatoTile({
+  icono: Icono,
+  etiqueta,
+  valor,
+  extra,
+}: {
+  icono: LucideIcon
+  etiqueta: string
+  valor: string
+  extra?: React.ReactNode
+}) {
   return (
-    <div>
-      <dt className="text-xs uppercase tracking-wider text-text-muted">
+    <div className="rounded-xl bg-bg-section p-4">
+      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icono className="h-3.5 w-3.5" />
         {etiqueta}
-      </dt>
-      <dd className="mt-0.5 text-sm text-text-primary">{valor}</dd>
+      </div>
+      <p className="mt-1.5 text-sm font-medium text-text-primary">{valor}</p>
+      {extra && (
+        <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
+          {extra}
+        </p>
+      )}
     </div>
   )
 }
 
-function Parrafo({ titulo, texto }: { titulo: string; texto: string | null }) {
+function Narrativa({
+  icono: Icono,
+  titulo,
+  texto,
+}: {
+  icono: LucideIcon
+  titulo: string
+  texto: string | null
+}) {
   if (!texto) return null
   return (
-    <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-primary">
+    <div className="border-l-2 border-primary-light pl-4">
+      <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icono className="h-3.5 w-3.5" />
+        {titulo}
+      </h3>
+      <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
+        {texto}
+      </p>
+    </div>
+  )
+}
+
+function Callout({
+  icono: Icono,
+  titulo,
+  texto,
+  tono,
+}: {
+  icono: LucideIcon
+  titulo: string
+  texto: string | null
+  tono: "primary" | "success"
+}) {
+  if (!texto) return null
+  const fondo =
+    tono === "primary" ? "bg-primary-light/40" : "bg-success-light/50"
+  return (
+    <div className={`rounded-xl p-4 ${fondo}`}>
+      <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+        <Icono className="h-3.5 w-3.5" />
         {titulo}
       </h3>
       <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
@@ -32,127 +94,179 @@ function Parrafo({ titulo, texto }: { titulo: string; texto: string | null }) {
 
 export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
   const { moneda } = ticket
+  const hayNarrativa =
+    ticket.problemaReportado || ticket.diagnostico || ticket.trabajoRealizado
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-10">
-      {/* Encabezado */}
-      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
-        <div>
+    <div className="p-6 sm:p-8">
+      {/* Encabezado propio del documento (se ve siempre y también al imprimir) */}
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-5">
+        <div className="flex items-center gap-3">
           <Image
             src="/logo2.png"
             alt="BR TECH"
-            width={64}
-            height={64}
-            className="h-14 w-auto"
+            width={48}
+            height={48}
+            className="h-10 w-auto"
           />
-          <p className="mt-3 text-xs uppercase tracking-wider text-text-muted">
-            Ticket de servicio
-          </p>
-          <p className="text-lg font-bold text-text-primary">{ticket.folio}</p>
-        </div>
-        <div className="text-right">
-          <p className="text-xs uppercase tracking-wider text-text-muted">
-            Fecha de servicio
-          </p>
-          <p className="text-sm font-medium text-text-primary">
-            {formatearFecha(ticket.fechaServicio)}
-          </p>
-          <div className="mt-2 flex justify-end">
-            <BadgePago pagado={ticket.pagado} />
+          <div>
+            <p className="text-xs uppercase tracking-wider text-text-muted">
+              Nota de servicio
+            </p>
+            <p className="text-sm font-bold text-text-primary">{ticket.folio}</p>
           </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-text-muted">
+          <CalendarDays className="h-3.5 w-3.5" />
+          {formatearFecha(ticket.fechaServicio)}
         </div>
       </header>
 
-      {/* Cliente y equipo */}
-      <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Dato etiqueta="Cliente" valor={ticket.cliente.nombre} />
-        <Dato etiqueta="Contacto" valor={ticket.cliente.contacto} />
-        <Dato etiqueta="Equipo" valor={ticket.equipo.tipo} />
-        <Dato etiqueta="Detalle del equipo" valor={ticket.equipo.detalle} />
-      </dl>
+      <div className="mt-6 space-y-7">
+        {/* Cliente y equipo */}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <DatoTile
+            icono={User}
+            etiqueta="Cliente"
+            valor={ticket.cliente.nombre}
+            extra={
+              ticket.cliente.contacto ? (
+                <>
+                  <Phone className="h-3 w-3" />
+                  {ticket.cliente.contacto}
+                </>
+              ) : null
+            }
+          />
+          <DatoTile
+            icono={Laptop}
+            etiqueta="Equipo"
+            valor={ticket.equipo.tipo}
+            extra={ticket.equipo.detalle}
+          />
+        </div>
 
-      {/* Narrativa del servicio */}
-      <div className="mt-6 space-y-4">
-        <Parrafo titulo="Problema reportado" texto={ticket.problemaReportado} />
-        <Parrafo titulo="Diagnóstico" texto={ticket.diagnostico} />
-        <Parrafo titulo="Trabajo realizado" texto={ticket.trabajoRealizado} />
-      </div>
+        {/* Narrativa del servicio */}
+        {hayNarrativa && (
+          <div className="space-y-4">
+            <Narrativa
+              icono={ClipboardList}
+              titulo="Problema reportado"
+              texto={ticket.problemaReportado}
+            />
+            <Narrativa
+              icono={Stethoscope}
+              titulo="Diagnóstico"
+              texto={ticket.diagnostico}
+            />
+            <Narrativa
+              icono={Wrench}
+              titulo="Trabajo realizado"
+              texto={ticket.trabajoRealizado}
+            />
+          </div>
+        )}
 
-      {/* Conceptos */}
-      <section className="mt-8">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Conceptos
-        </h3>
-        <table className="mt-3 w-full text-sm">
-          <thead>
-            <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-text-muted">
-              <th className="pb-2 font-medium">Concepto</th>
-              <th className="pb-2 text-right font-medium">Cant.</th>
-              <th className="pb-2 text-right font-medium">P. unitario</th>
-              <th className="pb-2 text-right font-medium">Importe</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {ticket.items.map((item) => (
-              <tr key={item.id}>
-                <td className="py-2.5 pr-3 align-top text-text-primary">
-                  {item.concepto}
-                  {item.detalle && (
-                    <span className="block text-xs text-text-muted">
-                      {item.detalle}
-                    </span>
-                  )}
-                </td>
-                <td className="py-2.5 text-right align-top tabular-nums text-text-secondary">
-                  {item.cantidad}
-                </td>
-                <td className="py-2.5 text-right align-top tabular-nums text-text-secondary">
-                  {formatearDinero(item.precioUnitario, moneda)}
-                </td>
-                <td className="py-2.5 text-right align-top tabular-nums text-text-primary">
-                  {formatearDinero(item.importe, moneda)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Conceptos */}
+        <div className="border-t border-border pt-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-primary">
+            Conceptos
+          </h3>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full min-w-[28rem] text-sm">
+              <thead>
+                <tr className="rounded-lg bg-bg-section text-left text-[11px] uppercase tracking-wider text-text-muted">
+                  <th className="rounded-l-lg px-3 py-2 font-medium">
+                    Concepto
+                  </th>
+                  <th className="px-3 py-2 text-right font-medium">Cant.</th>
+                  <th className="px-3 py-2 text-right font-medium">
+                    P. unitario
+                  </th>
+                  <th className="rounded-r-lg px-3 py-2 text-right font-medium">
+                    Importe
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {ticket.items.map((item) => (
+                  <tr key={item.id}>
+                    <td className="px-3 py-2.5 align-top text-text-primary">
+                      {item.concepto}
+                      {item.detalle && (
+                        <span className="block text-xs text-text-muted">
+                          {item.detalle}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-right align-top tabular-nums text-text-secondary">
+                      {item.cantidad}
+                    </td>
+                    <td className="px-3 py-2.5 text-right align-top tabular-nums text-text-secondary">
+                      {formatearDinero(item.precioUnitario, moneda)}
+                    </td>
+                    <td className="px-3 py-2.5 text-right align-top font-medium tabular-nums text-text-primary">
+                      {formatearDinero(item.importe, moneda)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Totales */}
-        <div className="mt-4 flex justify-end">
-          <dl className="w-full max-w-xs space-y-1.5 text-sm">
-            <div className="flex justify-between text-text-secondary">
-              <dt>Subtotal</dt>
-              <dd className="tabular-nums">
-                {formatearDinero(ticket.subtotal, moneda)}
-              </dd>
-            </div>
-            {ticket.impuesto > 0 && (
+          {/* Totales */}
+          <div className="mt-5 flex justify-end">
+            <dl className="w-full max-w-xs space-y-2 rounded-xl bg-bg-section p-4 text-sm">
               <div className="flex justify-between text-text-secondary">
-                <dt>Impuesto</dt>
+                <dt>Subtotal</dt>
                 <dd className="tabular-nums">
-                  {formatearDinero(ticket.impuesto, moneda)}
+                  {formatearDinero(ticket.subtotal, moneda)}
                 </dd>
               </div>
-            )}
-            <div className="flex items-baseline justify-between border-t border-border pt-2">
-              <dt className="text-sm font-semibold text-text-primary">Total</dt>
-              <dd className="text-2xl font-bold tabular-nums text-text-primary">
-                {formatearDinero(ticket.total, moneda)}
-              </dd>
-            </div>
-          </dl>
+              {ticket.impuesto > 0 && (
+                <div className="flex justify-between text-text-secondary">
+                  <dt>Impuesto</dt>
+                  <dd className="tabular-nums">
+                    {formatearDinero(ticket.impuesto, moneda)}
+                  </dd>
+                </div>
+              )}
+              <div className="flex items-baseline justify-between border-t border-border pt-2">
+                <dt className="font-semibold text-text-primary">Total</dt>
+                <dd className="text-2xl font-bold tabular-nums text-primary">
+                  {formatearDinero(ticket.total, moneda)}
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
-      </section>
 
-      {/* Recomendaciones y garantía */}
-      <div className="mt-8 space-y-4">
-        <Parrafo titulo="Recomendaciones" texto={ticket.recomendaciones} />
-        <Parrafo titulo="Garantía" texto={ticket.notaGarantia} />
-      </div>
+        {/* Recomendaciones y garantía */}
+        {(ticket.recomendaciones || ticket.notaGarantia) && (
+          <div className="space-y-3">
+            <Callout
+              icono={Lightbulb}
+              titulo="Recomendaciones"
+              texto={ticket.recomendaciones}
+              tono="primary"
+            />
+            <Callout
+              icono={ShieldCheck}
+              titulo="Garantía"
+              texto={ticket.notaGarantia}
+              tono="success"
+            />
+          </div>
+        )}
 
-      <div className="no-print mt-8 flex justify-end">
-        <BotonImprimir />
+        {/* Sello de pago */}
+        <div className="flex items-center justify-between border-t border-border pt-5">
+          <p className="text-xs text-text-muted">
+            Gracias por confiar en BR TECH.
+          </p>
+          <BadgePago pagado={ticket.pagado} />
+        </div>
       </div>
-    </article>
+    </div>
   )
 }
