@@ -7,17 +7,45 @@ import { usePathname } from "next/navigation"
 import {
   ChevronDown,
   ExternalLink,
-  FilePlus2,
+  Globe,
   LogOut,
   Menu,
   ReceiptText,
   X,
 } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { cerrarSesion } from "@/src/app/(panel)/panel/acciones"
 
-const NAV = [
-  { href: "/panel", label: "Tickets", icon: ReceiptText, exact: true },
-  { href: "/panel/nuevo", label: "Nuevo ticket", icon: FilePlus2, exact: false },
+interface ItemNav {
+  href: string
+  label: string
+  icon: LucideIcon
+  exact?: boolean
+  externo?: boolean
+}
+
+interface SeccionNav {
+  titulo: string
+  items: ItemNav[]
+}
+
+const SECCIONES: SeccionNav[] = [
+  {
+    titulo: "Servicios TI",
+    items: [
+      { href: "/panel", label: "Tickets", icon: ReceiptText, exact: true },
+    ],
+  },
+  {
+    titulo: "Sitio",
+    items: [
+      { href: "/", label: "Sitio web", icon: Globe, externo: true },
+    ],
+  },
+  {
+    titulo: "Software Managment",
+    items: [],
+  },
 ]
 
 /**
@@ -26,40 +54,63 @@ const NAV = [
  */
 const USUARIO = { nombre: "BR TECH", rol: "Administrador", iniciales: "BR" }
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavSecciones({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+
   return (
-    <nav className="flex flex-col gap-1">
-      {NAV.map((item) => {
-        const activo = item.exact
-          ? pathname === item.href
-          : pathname.startsWith(item.href)
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-              activo
-                ? "bg-primary-light text-primary"
-                : "text-text-muted hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <item.icon className="h-4 w-4" />
-            {item.label}
-          </Link>
-        )
-      })}
-      <a
-        href="/"
-        target="_blank"
-        rel="noreferrer"
-        className="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-white/10 hover:text-white"
-      >
-        <ExternalLink className="h-4 w-4" />
-        Ver sitio
-      </a>
-    </nav>
+    <div className="flex flex-col gap-6">
+      {SECCIONES.map((seccion) => (
+        <div key={seccion.titulo}>
+          <p className="px-3 text-xs font-semibold text-white">
+            {seccion.titulo}
+          </p>
+          {seccion.items.length > 0 && (
+            <nav className="mt-2 flex flex-col gap-1">
+              {seccion.items.map((item) => {
+                const activo =
+                  !item.externo &&
+                  (item.exact
+                    ? pathname === item.href
+                    : pathname.startsWith(item.href))
+                const clase = `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  activo
+                    ? "bg-primary-light text-primary"
+                    : "text-text-muted hover:bg-white/10 hover:text-white"
+                }`
+
+                if (item.externo) {
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={clase}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.label}
+                      <ExternalLink className="ml-auto h-3.5 w-3.5 opacity-60" />
+                    </a>
+                  )
+                }
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onNavigate}
+                    className={clase}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </nav>
+          )}
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -75,7 +126,7 @@ function ContenidoBarra({ children }: { children: React.ReactNode }) {
           className="h-11 w-auto"
         />
       </Link>
-      <div className="mt-6 flex-1">{children}</div>
+      <div className="mt-6 flex-1 overflow-y-auto">{children}</div>
       <p className="px-3 text-[11px] text-text-muted/70">BR TECH DS · Tickets</p>
     </>
   )
@@ -146,7 +197,7 @@ export function ShellPanel({ children }: { children: React.ReactNode }) {
       {/* Sidebar fijo — escritorio */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col bg-bg-dark p-4 lg:flex">
         <ContenidoBarra>
-          <NavLinks />
+          <NavSecciones />
         </ContenidoBarra>
       </aside>
 
@@ -167,7 +218,7 @@ export function ShellPanel({ children }: { children: React.ReactNode }) {
               <X className="h-5 w-5" />
             </button>
             <ContenidoBarra>
-              <NavLinks onNavigate={() => setDrawer(false)} />
+              <NavSecciones onNavigate={() => setDrawer(false)} />
             </ContenidoBarra>
           </aside>
         </div>
