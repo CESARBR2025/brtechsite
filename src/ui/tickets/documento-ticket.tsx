@@ -1,13 +1,10 @@
 import Image from "next/image"
 import {
   ClipboardList,
-  Laptop,
   Lightbulb,
   ListChecks,
-  Phone,
   ShieldCheck,
   Stethoscope,
-  User,
   Wrench,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
@@ -28,37 +25,6 @@ function SeccionTitulo({
         <Icono className="h-4 w-4" />
       </span>
       <h2 className="text-sm font-bold text-text-primary">{children}</h2>
-    </div>
-  )
-}
-
-function DatoTile({
-  icono: Icono,
-  etiqueta,
-  valor,
-  extra,
-}: {
-  icono: LucideIcon
-  etiqueta: string
-  valor: string
-  extra?: React.ReactNode
-}) {
-  return (
-    <div className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-light to-primary/10 text-primary">
-        <Icono className="h-5 w-5" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-          {etiqueta}
-        </p>
-        <p className="mt-0.5 text-sm font-semibold text-text-primary">{valor}</p>
-        {extra && (
-          <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
-            {extra}
-          </p>
-        )}
-      </div>
     </div>
   )
 }
@@ -106,29 +72,6 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
       </p>
 
       <div className="space-y-8 p-6 sm:p-8">
-        {/* Cliente y equipo */}
-        <div className="grid gap-3 sm:grid-cols-2">
-          <DatoTile
-            icono={User}
-            etiqueta="Cliente"
-            valor={ticket.cliente.nombre}
-            extra={
-              ticket.cliente.contacto ? (
-                <>
-                  <Phone className="h-3 w-3" />
-                  {ticket.cliente.contacto}
-                </>
-              ) : null
-            }
-          />
-          <DatoTile
-            icono={Laptop}
-            etiqueta="Equipo"
-            valor={ticket.equipo.tipo}
-            extra={ticket.equipo.detalle}
-          />
-        </div>
-
         {/* Narrativa del servicio — línea de tiempo */}
         {pasos.length > 0 && (
           <section className="space-y-4">
