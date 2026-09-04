@@ -4,7 +4,6 @@ import { ArrowLeft } from "lucide-react"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import { getEnv } from "@/src/modules/shared/infrastructure/config/env"
 import { tickets } from "@/src/modules/tickets/infrastructure/contenedor"
-import { EncabezadoPanel } from "@/src/ui/panel/encabezado-panel"
 import { AccionesTicket } from "@/src/ui/panel/acciones-ticket"
 import { CopiarEnlace } from "@/src/ui/panel/copiar-enlace"
 import { BadgeEstado, BadgePago } from "@/src/ui/primitivos/badge-estado"
@@ -31,17 +30,15 @@ export default async function PaginaEditarTicket({ params }: Props) {
   const urlPublica = `${base}/t/${ticket.slug}`
 
   return (
-    <>
-      <EncabezadoPanel />
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <Link
-          href="/panel"
-          className="inline-flex items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-primary"
-        >
-          <ArrowLeft className="h-4 w-4" /> Tickets
-        </Link>
+    <div className="mx-auto max-w-3xl">
+      <Link
+        href="/panel"
+        className="inline-flex items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-primary"
+      >
+        <ArrowLeft className="h-4 w-4" /> Tickets
+      </Link>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-text-primary">
               {ticket.folio}
@@ -82,10 +79,9 @@ export default async function PaginaEditarTicket({ params }: Props) {
           </div>
         </section>
 
-        <div className="mt-6">
-          <FormularioTicket inicial={ticket} ticketId={ticket.id} />
-        </div>
-      </main>
-    </>
+      <div className="mt-6">
+        <FormularioTicket inicial={ticket} ticketId={ticket.id} />
+      </div>
+    </div>
   )
 }

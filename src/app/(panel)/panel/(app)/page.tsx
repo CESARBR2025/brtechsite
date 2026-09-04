@@ -11,7 +11,6 @@ import {
 import { getEnv } from "@/src/modules/shared/infrastructure/config/env"
 import { tickets } from "@/src/modules/tickets/infrastructure/contenedor"
 import { formatearDinero, formatearFecha } from "@/src/ui/formato"
-import { EncabezadoPanel } from "@/src/ui/panel/encabezado-panel"
 import { CopiarEnlace } from "@/src/ui/panel/copiar-enlace"
 import { BadgeEstado, BadgePago } from "@/src/ui/primitivos/badge-estado"
 
@@ -56,10 +55,8 @@ export default async function PaginaPanel() {
   ).length
 
   return (
-    <>
-      <EncabezadoPanel />
-      <main className="min-h-screen bg-bg-section">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl">
+      <div>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-primary-light px-4 py-1.5 text-xs font-medium text-primary">
@@ -189,8 +186,7 @@ export default async function PaginaPanel() {
               ))}
             </div>
           )}
-        </div>
-      </main>
-    </>
+      </div>
+    </div>
   )
 }
