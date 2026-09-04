@@ -1,6 +1,5 @@
 import { Suspense } from "react"
 import Image from "next/image"
-import { Sparkles } from "lucide-react"
 import { FormularioLogin } from "./formulario-login"
 
 export default function PaginaLogin() {
@@ -34,12 +33,7 @@ export default function PaginaLogin() {
             className="absolute left-1/2 top-0 h-24 w-auto -translate-x-1/2 -translate-y-1/2"
           />
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            Acceso interno
-          </div>
-
-          <h1 className="mt-4 text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-white">
             Panel{" "}
             <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
               BR TECH
