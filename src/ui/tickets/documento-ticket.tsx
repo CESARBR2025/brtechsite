@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Laptop,
   Lightbulb,
+  ListChecks,
   Phone,
   ShieldCheck,
   Stethoscope,
@@ -14,6 +15,23 @@ import type { LucideIcon } from "lucide-react"
 import type { TicketPublicoDTO } from "@/src/modules/tickets/application/dtos"
 import { formatearDinero, formatearFecha } from "@/src/ui/formato"
 import { BadgePago } from "@/src/ui/primitivos/badge-estado"
+
+function SeccionTitulo({
+  icono: Icono,
+  children,
+}: {
+  icono: LucideIcon
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary-light to-primary/10 text-primary">
+        <Icono className="h-4 w-4" />
+      </span>
+      <h2 className="text-sm font-bold text-text-primary">{children}</h2>
+    </div>
+  )
+}
 
 function DatoTile({
   icono: Icono,
@@ -27,102 +45,80 @@ function DatoTile({
   extra?: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl bg-bg-section p-4">
-      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-        <Icono className="h-3.5 w-3.5" />
-        {etiqueta}
-      </div>
-      <p className="mt-1.5 text-sm font-medium text-text-primary">{valor}</p>
-      {extra && (
-        <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
-          {extra}
+    <div className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-light to-primary/10 text-primary">
+        <Icono className="h-5 w-5" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+          {etiqueta}
         </p>
-      )}
-    </div>
-  )
-}
-
-function Narrativa({
-  icono: Icono,
-  titulo,
-  texto,
-}: {
-  icono: LucideIcon
-  titulo: string
-  texto: string | null
-}) {
-  if (!texto) return null
-  return (
-    <div className="border-l-2 border-primary-light pl-4">
-      <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-        <Icono className="h-3.5 w-3.5" />
-        {titulo}
-      </h3>
-      <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
-        {texto}
-      </p>
-    </div>
-  )
-}
-
-function Callout({
-  icono: Icono,
-  titulo,
-  texto,
-  tono,
-}: {
-  icono: LucideIcon
-  titulo: string
-  texto: string | null
-  tono: "primary" | "success"
-}) {
-  if (!texto) return null
-  const fondo =
-    tono === "primary" ? "bg-primary-light/40" : "bg-success-light/50"
-  return (
-    <div className={`rounded-xl p-4 ${fondo}`}>
-      <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-        <Icono className="h-3.5 w-3.5" />
-        {titulo}
-      </h3>
-      <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
-        {texto}
-      </p>
+        <p className="mt-0.5 text-sm font-semibold text-text-primary">{valor}</p>
+        {extra && (
+          <p className="mt-0.5 flex items-center gap-1 text-xs text-text-muted">
+            {extra}
+          </p>
+        )}
+      </div>
     </div>
   )
 }
 
 export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
   const { moneda } = ticket
-  const hayNarrativa =
-    ticket.problemaReportado || ticket.diagnostico || ticket.trabajoRealizado
+
+  const pasos = [
+    {
+      icono: ClipboardList,
+      titulo: "Problema reportado",
+      texto: ticket.problemaReportado,
+    },
+    { icono: Stethoscope, titulo: "Diagnóstico", texto: ticket.diagnostico },
+    { icono: Wrench, titulo: "Trabajo realizado", texto: ticket.trabajoRealizado },
+  ].filter((p) => p.texto)
 
   return (
     <div>
-      {/* Membrete: franja oscura a todo lo ancho (se ve siempre y al imprimir) */}
-      <header className="flex flex-wrap items-center justify-between gap-3 bg-bg-dark px-6 py-4 sm:px-8">
-        <div className="flex items-center gap-3">
+      {/* Membrete solo para impresión / PDF */}
+      <div className="hidden items-center gap-3 border-b border-border px-8 pb-4 pt-6 print:flex">
+        <span className="inline-flex rounded-md bg-bg-dark px-2 py-1.5">
           <Image
             src="/logo.png"
             alt="BR TECH"
             width={411}
             height={147}
-            className="h-8 w-auto"
+            className="h-6 w-auto"
           />
-          <div className="border-l border-white/15 pl-3">
-            <p className="text-[11px] uppercase tracking-wider text-text-muted">
-              Nota de servicio
-            </p>
-            <p className="text-sm font-bold text-white">{ticket.folio}</p>
-          </div>
+        </span>
+        <div className="border-l border-border pl-3">
+          <p className="text-[11px] uppercase tracking-wider text-text-muted">
+            Nota de servicio
+          </p>
+          <p className="text-sm font-bold text-text-primary">{ticket.folio}</p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-text-muted">
-          <CalendarDays className="h-3.5 w-3.5" />
-          {formatearFecha(ticket.fechaServicio)}
-        </div>
-      </header>
+      </div>
 
-      <div className="space-y-7 p-6 sm:p-8">
+      {/* Filo superior de marca (pantalla) */}
+      <div className="h-1 bg-gradient-to-r from-primary to-primary-hover print:hidden" />
+
+      {/* Cabecera compacta (pantalla) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4 print:hidden sm:px-8">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+            Nota de servicio
+          </p>
+          <p className="text-base font-bold text-text-primary">{ticket.folio}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5 text-xs text-text-muted">
+            <CalendarDays className="h-3.5 w-3.5" />
+            {formatearFecha(ticket.fechaServicio)}
+          </span>
+          <BadgePago pagado={ticket.pagado} />
+        </div>
+      </div>
+
+      <div className="space-y-8 p-6 sm:p-8">
         {/* Cliente y equipo */}
         <div className="grid gap-3 sm:grid-cols-2">
           <DatoTile
@@ -146,77 +142,88 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
           />
         </div>
 
-        {/* Narrativa del servicio */}
-        {hayNarrativa && (
-          <div className="space-y-4">
-            <Narrativa
-              icono={ClipboardList}
-              titulo="Problema reportado"
-              texto={ticket.problemaReportado}
-            />
-            <Narrativa
-              icono={Stethoscope}
-              titulo="Diagnóstico"
-              texto={ticket.diagnostico}
-            />
-            <Narrativa
-              icono={Wrench}
-              titulo="Trabajo realizado"
-              texto={ticket.trabajoRealizado}
-            />
-          </div>
+        {/* Narrativa del servicio — línea de tiempo */}
+        {pasos.length > 0 && (
+          <section className="space-y-4">
+            <SeccionTitulo icono={ClipboardList}>
+              Detalle del servicio
+            </SeccionTitulo>
+            <div className="relative">
+              {pasos.length > 1 && (
+                <div className="absolute bottom-4 left-[21px] top-3 hidden w-px bg-gradient-to-b from-primary via-primary/40 to-transparent sm:block" />
+              )}
+              <div className="space-y-3">
+                {pasos.map((paso) => (
+                  <div
+                    key={paso.titulo}
+                    className="relative flex items-start gap-4"
+                  >
+                    <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-hover text-white shadow-lg shadow-primary/20">
+                      <paso.icono className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                        {paso.titulo}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
+                        {paso.texto}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         )}
 
         {/* Conceptos */}
-        <div className="border-t border-border pt-6">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-primary">
-            Conceptos
-          </h3>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full min-w-[28rem] text-sm">
-              <thead>
-                <tr className="rounded-lg bg-bg-section text-left text-[11px] uppercase tracking-wider text-text-muted">
-                  <th className="rounded-l-lg px-3 py-2 font-medium">
-                    Concepto
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium">Cant.</th>
-                  <th className="px-3 py-2 text-right font-medium">
-                    P. unitario
-                  </th>
-                  <th className="rounded-r-lg px-3 py-2 text-right font-medium">
-                    Importe
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {ticket.items.map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-3 py-2.5 align-top text-text-primary">
+        <section className="space-y-4">
+          <SeccionTitulo icono={ListChecks}>Conceptos</SeccionTitulo>
+
+          <div className="overflow-hidden rounded-xl border border-border">
+            <div className="hidden bg-bg-section px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-text-muted sm:grid sm:grid-cols-[1fr_4rem_7rem_7rem] sm:gap-3">
+              <span>Concepto</span>
+              <span className="text-right">Cant.</span>
+              <span className="text-right">P. unitario</span>
+              <span className="text-right">Importe</span>
+            </div>
+            <div className="divide-y divide-border">
+              {ticket.items.map((item) => (
+                <div
+                  key={item.id}
+                  className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 px-4 py-3 sm:grid-cols-[1fr_4rem_7rem_7rem] sm:items-baseline sm:gap-3"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-text-primary">
                       {item.concepto}
-                      {item.detalle && (
-                        <span className="block text-xs text-text-muted">
-                          {item.detalle}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2.5 text-right align-top tabular-nums text-text-secondary">
-                      {item.cantidad}
-                    </td>
-                    <td className="px-3 py-2.5 text-right align-top tabular-nums text-text-secondary">
-                      {formatearDinero(item.precioUnitario, moneda)}
-                    </td>
-                    <td className="px-3 py-2.5 text-right align-top font-medium tabular-nums text-text-primary">
-                      {formatearDinero(item.importe, moneda)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </p>
+                    {item.detalle && (
+                      <p className="text-xs text-text-muted">{item.detalle}</p>
+                    )}
+                  </div>
+                  <p className="text-right text-sm font-semibold tabular-nums text-text-primary sm:hidden">
+                    {formatearDinero(item.importe, moneda)}
+                  </p>
+                  <p className="col-span-2 text-xs text-text-muted sm:hidden">
+                    {item.cantidad} × {formatearDinero(item.precioUnitario, moneda)}
+                  </p>
+                  <p className="hidden text-right text-sm tabular-nums text-text-secondary sm:block">
+                    {item.cantidad}
+                  </p>
+                  <p className="hidden text-right text-sm tabular-nums text-text-secondary sm:block">
+                    {formatearDinero(item.precioUnitario, moneda)}
+                  </p>
+                  <p className="hidden text-right text-sm font-semibold tabular-nums text-text-primary sm:block">
+                    {formatearDinero(item.importe, moneda)}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Totales */}
-          <div className="mt-5 flex justify-end">
-            <dl className="w-full max-w-xs space-y-2 rounded-xl bg-bg-section p-4 text-sm">
+          <div className="ml-auto w-full max-w-sm overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary-light/60 to-surface p-5">
+            <dl className="space-y-2 text-sm">
               <div className="flex justify-between text-text-secondary">
                 <dt>Subtotal</dt>
                 <dd className="tabular-nums">
@@ -231,40 +238,55 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
                   </dd>
                 </div>
               )}
-              <div className="flex items-baseline justify-between border-t border-border pt-2">
-                <dt className="font-semibold text-text-primary">Total</dt>
-                <dd className="text-2xl font-bold tabular-nums text-primary">
+              <div className="mt-3 flex items-end justify-between border-t border-primary/20 pt-3">
+                <dt className="text-sm font-semibold text-text-primary">Total</dt>
+                <dd className="text-3xl font-bold tabular-nums text-primary">
                   {formatearDinero(ticket.total, moneda)}
                 </dd>
               </div>
             </dl>
+            <div className="mt-3 flex justify-end">
+              <BadgePago pagado={ticket.pagado} />
+            </div>
           </div>
-        </div>
+        </section>
 
         {/* Recomendaciones y garantía */}
         {(ticket.recomendaciones || ticket.notaGarantia) && (
-          <div className="space-y-3">
-            <Callout
-              icono={Lightbulb}
-              titulo="Recomendaciones"
-              texto={ticket.recomendaciones}
-              tono="primary"
-            />
-            <Callout
-              icono={ShieldCheck}
-              titulo="Garantía"
-              texto={ticket.notaGarantia}
-              tono="success"
-            />
-          </div>
+          <section className="grid gap-3 sm:grid-cols-2">
+            {ticket.recomendaciones && (
+              <div className="rounded-xl border border-primary/15 bg-primary-light/40 p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                  <Lightbulb className="h-4 w-4" />
+                  Recomendaciones
+                </div>
+                <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
+                  {ticket.recomendaciones}
+                </p>
+              </div>
+            )}
+            {ticket.notaGarantia && (
+              <div className="rounded-xl border border-success/20 bg-success-light/50 p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-success">
+                  <ShieldCheck className="h-4 w-4" />
+                  Garantía
+                </div>
+                <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
+                  {ticket.notaGarantia}
+                </p>
+              </div>
+            )}
+          </section>
         )}
 
-        {/* Sello de pago */}
-        <div className="flex items-center justify-between border-t border-border pt-5">
-          <p className="text-xs text-text-muted">
-            Gracias por confiar en BR TECH.
+        {/* Cierre */}
+        <div className="border-t border-border pt-6 text-center">
+          <p className="text-sm font-semibold text-text-primary">
+            Gracias por tu preferencia
           </p>
-          <BadgePago pagado={ticket.pagado} />
+          <p className="mt-0.5 text-xs text-text-muted">
+            BR TECH Digital Systems · brtechds.com
+          </p>
         </div>
       </div>
     </div>
