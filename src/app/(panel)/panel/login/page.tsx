@@ -25,16 +25,14 @@ export default function PaginaLogin() {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
           {/* Logo montado sobre el borde superior, centrado */}
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-white/10 bg-bg-dark p-3 shadow-lg">
-            <Image
-              src="/logo.png"
-              alt="BR TECH"
-              width={120}
-              height={120}
-              className="h-11 w-auto"
-              priority
-            />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="BR TECH"
+            width={140}
+            height={140}
+            priority
+            className="absolute left-1/2 top-0 h-14 w-auto -translate-x-1/2 -translate-y-1/2"
+          />
 
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
