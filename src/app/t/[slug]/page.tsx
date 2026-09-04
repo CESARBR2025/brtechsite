@@ -69,12 +69,9 @@ export default async function PaginaTicket({ params }: Props) {
           <div className="mt-10 flex flex-wrap items-start gap-3">
             <div>
               <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">
-                Hola{" "}
-                <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-                  {nombreDePila(ticket.cliente.nombre)}
-                </span>
+                Hola {nombreDePila(ticket.cliente.nombre)}
               </h1>
-              <p className="mt-2 text-sm text-text-muted sm:text-base">
+              <p className="mt-2 text-sm text-white sm:text-base">
                 Este es el resumen de tu servicio.
               </p>
             </div>
