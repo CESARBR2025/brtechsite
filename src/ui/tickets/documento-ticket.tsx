@@ -10,7 +10,6 @@ import {
 import type { LucideIcon } from "lucide-react"
 import type { TicketPublicoDTO } from "@/src/modules/tickets/application/dtos"
 import { formatearDinero } from "@/src/ui/formato"
-import { BadgePago } from "@/src/ui/primitivos/badge-estado"
 
 function SeccionTitulo({
   icono: Icono,
@@ -175,9 +174,6 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
                 </dd>
               </div>
             </dl>
-            <div className="mt-3 flex justify-end">
-              <BadgePago pagado={ticket.pagado} />
-            </div>
           </div>
         </section>
 
