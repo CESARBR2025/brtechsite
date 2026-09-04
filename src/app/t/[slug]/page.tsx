@@ -3,7 +3,7 @@ import Image from "next/image"
 import { notFound } from "next/navigation"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import { tickets } from "@/src/modules/tickets/infrastructure/contenedor"
-import { formatearDinero } from "@/src/ui/formato"
+import { formatearDinero, nombreDePila } from "@/src/ui/formato"
 import { BadgePago } from "@/src/ui/primitivos/badge-estado"
 import { BloqueConoceMas } from "@/src/ui/tickets/bloque-conoce-mas"
 import { BotonImprimir } from "@/src/ui/tickets/boton-imprimir"
@@ -66,13 +66,19 @@ export default async function PaginaTicket({ params }: Props) {
             <BotonImprimir variante="oscuro" />
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">
-              Resumen del{" "}
-              <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-                servicio
-              </span>
-            </h1>
+          <div className="mt-10 flex flex-wrap items-start gap-3">
+            <div>
+              <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">
+                Hola{" "}
+                <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+                  {nombreDePila(ticket.cliente.nombre)}
+                </span>{" "}
+                👋
+              </h1>
+              <p className="mt-2 text-sm text-text-muted sm:text-base">
+                Este es el resumen de tu servicio.
+              </p>
+            </div>
 
             <div className="ml-auto">
               <BadgePago pagado={ticket.pagado} />

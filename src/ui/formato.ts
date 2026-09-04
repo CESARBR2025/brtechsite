@@ -17,6 +17,16 @@ export function formatearFecha(iso: string): string {
   }).format(d)
 }
 
+/** Primer nombre, con la inicial en mayúscula y el resto en minúscula. */
+export function nombreDePila(nombre: string): string {
+  const primero = nombre.trim().split(/\s+/)[0] ?? ""
+  if (!primero) return ""
+  return (
+    primero.charAt(0).toLocaleUpperCase("es") +
+    primero.slice(1).toLocaleLowerCase("es")
+  )
+}
+
 export function formatearFechaHora(iso: string): string {
   const d = new Date(iso)
   return new Intl.DateTimeFormat("es-MX", {
