@@ -6,9 +6,18 @@ import { FormularioLogin } from "./formulario-login"
 export default function PaginaLogin() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-dark px-4 py-16">
+      {/* Rejilla de fondo */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
-      <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-      <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+
+      {/* Punto de luz — esquina superior izquierda */}
+      <div className="pointer-events-none absolute -left-20 -top-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
+      <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-primary/50 blur-2xl" />
+      <div className="pointer-events-none absolute left-2 top-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(124,58,237,0.6)]" />
+
+      {/* Punto de luz — esquina inferior derecha */}
+      <div className="pointer-events-none absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-primary/45 blur-2xl" />
+      <div className="pointer-events-none absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(124,58,237,0.55)]" />
 
       <div className="relative w-full max-w-sm">
         <div className="flex justify-center">
@@ -22,7 +31,10 @@ export default function PaginaLogin() {
           />
         </div>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm">
+        <div className="relative mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-sm">
+          {/* Filo superior iluminado */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
             Acceso interno
