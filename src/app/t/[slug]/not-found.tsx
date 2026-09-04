@@ -13,9 +13,9 @@ export default function TicketNoEncontrado() {
         <Image
           src="/logo.png"
           alt="BR TECH"
-          width={120}
-          height={120}
-          className="mx-auto h-14 w-auto"
+          width={411}
+          height={147}
+          className="mx-auto h-12 w-auto"
         />
 
         <div className="mx-auto mt-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-hover shadow-lg shadow-primary/20">

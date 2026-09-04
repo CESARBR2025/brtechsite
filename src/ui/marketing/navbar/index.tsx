@@ -28,9 +28,10 @@ export function Navbar() {
           <Image
             src="/logo.png"
             alt="BR TECH"
-            width={100}
-            height={100}
-            className="h-20 w-auto"
+            width={411}
+            height={147}
+            priority
+            className="h-9 w-auto sm:h-10"
           />
         </Link>
 

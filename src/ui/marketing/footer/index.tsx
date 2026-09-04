@@ -24,15 +24,14 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-xl bg-bg-dark px-4 py-3">
               <Image
-                src="/logo2.png"
+                src="/logo.png"
                 alt="BR TECH"
-                width={70}
-                height={70}
-                className="h-20 w-auto"
+                width={411}
+                height={147}
+                className="h-9 w-auto"
               />
-
             </div>
             <p className="mt-3 max-w-md text-sm text-text-secondary">
               Diseñamos software que se adapta a tu operación, no operaciones que se adapten al software

@@ -121,9 +121,9 @@ function ContenidoBarra({ children }: { children: React.ReactNode }) {
         <Image
           src="/logo.png"
           alt="BR TECH"
-          width={100}
-          height={100}
-          className="h-11 w-auto"
+          width={411}
+          height={147}
+          className="h-9 w-auto"
         />
       </Link>
       <div className="mt-6 flex-1 overflow-y-auto">{children}</div>

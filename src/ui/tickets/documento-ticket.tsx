@@ -98,22 +98,22 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
     ticket.problemaReportado || ticket.diagnostico || ticket.trabajoRealizado
 
   return (
-    <div className="p-6 sm:p-8">
-      {/* Encabezado propio del documento (se ve siempre y también al imprimir) */}
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-5">
+    <div>
+      {/* Membrete: franja oscura a todo lo ancho (se ve siempre y al imprimir) */}
+      <header className="flex flex-wrap items-center justify-between gap-3 bg-bg-dark px-6 py-4 sm:px-8">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo2.png"
+            src="/logo.png"
             alt="BR TECH"
-            width={48}
-            height={48}
-            className="h-10 w-auto"
+            width={411}
+            height={147}
+            className="h-8 w-auto"
           />
-          <div>
-            <p className="text-xs uppercase tracking-wider text-text-muted">
+          <div className="border-l border-white/15 pl-3">
+            <p className="text-[11px] uppercase tracking-wider text-text-muted">
               Nota de servicio
             </p>
-            <p className="text-sm font-bold text-text-primary">{ticket.folio}</p>
+            <p className="text-sm font-bold text-white">{ticket.folio}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-text-muted">
@@ -122,7 +122,7 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
         </div>
       </header>
 
-      <div className="mt-6 space-y-7">
+      <div className="space-y-7 p-6 sm:p-8">
         {/* Cliente y equipo */}
         <div className="grid gap-3 sm:grid-cols-2">
           <DatoTile

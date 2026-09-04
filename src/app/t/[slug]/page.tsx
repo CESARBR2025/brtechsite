@@ -59,9 +59,9 @@ export default async function PaginaTicket({ params }: Props) {
             <Image
               src="/logo.png"
               alt="BR TECH"
-              width={120}
-              height={120}
-              className="h-12 w-auto"
+              width={411}
+              height={147}
+              className="h-10 w-auto"
               priority
             />
             <BotonImprimir variante="oscuro" />
