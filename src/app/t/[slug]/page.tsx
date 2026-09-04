@@ -72,8 +72,7 @@ export default async function PaginaTicket({ params }: Props) {
                 Hola{" "}
                 <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
                   {nombreDePila(ticket.cliente.nombre)}
-                </span>{" "}
-                👋
+                </span>
               </h1>
               <p className="mt-2 text-sm text-text-muted sm:text-base">
                 Este es el resumen de tu servicio.
