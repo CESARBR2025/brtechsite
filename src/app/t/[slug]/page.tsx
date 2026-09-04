@@ -66,18 +66,18 @@ export default async function PaginaTicket({ params }: Props) {
             <BotonImprimir variante="oscuro" />
           </div>
 
-          <div className="mt-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Nota de servicio · {ticket.folio}
-            </div>
-
-            <h1 className="mt-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
+          <div className="mt-10 flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">
               Resumen del{" "}
               <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
                 servicio
               </span>
             </h1>
+
+            <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              Nota de servicio · {ticket.folio}
+            </div>
           </div>
         </div>
       </div>
