@@ -1,6 +1,6 @@
-import { ContactoHero } from "@/src/features/contacto/hero"
-import { ContactForm } from "@/src/features/contacto/form"
-import { ContactInfo } from "@/src/features/contacto/info"
+import { ContactoHero } from "@/src/ui/marketing/contacto/hero"
+import { ContactForm } from "@/src/ui/marketing/contacto/form"
+import { ContactInfo } from "@/src/ui/marketing/contacto/info"
 
 export default function ContactoPage() {
   return (

@@ -119,3 +119,54 @@ colors: {
   warning:           '#F59E0B',   // amber-500
 }
 ```
+
+---
+
+## ARQUITECTURA — Hexagonal (puertos y adaptadores)
+
+> Toda feature con lógica de negocio sigue esta estructura. El marketing (páginas
+> estáticas) vive en `src/ui/marketing/` y no necesita capa de dominio.
+
+### Capas
+
+```
+src/modules/<modulo>/
+  domain/          Entidades, value objects, invariantes y PUERTOS (interfaces).
+                   No importa nada de infraestructura ni de Next.
+  application/     Casos de uso: orquestan el dominio. Reciben puertos por
+                   constructor. DTOs de entrada/salida con primitivas.
+  infrastructure/  ADAPTADORES: implementan los puertos (Postgres, Resend…),
+                   el contenedor de composición y las server actions delgadas.
+src/ui/            Componentes de presentación (React). Sin acceso a BD.
+src/app/           Solo routing y composición: la página llama a un caso de uso
+                   vía el contenedor del módulo y pasa DTOs a componentes de ui/.
+```
+
+### Reglas
+
+1. **Dirección de dependencias:** `app`/`ui` → `application` → `domain`.
+   `infrastructure` → `domain`. El dominio no depende de nadie.
+2. **Sin ORM.** Persistencia con `pg` + `Pool` (`src/modules/shared/infrastructure/db/pool.ts`)
+   y SQL parametrizado. Migraciones con `node-pg-migrate` (`npm run migrate:up`).
+3. **Dinero** siempre como enteros de centavos (`Dinero` VO). Nunca floats en BD.
+4. Cada módulo expone un **contenedor** (`infrastructure/contenedor.ts`) que la
+   presentación importa; nunca se instancian adaptadores en `app/` o `ui/`.
+5. **Server actions** (`"use server"`) solo traducen entrada → caso de uso →
+   `{ ok, error }`. Nada de lógica ahí. No exportan tipos (van en `tipos.ts`).
+6. **Tests** (`vitest`): dominio y casos de uso con dobles en memoria
+   (`src/testing/dobles.ts`). Integración de adaptadores con `RUN_DB_TESTS=1`.
+7. Estilos: **`DESIGNS.md`** manda. No inventar tokens.
+
+### Módulos actuales
+
+- `tickets/` — tickets de servicio. Público en `/t/[slug]`, captura en `/panel`.
+- `contacto/` — formulario de contacto (adaptador Resend).
+- `panel/` — sesión del panel (cookie HMAC, la valida `src/proxy.ts`).
+- `shared/` — `Dinero`, errores, puertos `Reloj`/`GeneradorId`, `pool`, `env` (zod).
+
+### Base de datos
+
+`brtech_site` en el contenedor `parrillasoft-db` del VPS (Postgres 17, compartido
+con parrilla). Rol `brtech_app` con `CONNECTION LIMIT 5` y `statement_timeout`.
+En dev se llega por túnel SSH a `127.0.0.1:5433`. En prod (Dokploy) el host es
+`parrillasoft-db:5432` por la red `dokploy-network`.
