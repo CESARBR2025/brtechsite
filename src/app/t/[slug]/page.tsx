@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
-import { CalendarDays, CheckCircle2, Clock, Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import { tickets } from "@/src/modules/tickets/infrastructure/contenedor"
-import { formatearDinero, formatearFecha } from "@/src/ui/formato"
+import { formatearDinero } from "@/src/ui/formato"
 import { BloqueConoceMas } from "@/src/ui/tickets/bloque-conoce-mas"
 import { BotonImprimir } from "@/src/ui/tickets/boton-imprimir"
 import { DocumentoTicket } from "@/src/ui/tickets/documento-ticket"
@@ -40,23 +40,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-function StatHero({
-  etiqueta,
-  children,
-}: {
-  etiqueta: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
-      <p className="text-[11px] font-medium uppercase tracking-wider text-text-muted">
-        {etiqueta}
-      </p>
-      <div className="mt-1 text-sm font-semibold text-white">{children}</div>
-    </div>
-  )
-}
-
 export default async function PaginaTicket({ params }: Props) {
   const { slug } = await params
   const ticket = await cargar(slug)
@@ -70,7 +53,7 @@ export default async function PaginaTicket({ params }: Props) {
         <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute -bottom-40 right-0 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 
-        <div className="relative mx-auto max-w-3xl px-4 pb-20 pt-10 sm:px-6">
+        <div className="relative mx-auto max-w-3xl px-4 pb-16 pt-10 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <Image
               src="/logo.png"
@@ -95,34 +78,6 @@ export default async function PaginaTicket({ params }: Props) {
                 servicio
               </span>
             </h1>
-
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <StatHero etiqueta="Fecha de servicio">
-                <span className="flex items-center gap-1.5">
-                  <CalendarDays className="h-4 w-4 text-primary" />
-                  {formatearFecha(ticket.fechaServicio)}
-                </span>
-              </StatHero>
-              <StatHero etiqueta="Total">
-                <span className="text-base font-bold tabular-nums">
-                  {formatearDinero(ticket.total, ticket.moneda)}
-                </span>
-              </StatHero>
-              <StatHero etiqueta="Estado">
-                <span
-                  className={`flex items-center gap-1.5 ${
-                    ticket.pagado ? "text-success" : "text-warning"
-                  }`}
-                >
-                  {ticket.pagado ? (
-                    <CheckCircle2 className="h-4 w-4" />
-                  ) : (
-                    <Clock className="h-4 w-4" />
-                  )}
-                  {ticket.pagado ? "Pagado" : "Pendiente"}
-                </span>
-              </StatHero>
-            </div>
           </div>
         </div>
       </div>
