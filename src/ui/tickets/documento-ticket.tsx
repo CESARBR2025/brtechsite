@@ -1,6 +1,5 @@
 import Image from "next/image"
 import {
-  CalendarDays,
   ClipboardList,
   Laptop,
   Lightbulb,
@@ -13,7 +12,7 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import type { TicketPublicoDTO } from "@/src/modules/tickets/application/dtos"
-import { formatearDinero, formatearFecha } from "@/src/ui/formato"
+import { formatearDinero } from "@/src/ui/formato"
 import { BadgePago } from "@/src/ui/primitivos/badge-estado"
 
 function SeccionTitulo({
@@ -101,22 +100,10 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
       {/* Filo superior de marca (pantalla) */}
       <div className="h-1 bg-gradient-to-r from-primary to-primary-hover print:hidden" />
 
-      {/* Cabecera compacta (pantalla) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4 print:hidden sm:px-8">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-            Nota de servicio
-          </p>
-          <p className="text-base font-bold text-text-primary">{ticket.folio}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 text-xs text-text-muted">
-            <CalendarDays className="h-3.5 w-3.5" />
-            {formatearFecha(ticket.fechaServicio)}
-          </span>
-          <BadgePago pagado={ticket.pagado} />
-        </div>
-      </div>
+      {/* Subtítulo (pantalla) */}
+      <p className="border-b border-border px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.2em] text-text-muted print:hidden sm:px-8">
+        Desglose de servicio
+      </p>
 
       <div className="space-y-8 p-6 sm:p-8">
         {/* Cliente y equipo */}
