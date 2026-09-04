@@ -20,7 +20,7 @@ export default function PaginaLogin() {
       <div className="pointer-events-none absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(124,58,237,0.55)]" />
 
       <div className="relative w-full max-w-sm">
-        <div className="relative mt-10 rounded-2xl border border-white/10 bg-white/5 px-8 pb-8 pt-14 shadow-2xl backdrop-blur-sm">
+        <div className="relative mt-14 rounded-2xl border border-white/10 bg-white/5 px-8 pb-8 pt-20 shadow-2xl backdrop-blur-sm">
           {/* Filo superior iluminado */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
@@ -28,10 +28,10 @@ export default function PaginaLogin() {
           <Image
             src="/logo.png"
             alt="BR TECH"
-            width={140}
-            height={140}
+            width={200}
+            height={200}
             priority
-            className="absolute left-1/2 top-0 h-14 w-auto -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-0 h-24 w-auto -translate-x-1/2 -translate-y-1/2"
           />
 
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
