@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { Send, User, Mail, MessageSquare, CheckCircle, Sparkles, ArrowRight, Loader2 } from "lucide-react"
-// 1. IMPORTA TU BACKEND (Asegúrate de ajustar la ruta si guardaste el archivo en otro lado)
-import { sendContactEmail } from "../emails/actions/send-email"
+import { enviarMensajeContacto } from "@/src/modules/contacto/infrastructure/acciones-contacto"
 
 const reasons = [
   "Diagnóstico gratis de tu negocio",
@@ -18,24 +17,19 @@ export function ContactForm() {
   // Estado opcional por si quieres capturar y mostrar un error si falla Resend
   const [error, setError] = useState<string | null>(null)
 
-  // 2. MODIFICA EL MANEJADOR DEL FORMULARIO
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsPending(true)
     setError(null)
 
-    // Obtenemos de forma nativa todos los inputs del formulario
     const formData = new FormData(e.currentTarget)
-
-    // Invocamos de forma segura la Server Action de Resend
-    const result = await sendContactEmail(formData)
+    const result = await enviarMensajeContacto(formData)
 
     setIsPending(false)
 
     if (result.success) {
       setSent(true)
     } else {
-      // Si la API key está mal o falló algo en Vercel, capturamos el error
       setError(result.error || "Hubo un error al enviar el mensaje.")
     }
   }
