@@ -1,4 +1,4 @@
-import { Mail, MapPin, Clock, ArrowRight, ExternalLink } from "lucide-react"
+import { Mail, MapPin, Clock, ExternalLink } from "lucide-react"
 
 const contactInfo = [
   {
@@ -21,16 +21,9 @@ const contactInfo = [
 ]
 
 const stats = [
-  { label: "Proyectos entregados", value: "+50" },
-  { label: "Clientes satisfechos", value: "95%" },
+  { label: "Cadena en producción", value: "1" },
+  { label: "Sucursales activas", value: "2" },
   { label: "Respuesta promedio", value: "24 h" },
-]
-
-const socialLinks = [
-  { label: "LinkedIn", href: "#" },
-  { label: "GitHub", href: "#" },
-  { label: "Facebook", href: "#" },
-  { label: "Instagram", href: "#" },
 ]
 
 export function ContactInfo() {

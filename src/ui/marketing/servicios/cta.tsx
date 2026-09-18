@@ -12,7 +12,7 @@ export function ServiciosCTA() {
           <Sparkles className="h-7 w-7 text-primary" />
         </div>
 
-        <h2 className="mt-6 text-[22px] font-bold text-white sm:text-3xl">
+        <h2 className="mt-6 text-balance text-[26px] font-bold tracking-tight text-white sm:text-[34px]">
           ¿No sabes cuál elegir?
         </h2>
         <p className="mt-4 text-base text-text-muted">

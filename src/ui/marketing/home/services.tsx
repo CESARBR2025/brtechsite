@@ -47,7 +47,7 @@ export function ServicesSection() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary-light px-4 py-1.5 text-xs font-medium text-primary">
             Nuestro Portafolio
           </div>
-          <h2 className="mt-4 text-[22px] font-bold text-text-primary sm:text-3xl">
+          <h2 className="mt-4 text-balance text-[26px] font-bold tracking-tight text-text-primary sm:text-[34px]">
             Servicios que Transforman
           </h2>
         </div>
@@ -55,10 +55,9 @@ export function ServicesSection() {
           {services.map((service) => (
             <div
               key={service.title}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-card transition-all hover:border-primary/30 hover:shadow-hover"
+              className="group flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-card transition-all hover:border-primary/30 hover:shadow-hover"
             >
-              <div className="absolute right-0 top-0 h-20 w-20 translate-x-6 -translate-y-6 rounded-full bg-primary-light/30 transition-all group-hover:scale-150" />
-              <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary/10 text-primary shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-light to-primary/10 text-primary shadow-sm">
                 <service.icon className="h-6 w-6" />
               </div>
               <p className="relative mt-4 text-xs font-semibold uppercase tracking-wider text-primary">

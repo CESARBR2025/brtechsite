@@ -1,13 +1,24 @@
 import Link from "next/link"
-import { ChevronRight, TrendingUp, Zap, Shield, Sparkles } from "lucide-react"
+import Image from "next/image"
+import { ChevronRight, ChevronDown, Sparkles } from "lucide-react"
+
+const clientes = [
+  { marca: "Parrilla Norteña", sucursal: "Sucursal Lomas" },
+  { marca: "Parrilla Norteña", sucursal: "Sucursal Club Punta Nogal" },
+]
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-bg-dark">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      {/* Rejilla con máscara para que se desvanezca hacia los bordes */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_35%,black_10%,transparent_75%)]" />
+
+      {/* Resplandor central + halo cónico que gira lento */}
+      <div className="absolute left-1/2 top-[36%] h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.30),transparent_62%)] blur-2xl" />
+      <div className="absolute left-1/2 top-[36%] h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg,transparent,rgba(124,58,237,0.16),transparent_45%)] blur-3xl motion-safe:animate-[spin_32s_linear_infinite]" />
+
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-      <div className="absolute left-1/2 top-1/3 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
@@ -16,15 +27,16 @@ export function HeroSection() {
             Resultados medibles en 90 días
           </div>
 
-          <h1 className="mt-6 text-[28px] font-bold leading-tight text-white sm:text-4xl md:text-5xl">
+          <h1 className="mt-6 text-balance text-[32px] font-bold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl">
             Tu negocio es diferente.{" "}
-            <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+            <span className="bg-gradient-to-br from-primary-light to-primary bg-clip-text text-transparent">
               Tu software también debería de serlo
             </span>
           </h1>
-          <p className="mt-4 text-base text-text-muted sm:text-lg">
-            Diseñamos software que se adapta a tu operación, no operaciones que
-            se adapten al software
+
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/70 sm:text-lg">
+            Diseñamos un software que se adapte a ti, a tu operación, a tu
+            entorno.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -36,26 +48,56 @@ export function HeroSection() {
               <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
-              href="/servicios"
+              href="/#proyectos"
               className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 bg-white/5 px-7 py-3 text-sm font-medium text-text-muted shadow-lg backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white sm:w-auto"
             >
-              Nuestros servicios
+              Ver proyectos
             </Link>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-text-muted">
-            <div className="flex items-center gap-2 rounded-full bg-white/5 px-3.5 py-1.5">
-              <TrendingUp className="h-3.5 w-3.5 text-success" />
-              Software diseñado para tu negocio
+          <div className="mx-auto mt-14 max-w-2xl">
+            <div className="flex items-center gap-3">
+              <span className="h-px flex-1 bg-white/10" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+                Nuestros Clientes
+              </span>
+              <span className="h-px flex-1 bg-white/10" />
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-white/5 px-3.5 py-1.5">
-              <Shield className="h-3.5 w-3.5 text-primary" />
-              +50 proyectos entregados
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {clientes.map((c) => (
+                <div
+                  key={c.sucursal}
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-left shadow-lg backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10"
+                >
+                  <div className="flex h-16 w-24 flex-shrink-0 items-center justify-center rounded-lg bg-white p-2">
+                    <Image
+                      src="/clientes/parrilla-nortena/logo-arracheras.png"
+                      alt={`${c.marca} — ${c.sucursal}`}
+                      width={659}
+                      height={379}
+                      className="max-h-full w-auto object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold leading-snug text-white">
+                      {c.sucursal}
+                    </p>
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-text-muted">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 motion-safe:animate-ping" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+                      </span>
+                      En operación
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-white/5 px-3.5 py-1.5">
-              <Zap className="h-3.5 w-3.5 text-warning" />
-              Resultados en semanas, no meses
-            </div>
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <ChevronDown className="h-5 w-5 text-white/25 motion-safe:animate-bounce" />
           </div>
         </div>
       </div>

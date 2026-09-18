@@ -3,10 +3,11 @@ import { ChevronRight, Calendar, MessageCircle, Sparkles } from "lucide-react"
 
 export function CTASection() {
   return (
-    <section className="relative overflow-hidden py-16 sm:py-24">
+    <section className="relative overflow-hidden py-20 sm:py-28">
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary-hover" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08)_0%,transparent_60%)]" />
-      <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_at_50%_40%,black_10%,transparent_75%)]" />
+      <div className="absolute left-1/2 top-1/3 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.14),transparent_60%)] blur-2xl" />
+      <div className="absolute left-1/2 top-1/3 h-[44rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_120deg,transparent,rgba(255,255,255,0.10),transparent_40%)] blur-3xl motion-safe:animate-[spin_36s_linear_infinite]" />
       <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
 
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
@@ -14,12 +15,12 @@ export function CTASection() {
           <Sparkles className="h-8 w-8 text-white" />
         </div>
 
-        <h2 className="mt-6 text-[22px] font-bold text-white sm:text-3xl">
+        <h2 className="mt-6 text-balance text-[26px] font-bold tracking-tight text-white sm:text-[34px]">
           ¿Listo para llevar tu negocio al siguiente nivel?
         </h2>
         <p className="mt-4 text-base text-primary-light">
-          Permitenos conocer tu negocio desde el interior para brindarte una
-          solucion en el exterior.
+          Cuéntanos cómo funciona tu negocio por dentro y te proponemos la
+          solución correcta.
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

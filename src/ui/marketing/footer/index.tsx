@@ -1,21 +1,12 @@
-"use client"
-
-import Link from "next/link"
 import Image from "next/image"
 import { Mail, MapPin } from "lucide-react"
 
 const socialLinks = [
-  { label: "Facebook", href: "#" },
-  { label: "X", href: "#" },
-  { label: "Instagram", href: "#" },
-  { label: "YouTube", href: "#" },
-  { label: "LinkedIn", href: "#" },
-]
-
-const footerLinks = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms", href: "#" },
-  { label: "Contact", href: "/contacto" },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/cesar-ivan-barcenas-rosales-a74a83378/",
+  },
+  // TODO: Instagram — agregar la URL del perfil cuando esté disponible.
 ]
 
 export function Footer() {
@@ -34,21 +25,24 @@ export function Footer() {
               />
             </div>
             <p className="mt-3 max-w-md text-sm text-text-secondary">
-              Diseñamos software que se adapta a tu operación, no operaciones que se adapten al software
-
-
+              Diseñamos un software que se adapte a ti, a tu operación, a tu
+              entorno.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {socialLinks.map((social) => (
-                <Link
-                  key={social.label}
-                  href={social.href}
-                  className="rounded-md border border-border px-3 py-1.5 text-xs text-text-secondary transition-colors hover:bg-background"
-                >
-                  {social.label}
-                </Link>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-md border border-border px-3 py-1.5 text-xs text-text-secondary transition-colors hover:bg-background"
+                  >
+                    {social.label}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -58,27 +52,26 @@ export function Footer() {
             <ul className="mt-4 space-y-3">
               <li>
                 <a
-                  href="mailto:hola@brtech.com"
-                  className="flex items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary min-w-0"
+                  href="mailto:barcenasrosalescesarivan@gmail.com"
+                  className="flex min-w-0 items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary"
                 >
                   <Mail className="h-4 w-4 flex-shrink-0" />
-                  <span className="break-all">barcenasrosalescesarivan@gmail.com</span>
+                  <span className="break-all">
+                    barcenasrosalescesarivan@gmail.com
+                  </span>
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-text-secondary">
                 <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                San Juan del Rio, QRO
+                San Juan del Río, Querétaro
               </li>
             </ul>
           </div>
-
-
         </div>
 
         <div className="mt-10 border-t border-border pt-6">
           <p className="text-center text-xs text-text-muted">
-            &copy; {new Date().getFullYear()} BR TECH DS | Privacy Policy | Terms |
-            Contact
+            &copy; {new Date().getFullYear()} BR TECH DS
           </p>
         </div>
       </div>

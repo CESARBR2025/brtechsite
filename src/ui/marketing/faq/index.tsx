@@ -43,7 +43,7 @@ export function FAQSection() {
             <HelpCircle className="h-3.5 w-3.5" />
             FAQ
           </div>
-          <h2 className="mt-4 text-[22px] font-bold text-text-primary sm:text-3xl">
+          <h2 className="mt-4 text-balance text-[26px] font-bold tracking-tight text-text-primary sm:text-[34px]">
             Preguntas Frecuentes
           </h2>
         </div>

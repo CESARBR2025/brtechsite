@@ -38,7 +38,7 @@ export function ProcessSection() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary-light px-4 py-1.5 text-xs font-medium text-primary">
             Nuestro Método
           </div>
-          <h2 className="mt-4 text-[22px] font-bold text-text-primary sm:text-3xl">
+          <h2 className="mt-4 text-balance text-[26px] font-bold tracking-tight text-text-primary sm:text-[34px]">
             Tu problema + tu visión = una solución hecha a la medida de tu
             negocio
           </h2>

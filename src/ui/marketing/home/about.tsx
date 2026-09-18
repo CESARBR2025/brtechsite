@@ -1,23 +1,23 @@
-import { Briefcase, DollarSign, Heart } from "lucide-react"
+import { Briefcase, Rocket, Server } from "lucide-react"
 
 const stats = [
   {
     icon: Briefcase,
-    value: "Flexibilidad",
+    value: "A la medida",
     label:
-      "Desarrollo de software adaptado a la escala y realidad de cada empresa",
+      "Cada sistema se construye alrededor de tu operación, no de una plantilla",
   },
   {
-    icon: DollarSign,
-    value: "- Merma",
+    icon: Rocket,
+    value: "En producción",
     label:
-      "Reducción de pérdidas operativas por procesos manuales",
+      "Ya opera todos los días en una cadena restaurantera real",
   },
   {
-    icon: Heart,
-    value: "100%",
+    icon: Server,
+    value: "Stack moderno",
     label:
-      "Soluciones diseñadas alrededor del negocio del cliente",
+      "Next.js y PostgreSQL en servidor dedicado con respaldos diarios",
   },
 ]
 
@@ -32,7 +32,7 @@ export function AboutSection() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary-light px-4 py-1.5 text-xs font-medium text-primary">
             Quiénes Somos
           </div>
-          <h2 className="mt-4 text-[22px] font-bold text-text-primary sm:text-3xl">
+          <h2 className="mt-4 text-balance text-[26px] font-bold tracking-tight text-text-primary sm:text-[34px]">
             Diseñadores de Software de Operación
           </h2>
           <p className="mt-4 text-base leading-relaxed text-text-secondary">
@@ -51,10 +51,9 @@ export function AboutSection() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-6 text-center shadow-card transition-all hover:border-primary/30 hover:shadow-hover"
+              className="group rounded-2xl border border-border bg-surface p-6 text-center shadow-card transition-all hover:border-primary/30 hover:shadow-hover"
             >
-              <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary-light/50 transition-all group-hover:scale-150" />
-              <div className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-light to-primary/10 text-primary shadow-sm">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-light to-primary/10 text-primary shadow-sm">
                 <stat.icon className="h-7 w-7" />
               </div>
               <p className="relative mt-4 text-[28px] font-bold text-primary">

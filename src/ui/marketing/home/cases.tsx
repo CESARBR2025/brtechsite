@@ -31,7 +31,7 @@ export function CasesSection() {
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             Social Proof
           </p>
-          <h2 className="mt-2 text-[22px] font-bold text-text-primary sm:text-3xl">
+          <h2 className="mt-2 text-balance text-[26px] font-bold tracking-tight text-text-primary sm:text-[34px]">
             Resultados Reales de Clientes Reales
           </h2>
         </div>
