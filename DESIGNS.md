@@ -14,13 +14,13 @@ Fuente: **Inter** (cargada en `src/app/layout.tsx` vía `next/font`), fallback `
 
 | Token | HEX | Clase | Uso |
 |---|---|---|---|
-| `primary` | `#7C3AED` | `bg-primary` `text-primary` `border-primary` | Marca, CTA primario, elementos activos, íconos destacados |
-| `primary-hover` | `#5B21B6` | `hover:bg-primary-hover` | Hover de botones, extremo profundo de degradados |
-| `primary-light` | `#EDE9FE` | `bg-primary-light` `text-primary` | Fondos suaves, badges de marca, "eyebrow" labels, botón secundario |
+| `primary` | `#7836E2` | `bg-primary` `text-primary` `border-primary` | Marca, CTA primario, elementos activos, íconos destacados |
+| `primary-hover` | `#471FA3` | `hover:bg-primary-hover` | Hover de botones, extremo profundo de degradados |
+| `primary-light` | `#F1EBFF` | `bg-primary-light` `text-primary` | Fondos suaves, badges de marca, "eyebrow" labels, botón secundario |
 | `success` | `#10B981` | `bg-success` `text-success` | Estado OK, "Publicado", "Pagado", indicadores positivos |
 | `success-light` | `#D1FAE5` | `bg-success-light` | Fondo de pills de estado positivo |
 | `warning` | `#F59E0B` | `bg-warning` `text-warning` | "Pendiente", alertas, ratings |
-| `bg-dark` | `#1E1B2E` | `bg-bg-dark` | Navbar, footer, secciones hero oscuras, bloque "Conoce más" |
+| `bg-dark` | `#151127` | `bg-bg-dark` | Navbar, footer, secciones hero oscuras, bloque "Conoce más" |
 | `text-primary` | `#111827` | `text-text-primary` | Títulos, montos grandes |
 | `text-secondary` | `#374151` | `text-text-secondary` | Párrafos, labels de formulario |
 | `text-muted` | `#6B7280` | `text-text-muted` | Texto atenuado, placeholders, metadatos |
@@ -166,7 +166,7 @@ Error de campo/formulario: `rounded-lg border border-red-500/20 bg-red-500/10 p-
 ### Decoración (opcional, no abusar)
 - Blob: `absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl`
 - Grid sutil sobre fondo oscuro:
-  `absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]`
+  `absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px]`
 - Siempre dentro de un contenedor `relative overflow-hidden`; el contenido va en un hijo `relative`.
 
 ---

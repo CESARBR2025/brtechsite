@@ -19,8 +19,8 @@ export function Footer() {
               <Image
                 src="/logo.png"
                 alt="BR TECH"
-                width={411}
-                height={147}
+                width={566}
+                height={191}
                 className="h-9 w-auto"
               />
             </div>

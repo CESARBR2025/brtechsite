@@ -3,7 +3,7 @@ import { MessageCircle, Clock, BadgeCheck, Zap } from "lucide-react"
 export function ContactoHero() {
   return (
     <section className="relative overflow-hidden bg-bg-dark">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -right-32 bottom-0 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
 

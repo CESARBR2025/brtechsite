@@ -17,23 +17,23 @@
 
 ### Primary
 
-- **HEX:** `#7C3AED`
-- **RGB:** `rgb(124, 58, 237)`
-- **HSL:** `hsl(263, 83%, 57%)`
+- **HEX:** `#7836E2`
+- **RGB:** `rgb(120, 54, 226)`
+- **HSL:** `hsl(263, 75%, 55%)`
 - **Uso:** Color de marca principal, CTAs, botones primarios, elementos activos de sidebar, barras de progreso activas, íconos destacados
 
 ### Primary Hover & Accent
 
-- **HEX:** `#5B21B6`
-- **RGB:** `rgb(91, 33, 182)`
-- **HSL:** `hsl(263, 70%, 42%)`
+- **HEX:** `#471FA3`
+- **RGB:** `rgb(71, 31, 163)`
+- **HSL:** `hsl(258, 68%, 38%)`
 - **Uso:** Hover de botones, acentos secundarios, elementos de énfasis, degradados profundos
 
 ### Primary Light / Highlight
 
-- **HEX:** `#EDE9FE`
-- **RGB:** `rgb(237, 233, 254)`
-- **HSL:** `hsl(250, 100%, 96%)`
+- **HEX:** `#F1EBFF`
+- **RGB:** `rgb(241, 235, 255)`
+- **HSL:** `hsl(258, 100%, 96%)`
 - **Uso:** Fondos suaves, badges de marca, highlights, barras de gráficos secundarias (Expense)
 
 ### Success
@@ -59,9 +59,9 @@
 
 ### Background Dark (Layout structural)
 
-- **HEX:** `#1E1B2E`
-- **RGB:** `rgb(30, 27, 46)`
-- **HSL:** `hsl(253, 25%, 14%)`
+- **HEX:** `#151127`
+- **RGB:** `rgb(21, 17, 39)`
+- **HSL:** `hsl(251, 39%, 11%)`
 - **Uso:** Navbar, footer, tarjeta de crédito (gradiente/fondo oscuro)
 
 ### Text Primary & Headings
@@ -105,12 +105,12 @@
 
 ```js
 colors: {
-  primary:           '#7C3AED',   // violet-600
-  'primary-hover':   '#5B21B6',   // violet-800
-  'primary-light':   '#EDE9FE',   // violet-100
+  primary:           '#7836E2',   // violeta frío (marca)
+  'primary-hover':   '#471FA3',   // violeta frío profundo
+  'primary-light':   '#F1EBFF',   // violeta frío muy claro
   success:           '#10B981',   // emerald-500
   'success-light':   '#D1FAE5',   // emerald-100
-  'bg-dark':         '#1E1B2E',   // custom deep dark
+  'bg-dark':         '#151127',   // custom deep dark (indigo frío)
   'text-primary':    '#111827',   // gray-900
   'text-secondary':  '#374151',   // gray-700
   'text-muted':      '#6B7280',   // gray-500

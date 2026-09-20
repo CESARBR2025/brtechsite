@@ -28,8 +28,8 @@ export function Navbar() {
           <Image
             src="/logo.png"
             alt="BR TECH"
-            width={411}
-            height={147}
+            width={566}
+            height={191}
             priority
             className="h-9 w-auto sm:h-10"
           />

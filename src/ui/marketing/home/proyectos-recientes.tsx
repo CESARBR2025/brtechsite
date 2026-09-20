@@ -31,7 +31,7 @@ export function ProyectosRecientesSection() {
       id="proyectos"
       className="relative scroll-mt-20 overflow-hidden bg-bg-dark py-20 sm:py-28"
     >
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.06)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_20%,black_10%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.06)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_20%,black_10%,transparent_70%)]" />
       <div className="absolute -right-40 top-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
 

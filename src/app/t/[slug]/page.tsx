@@ -49,7 +49,7 @@ export default async function PaginaTicket({ params }: Props) {
     <main className="min-h-screen bg-bg-section">
       {/* Hero de marca */}
       <div className="no-print relative overflow-hidden bg-bg-dark">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
         <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute -bottom-40 right-0 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 
@@ -58,8 +58,8 @@ export default async function PaginaTicket({ params }: Props) {
             <Image
               src="/logo.png"
               alt="BR TECH"
-              width={411}
-              height={147}
+              width={566}
+              height={191}
               className="h-10 w-auto"
               priority
             />

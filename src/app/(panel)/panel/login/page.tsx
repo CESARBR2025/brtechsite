@@ -6,17 +6,17 @@ export default function PaginaLogin() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-dark px-4 py-16">
       {/* Rejilla de fondo */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
       {/* Punto de luz — esquina superior izquierda */}
       <div className="pointer-events-none absolute -left-20 -top-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
       <div className="pointer-events-none absolute -left-8 -top-8 h-32 w-32 rounded-full bg-primary/50 blur-2xl" />
-      <div className="pointer-events-none absolute left-2 top-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(124,58,237,0.6)]" />
+      <div className="pointer-events-none absolute left-2 top-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(120,54,226,0.6)]" />
 
       {/* Punto de luz — esquina inferior derecha */}
       <div className="pointer-events-none absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-primary/45 blur-2xl" />
-      <div className="pointer-events-none absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(124,58,237,0.55)]" />
+      <div className="pointer-events-none absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_28px_10px_rgba(120,54,226,0.55)]" />
 
       <div className="relative w-full max-w-sm">
         <div className="relative mt-12 rounded-2xl border border-white/10 bg-white/5 px-8 pb-8 pt-16 shadow-2xl backdrop-blur-sm">
@@ -27,8 +27,8 @@ export default function PaginaLogin() {
           <Image
             src="/logo.png"
             alt="BR TECH"
-            width={411}
-            height={147}
+            width={566}
+            height={191}
             priority
             className="absolute left-1/2 top-0 h-16 w-auto -translate-x-1/2 -translate-y-1/2"
           />

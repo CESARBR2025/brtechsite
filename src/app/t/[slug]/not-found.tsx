@@ -5,7 +5,7 @@ import { ChevronRight, FileQuestion } from "lucide-react"
 export default function TicketNoEncontrado() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-bg-dark px-4 text-center">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
 
@@ -13,8 +13,8 @@ export default function TicketNoEncontrado() {
         <Image
           src="/logo.png"
           alt="BR TECH"
-          width={411}
-          height={147}
+          width={566}
+          height={191}
           className="mx-auto h-12 w-auto"
         />
 

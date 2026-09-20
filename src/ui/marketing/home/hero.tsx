@@ -11,11 +11,11 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-bg-dark">
       {/* Rejilla con máscara para que se desvanezca hacia los bordes */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.07)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_35%,black_10%,transparent_75%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_35%,black_10%,transparent_75%)]" />
 
       {/* Resplandor central + halo cónico que gira lento */}
-      <div className="absolute left-1/2 top-[36%] h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.30),transparent_62%)] blur-2xl" />
-      <div className="absolute left-1/2 top-[36%] h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg,transparent,rgba(124,58,237,0.16),transparent_45%)] blur-3xl motion-safe:animate-[spin_32s_linear_infinite]" />
+      <div className="absolute left-1/2 top-[36%] h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(120,54,226,0.30),transparent_62%)] blur-2xl" />
+      <div className="absolute left-1/2 top-[36%] h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg,transparent,rgba(120,54,226,0.16),transparent_45%)] blur-3xl motion-safe:animate-[spin_32s_linear_infinite]" />
 
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />

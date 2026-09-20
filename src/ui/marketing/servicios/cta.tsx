@@ -4,7 +4,7 @@ import { Calendar, ChevronRight, MessageCircle, Sparkles } from "lucide-react"
 export function ServiciosCTA() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-bg-dark via-bg-dark to-primary/20 py-16 sm:py-24">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.06)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.06)_1px,transparent_1px)] bg-[size:64px_64px]" />
       <div className="absolute left-1/3 top-0 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">

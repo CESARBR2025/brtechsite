@@ -190,7 +190,7 @@ export function ServiceList() {
             id={service.title.toLowerCase().replace(/\s+/g, "-")}
             className={`relative overflow-hidden ${bg}`}>
             {isDark && (
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:64px_64px]" />
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.05)_1px,transparent_1px)] bg-[size:64px_64px]" />
             )}
 
             <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
