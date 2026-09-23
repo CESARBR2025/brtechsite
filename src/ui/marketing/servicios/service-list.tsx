@@ -1,394 +1,151 @@
 import Link from "next/link"
+import { ArrowRight, Check, Minus, TrendingUp } from "lucide-react"
+import { servicios } from "@/src/ui/marketing/servicios/datos"
 import {
-  ShoppingCart,
-  Settings,
-  ArrowRight,
-  Globe,
-  Check,
-  X,
-  Clock,
-  Star,
-  TrendingUp,
-  Users,
-  BarChart3,
-  Layers,
-  Zap,
-  Calculator,
-  ClipboardList,
-  Smartphone,
-  Search,
-  Palette,
-  MessageSquare,
-} from "lucide-react"
+  IlustracionInventario,
+  IlustracionMultisucursal,
+  IlustracionWeb,
+} from "@/src/ui/marketing/home/ilustraciones-servicios"
 
-const services = [
+const ilustraciones: Record<string, () => React.JSX.Element> = {
+  "sistema-pos-para-restaurantes": IlustracionMultisucursal,
+  "control-de-inventarios": IlustracionInventario,
+  "tu-negocio-digital": IlustracionWeb,
+}
 
-  {
-    icon: Settings,
-    title: "Control de Inventarios",
-    tagline: "Elimina tu venda de stock faltante",
-    description:
-      "Sistema para controlar entradas, salidas y existencias en tiempo real. Reduce errores y evita fugas de inventario.",
-    price: "$6,000 MXN",
-    problem: [
-      "No sabes cuánto inventario tienes sin contar manualmente",
-      "Se te acaban insumos en horas pico y no lo prevés",
-      "Diferencias entre lo que compras y lo que vendes",
-    ],
-    includes: [
-      "Control de entradas y salidas",
-      "Stock en tiempo real",
-      "Alertas automáticas de reorden",
-      "Movimientos registrados con usuario",
-      "Historial completo de ajustes",
-      "Reportes de rotación de inventario",
-      "Capacitación del equipo",
-    ],
-    excludes: [
-      "Integración con proveedores",
-      "Módulo de compras automatizado",
-      "Hardware (lectores, tablets)",
-    ],
-    process: [
-      { step: "Te conoceremos", desc: "Analizamos tu operación actual", time: "3 días" },
-      { step: "Identificación de tu problema", desc: "Buscaremos hasta encontrar el problema principal de tu negocio", time: "1 semana" },
-      { step: "Propuesta de desarrollo", desc: "Con tu validación, te presentaremos la funcionalidad de tu herramienta", time: "3 días" },
-      { step: "Desarrollo de tu herramienta", desc: "Desarrollaremos modulos y semana semana nos reuniremos contigo para presentarte avances realizados", time: "4 - 8 semanas" },
-      { step: "Tu capacitación", desc: "Nos encargaremos de capacitarte para que exprimas al maximo tu sistema", time: "1 día" },
-      { step: "Puesta en marcha", desc: "Cuando arranque, estaremos contigo para verificar que el funcionamiento sea el adecuado", time: "1 día" },
-      { step: "Entrega", desc: "Te brindaremos acceso a las funcionalidades finales del sistema y haremos entrega formal de tu herramienta", time: "1 día" },
-    ],
-    results: [
-      "Evita quiebres de stock en hora pico",
-      "Reduce mermas y fugas hasta 40%",
-      "Alertas automáticas de reorden",
-      "Decisiones basadas en datos reales",
-    ],
-    variables: [
-      { label: "+500 SKUs en catálogo", add: "+$1,000" },
-      { label: "Integración con POS existente", add: "+$1,500" },
-      { label: "Alertas Email", add: "+$500" },
-      { label: "Multi-sucursal", add: "+$2,000" },
-    ],
-  },
-  {
-    icon: ShoppingCart,
-    title: "Sistema POS para Restaurantes",
-    tagline: "Obten el control de tu operación",
-    description:
-      "Creamos tu herramienta diseñada a tu restaurante gestionando: mesas, pedidos, cocina e inventario integrados en una sola plataforma.",
-    price: "$7,000 MXN",
-    problem: [
-      "Aún tomas pedidos en papel y se pierden comandas",
-      "No sabes cuánto vendes hoy vs ayer en tiempo real",
-      "El inventario se descontrola y no sabes qué falta",
-    ],
-    includes: [
-      "Control de caja completo",
-      "Gestión de mesas y comandas",
-      "Órdenes en tiempo real a cocina",
-      "Conexión con ticket impresora externa",
-      "Reportes de ventas diarios",
-      "Dashboard con métricas clave",
-      "Capacitación del equipo",
-    ],
-    excludes: [
-      "Hardware (pantallas, impresoras)",
-      "Diseño de menús o branding",
-      "Pasarela de pagos integrada",
-    ],
-    process: [
-      { step: "Te conoceremos", desc: "Analizamos tu operación actual", time: "3 días" },
-      { step: "Identificación de tu problema", desc: "Buscaremos hasta encontrar el problema principal de tu negocio", time: "1 semana" },
-      { step: "Propuesta de desarrollo", desc: "Con tu validación, te presentaremos la funcionalidad de tu herramienta", time: "3 días" },
-      { step: "Desarrollo de tu herramienta", desc: "Desarrollaremos modulos y semana semana nos reuniremos contigo para presentarte avances realizados", time: "4 - 8 semanas" },
-      { step: "Tu capacitación", desc: "Nos encargaremos de capacitarte para que exprimas al maximo tu sistema", time: "1 día" },
-      { step: "Puesta en marcha", desc: "Cuando arranque, estaremos contigo para verificar que el funcionamiento sea el adecuado", time: "1 día" },
-      { step: "Entrega", desc: "Te brindaremos acceso a las funcionalidades finales del sistema y haremos entrega formal de tu herramienta", time: "1 día" },
-    ],
-    results: [
-      "Elimina errores en comandas",
-      "Agiliza el servicio al cliente",
-      "Reduce tiempos de espera",
-      "Reportes de ventas automáticos",
-    ],
-    variables: [
-      { label: "Multi-sucursal", add: "+$1,200" },
-      { label: "Vista para comensales", add: "+$1,000" },
-    ],
-  },
-  {
-    icon: Globe,
-    title: "Tu negocio digital",
-    tagline: "Haz que te encuentren",
-    description:
-      "Páginas web enfocadas en conversión para restaurantes y negocios locales. Diseñadas para generar reservas o pedidos.",
-    price: "$3,000 MXN",
-    problem: [
-      "No apareces en Google cuando te buscan",
-      "Competencia tiene web y redes, tú solo redes sociales",
-      "Clientes no pueden ver tu menú ni hacer pedidos online",
-    ],
-    includes: [
-      "Página web profesional (hasta 5 secciones)",
-      "Menú digital interactivo",
-      "Formulario de reservas o pedidos",
-      "Diseño responsive (móvil + desktop)",
-      "Optimización SEO básica",
-      "Hosting 12 meses incluido",
-      "Capacitación para actualizar contenido",
-    ],
-    excludes: [
-      "Fotografía profesional",
-      "Copia de textos (redacción)",
-      "Manejo de redes sociales",
-      "Pasarela de pagos integrada",
-    ],
-    process: [
-      { step: "Te conoceremos", desc: "Analizamos tu operación actual", time: "3 días" },
-      { step: "Identificación de tu problema", desc: "Buscaremos hasta encontrar el problema principal de tu negocio", time: "1 semana" },
-      { step: "Propuesta de desarrollo", desc: "Con tu validación, te presentaremos la funcionalidad de tu herramienta", time: "3 días" },
-      { step: "Desarrollo de tu herramienta", desc: "Desarrollaremos modulos y semana semana nos reuniremos contigo para presentarte avances realizados", time: "2 - 4 semanas" },
-      { step: "Tu capacitación", desc: "Nos encargaremos de capacitarte para que exprimas al maximo tu sistema", time: "1 día" },
-      { step: "Puesta en marcha", desc: "Cuando arranque, estaremos contigo para verificar que el funcionamiento sea el adecuado", time: "1 día" },
-      { step: "Entrega", desc: "Te brindaremos acceso a las funcionalidades finales del sistema y haremos entrega formal de tu herramienta", time: "1 día" },
-    ],
-    results: [
-      "Atrae clientes 24/7 desde Google",
-      "Genera reservas directas sin intermediarios",
-      "Menú digital siempre actualizado",
-      "Inversión desde $3,000 MXN",
-    ],
-    variables: [
-      { label: "Blog integrado (3 artículos/mes)", add: "+$500" },
-      { label: "Galería de fotos profesional", add: "+$500" },
-      { label: "Integración con sistema de pedidos", add: "+$1,000" },
-      { label: "SEO avanzado (5 keywords)", add: "+$1,000" },
-    ],
-  },
+// La rejilla cambia de lado en cada servicio para que no se repita
+const mascaras = [
+  "[mask-image:radial-gradient(ellipse_at_20%_30%,black_5%,transparent_60%)]",
+  "[mask-image:radial-gradient(ellipse_at_80%_40%,black_5%,transparent_60%)]",
+  "[mask-image:radial-gradient(ellipse_at_30%_70%,black_5%,transparent_60%)]",
 ]
 
-const serviceIcons = [
-  { icon: Smartphone, label: "Mobile first" },
-  { icon: BarChart3, label: "Reportes" },
-  { icon: Users, label: "Multi-usuario" },
-  { icon: Layers, label: "Escalable" },
-]
+function Etiqueta({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-white/55">{children}</h3>
+  )
+}
 
 export function ServiceList() {
   return (
-    <section>
-      {services.map((service, i) => {
-        const isDark = i % 2 !== 0
-        const bg = isDark ? "bg-bg-dark" : "bg-surface"
-        const textColor = isDark ? "text-white" : "text-text-primary"
-        const mutedColor = isDark ? "text-text-muted" : "text-text-secondary"
-
+    <>
+      {servicios.map((s, i) => {
+        const Ilustracion = ilustraciones[s.ancla]
         return (
-          <div
-            key={service.title}
-            id={service.title.toLowerCase().replace(/\s+/g, "-")}
-            className={`relative overflow-hidden ${bg}`}>
-            {isDark && (
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.05)_1px,transparent_1px)] bg-[size:64px_64px]" />
-            )}
+          <section
+            key={s.ancla}
+            id={s.ancla}
+            aria-labelledby={`${s.ancla}-titulo`}
+            className="relative scroll-mt-24 overflow-clip border-t border-line-dark bg-bg-dark py-24 sm:py-32"
+          >
+            <div
+              className={`absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.06)_1px,transparent_1px)] bg-[size:64px_64px] ${mascaras[i % mascaras.length]}`}
+            />
 
-            <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-              {/* Header */}
-              <div className="mx-auto max-w-3xl text-center">
-                <div
-                  className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl ${isDark ? "bg-primary/20 text-primary" : "bg-primary-light text-primary"
-                    }`}
+            <div className="relative mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-8">
+              {/* Izquierda: qué es (fija al hacer scroll) */}
+              <div className="lg:sticky lg:top-28 lg:self-start">
+                <span className="font-mono text-sm tabular-nums text-primary-light/60">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h2
+                  id={`${s.ancla}-titulo`}
+                  className="mt-3 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl"
                 >
-                  <service.icon className="h-8 w-8" />
-                </div>
-                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-primary">
-                  {service.tagline}
-                </p>
-                <h2 className={`mt-2 text-[26px] font-bold sm:text-4xl ${textColor}`}>
-                  {service.title}
+                  {s.titulo}
                 </h2>
-                <p className={`mt-3 text-base leading-relaxed ${mutedColor}`}>
-                  {service.description}
+                <p className="mt-5 text-pretty text-base leading-relaxed text-white/70 sm:text-lg">
+                  {s.descripcion}
                 </p>
+                {Ilustracion && (
+                  <div className="group mt-8 max-w-md">
+                    <Ilustracion />
+                  </div>
+                )}
+                <Link
+                  href="/contacto"
+                  className="group/enlace mt-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white outline-none transition-all hover:border-primary hover:bg-primary hover:shadow-lg hover:shadow-primary/30 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
+                >
+                  Cotiza este servicio
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover/enlace:translate-x-1" />
+                </Link>
               </div>
 
-              {/* Problem */}
-              <div className="mx-auto mt-12 max-w-3xl">
-                <div className={`rounded-2xl border p-6 sm:p-8 ${isDark
-                  ? "border-white/10 bg-white/5"
-                  : "border-red-100 bg-red-50/50"
-                  }`}>
-                  <h3 className={`flex items-center gap-2 text-base font-semibold ${isDark ? "text-white" : "text-red-600"}`}>
-                    <X className="h-5 w-5" />
-                    ¿Por qué lo necesitas?
-                  </h3>
-                  <ul className="mt-4 space-y-2">
-                    {service.problem.map((p) => (
-                      <li key={p} className={`flex items-start gap-2 text-sm ${mutedColor}`}>
-                        <span className="mt-0.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
-                        {p}
+              {/* Derecha: detalle */}
+              <div className="space-y-14">
+                <div>
+                  <Etiqueta>¿Por qué lo necesitas?</Etiqueta>
+                  <ul className="mt-4 divide-y divide-line-dark border-y border-line-dark">
+                    {s.necesidad.map((n) => (
+                      <li key={n} className="flex items-start gap-4 py-4 text-base text-white/85">
+                        <span className="mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary shadow-[0_0_8px_2px_rgba(120,54,226,0.6)]" />
+                        {n}
                       </li>
                     ))}
                   </ul>
                 </div>
-              </div>
 
-              {/* Includes / Excludes */}
-              <div className="mx-auto mt-10 grid gap-6 sm:grid-cols-2">
-                <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
-                  <h3 className="flex items-center gap-2 text-sm font-semibold text-success">
-                    <Check className="h-5 w-5" />
-                    ¿Qué incluye?
-                  </h3>
-                  <ul className="mt-4 space-y-2.5">
-                    {service.includes.map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-text-secondary">
-                        <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
+                <div>
+                  <Etiqueta>Qué incluye</Etiqueta>
+                  <ul className="mt-5 grid gap-x-8 gap-y-3.5 sm:grid-cols-2">
+                    {s.incluye.map((item) => (
+                      <li key={item} className="flex items-start gap-3 text-sm text-white/80 sm:text-base">
+                        <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-light sm:mt-1" />
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="rounded-2xl border border-border bg-surface p-6 shadow-card">
-                  <h3 className="flex items-center gap-2 text-sm font-semibold text-text-muted">
-                    <X className="h-5 w-5" />
-                    ¿Qué NO incluye?
-                  </h3>
-                  <ul className="mt-4 space-y-2.5">
-                    {service.excludes.map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
-                        <X className="mt-0.5 h-4 w-4 flex-shrink-0 text-text-muted" />
+
+                <div>
+                  <Etiqueta>No incluye</Etiqueta>
+                  <ul className="mt-5 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                    {s.noIncluye.map((item) => (
+                      <li key={item} className="flex items-start gap-3 text-sm text-white/55">
+                        <Minus className="mt-0.5 h-4 w-4 flex-shrink-0 text-white/35" />
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-              </div>
 
-              {/* Process */}
-              <div className="mx-auto mt-16 max-w-4xl">
-                <h3 className={`text-center text-lg font-bold ${textColor}`}>
-                  ¿Cómo lo hacemos?
-                </h3>
-                <div className="relative mt-8">
-                  <div className={`absolute left-6 top-0 hidden h-full w-0.5 md:block ${isDark ? "bg-white/10" : "bg-border"
-                    }`} />
-                  <div className="space-y-6">
-                    {service.process.map((step, si) => (
-                      <div key={step.step} className="relative flex items-start gap-5">
-                        <div className={`relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold shadow-elevated ${isDark ? "bg-primary text-white" : "bg-primary text-white"
-                          }`}>
-                          {si + 1}
-                        </div>
-                        <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface p-4 shadow-card">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <p className="text-sm font-semibold text-text-primary">
-                                {step.step}
-                              </p>
-                              <p className="text-xs text-text-secondary">
-                                {step.desc}
-                              </p>
-                            </div>
-                            <span className="flex items-center gap-1 rounded-full bg-primary-light px-2.5 py-0.5 text-xs font-medium text-primary whitespace-nowrap">
-                              <Clock className="h-3 w-3" />
-                              {step.time}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                <div>
+                  <Etiqueta>Resultados esperados</Etiqueta>
+                  <ul className="mt-5 grid grid-cols-2 gap-3">
+                    {s.resultados.map((r) => (
+                      <li
+                        key={r}
+                        className="rounded-2xl border border-line-dark bg-surface-dark p-5 transition-colors hover:border-line-dark-strong hover:bg-surface-dark-hover"
+                      >
+                        <TrendingUp className="h-5 w-5 text-primary-light" />
+                        <p className="mt-3 text-sm font-medium leading-snug text-white">{r}</p>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-line-dark bg-surface-dark p-6 sm:p-7">
+                  <Etiqueta>Qué define la inversión</Etiqueta>
+                  <p className="mt-3 text-pretty text-sm leading-relaxed text-white/65">
+                    Cada proyecto se cotiza a la medida, sin costo. Estos factores
+                    influyen en el alcance:
+                  </p>
+                  <ul className="mt-4 flex flex-wrap gap-2">
+                    {s.factores.map((f) => (
+                      <li
+                        key={f}
+                        className="rounded-full border border-line-dark-strong px-3 py-1.5 text-xs text-white/75 sm:text-sm"
+                      >
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-
-              {/* Results */}
-              <div className="mx-auto mt-16 max-w-4xl">
-                <h3 className={`text-center text-lg font-bold ${textColor}`}>
-                  Resultados esperados
-                </h3>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {service.results.map((r) => (
-                    <div
-                      key={r}
-                      className={`rounded-xl border p-4 text-center shadow-card ${isDark
-                        ? "border-white/10 bg-white/5"
-                        : "border-border bg-surface"
-                        }`}
-                    >
-                      <Star className="mx-auto h-5 w-5 text-primary" />
-                      <p className={`mt-2 text-xs ${isDark ? "text-text-muted" : "text-text-secondary"}`}>
-                        {r}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pricing */}
-              <div className="mx-auto mt-16 max-w-3xl">
-                <div className={`rounded-2xl border p-6 text-center sm:p-8 ${isDark
-                  ? "border-primary/30 bg-gradient-to-br from-primary/10 to-transparent"
-                  : "border-primary/30 bg-gradient-to-br from-primary-light/50 to-surface"
-                  }`}>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                    Inversión
-                  </p>
-                  <p className={`mt-2 text-4xl font-bold ${isDark ? "text-white" : "text-text-primary"}`}>
-                    {service.price}
-                  </p>
-                  <p className={`mt-1 text-sm ${mutedColor}`}>
-                    Proyecto base — pago único
-                  </p>
-
-                  <div className="mx-auto mt-6 max-w-md">
-                    <p className="text-xs font-medium text-text-muted uppercase tracking-wider">
-                      Variables que pueden aumentar el precio
-                    </p>
-                    <div className="mt-3 space-y-2">
-                      {service.variables.map((v) => (
-                        <div
-                          key={v.label}
-                          className={`flex items-center justify-between rounded-lg px-4 py-2 text-sm ${isDark ? "bg-white/5" : "bg-surface"
-                            }`}
-                        >
-                          <span className={isDark ? "text-text-muted" : "text-text-secondary"}>
-                            {v.label}
-                          </span>
-                          <span className="font-semibold text-primary">{v.add}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Link
-                    href="/contacto"
-                    className="group mt-8 inline-flex items-center gap-1.5 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl"
-                  >
-                    Cotiza este servicio
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Tech icons row for dark sections */}
-              {isDark && (
-                <div className="mx-auto mt-12 grid max-w-lg grid-cols-4 gap-4">
-                  {serviceIcons.map((s) => (
-                    <div key={s.label} className="text-center">
-                      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-primary">
-                        <s.icon className="h-5 w-5" />
-                      </div>
-                      <p className="mt-1.5 text-xs text-text-muted">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-          </div>
+          </section>
         )
       })}
-    </section>
+    </>
   )
 }

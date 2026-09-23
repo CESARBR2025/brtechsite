@@ -87,7 +87,10 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 > todo lo demás, footer incluido, va sobre `bg-dark` con rejilla desvanecida + un resplandor. El ritmo
 > entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el cambio de
 > color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
-> Servicios y Contacto se migrarán al mismo sistema; mientras tanto conservan sus secciones claras.
+> **Servicios** ya está en el mismo sistema (hero + un bloque por servicio + "Cómo trabajamos" + `CTAFinal`).
+> Contacto se migrará; mientras tanto conserva sus secciones claras.
+> **Sin montos en el sitio de marketing:** la inversión se cotiza. En Servicios solo se listan los
+> factores que definen la inversión (sin precios); el contenido vive en `servicios/datos.ts`.
 
 ```tsx
 // Sección estándar
@@ -245,7 +248,7 @@ Título fijo a la izquierda (`lg:sticky`, sección con `overflow-clip`) y pregun
 en círculo que rota 45° a `×` y se llena de `primary` al abrir. Respuesta con transición
 `grid-rows-[0fr] → [1fr]` e `inert` mientras está cerrada. La primera pregunta abre por defecto.
 
-### CTA final (`home/cta.tsx`)
+### CTA final (`src/ui/marketing/cta-final.tsx`, `<CTAFinal />` con textos por página)
 El sitio cierra como abrió: panel `rounded-2xl border-line-dark bg-bg-deep` dentro de la sección
 `bg-dark`, con la imagen fija del velo **invertida** (`-scale-y-100`, bajada `translate-y-[15%]` para que
 la luz nazca bajo el botón), filo de luz violeta arriba, etiqueta centrada con guiones, H2 de 60 px,
