@@ -4,7 +4,9 @@ Guía única de estilos para el sitio. **Toda feature nueva se construye con est
 No inventes colores, radios ni sombras fuera de esta tabla; si algo falta, se agrega aquí primero.
 
 Base: `src/styles/globals.css` (`@theme` de Tailwind v4) + spec FinPay Dashboard de `AGENTS.md`.
-Fuente: **Inter** (cargada en `src/app/layout.tsx` vía `next/font`), fallback `"Plus Jakarta Sans", sans-serif`.
+Fuente: **Inter** (cargada en `src/app/layout.tsx` vía `next/font`, expuesta como `--font-inter`).
+`--font-sans` apunta a esa variable en `globals.css`, así que `font-sans` usa Inter con su fallback
+métrico (`Inter Fallback`, evita saltos de layout). No declares `font-family` a mano.
 
 ---
 
@@ -20,7 +22,12 @@ Fuente: **Inter** (cargada en `src/app/layout.tsx` vía `next/font`), fallback `
 | `success` | `#10B981` | `bg-success` `text-success` | Estado OK, "Publicado", "Pagado", indicadores positivos |
 | `success-light` | `#D1FAE5` | `bg-success-light` | Fondo de pills de estado positivo |
 | `warning` | `#F59E0B` | `bg-warning` `text-warning` | "Pendiente", alertas, ratings |
-| `bg-dark` | `#151127` | `bg-bg-dark` | Navbar, footer, secciones hero oscuras, bloque "Conoce más" |
+| `bg-dark` | `#151127` | `bg-bg-dark` | **Fondo de todas las secciones oscuras** (con rejilla + resplandor), footer, heros de páginas internas, tinte del navbar de vidrio, bloque "Conoce más" |
+| `bg-deep` | `#000000` | `bg-bg-deep` | **Solo donde vive el velo:** hero de Inicio y el panel del CTA final (su eco). Negro puro para maximizar el contraste del violeta; el hero funde a `bg-dark` |
+| `surface-dark` | `white / 3%` | `bg-surface-dark` | Tarjetas y paneles sobre fondo oscuro |
+| `surface-dark-hover` | `white / 6%` | `hover:bg-surface-dark-hover` | Hover de tarjeta o botón-ícono sobre oscuro |
+| `line-dark` | `white / 8%` | `border-line-dark` `divide-line-dark` | Bordes finos y divisores sobre oscuro |
+| `line-dark-strong` | `white / 16%` | `hover:border-line-dark-strong` | Borde en hover/foco sobre oscuro |
 | `text-primary` | `#111827` | `text-text-primary` | Títulos, montos grandes |
 | `text-secondary` | `#374151` | `text-text-secondary` | Párrafos, labels de formulario |
 | `text-muted` | `#6B7280` | `text-text-muted` | Texto atenuado, placeholders, metadatos |
@@ -54,12 +61,14 @@ esas landings de venta personalizadas. Ninguna otra feature usa acento distinto 
 | `shadow-modal` | modales / diálogos |
 | `shadow-lg shadow-primary/25` | botón primario (glow de marca) |
 | `shadow-lg shadow-success/25` | confirmaciones en verde |
+| `shadow-glow` | resplandor violeta difuso de una tarjeta destacada sobre oscuro |
 
 ### Tipografía
 
 | Elemento | Clases |
 |---|---|
-| H1 (hero oscuro) | `text-[28px] sm:text-4xl md:text-5xl font-bold leading-tight text-white` |
+| H1 (hero de Inicio / display) | `text-[40px] sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-[-0.035em] text-white` |
+| H1 (hero oscuro interno) | `text-[28px] sm:text-4xl md:text-5xl font-bold leading-tight text-white` |
 | H1 (página clara) | `text-[28px] sm:text-4xl font-bold text-text-primary` |
 | H2 (sección) | `text-[22px] sm:text-3xl font-bold text-text-primary` |
 | H3 (card) | `text-lg font-semibold text-text-primary` |
@@ -74,10 +83,19 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 
 ## 2. Layout
 
+> **Dirección (sept 2026): Inicio es un lienzo oscuro continuo.** El hero es negro total (`bg-deep`);
+> todo lo demás, footer incluido, va sobre `bg-dark` con rejilla desvanecida + un resplandor. El ritmo
+> entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el cambio de
+> color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
+> **Todo el sitio de marketing** (Inicio, Servicios, Contacto) usa este sistema oscuro. Las recetas claras
+> de abajo (card blanca, input claro) quedan para el panel y el ticket público.
+> **Sin montos en el sitio de marketing:** la inversión se cotiza. En Servicios solo se listan los
+> factores que definen la inversión (sin precios); el contenido vive en `servicios/datos.ts`.
+
 ```tsx
 // Sección estándar
 <section className="relative overflow-hidden py-16 sm:py-24">
-  {/* variantes de fondo: (nada) | bg-bg-section | bg-bg-dark */}
+  {/* variantes de fondo: (nada) | bg-bg-section | bg-bg-dark  (bg-bg-deep solo en hero de Inicio) */}
   <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     {/* contenido */}
   </div>
@@ -88,6 +106,8 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 - **Ritmo vertical de sección:** `py-16 sm:py-24`.
 - **Grid de cards:** `grid gap-6 sm:grid-cols-2 lg:grid-cols-3`.
 - **Encabezado de sección:** bloque centrado `mx-auto max-w-2xl text-center` con eyebrow pill + H2.
+- **Navbar flotante:** el header es `fixed` (no ocupa espacio en el flujo). Todo hero bajo el layout de
+  marketing arranca con `pt-36 sm:pt-44` (o `sm:pt-40`) para no quedar debajo de la píldora.
 
 ---
 
@@ -95,15 +115,23 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 
 ### Botón primario
 ```tsx
-<button className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70">
-  Texto <ArrowRight className="h-4 w-4" />
+<button className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70">
+  Texto <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
 </button>
 ```
 Variante énfasis: `bg-gradient-to-r from-primary to-primary-hover shadow-primary/30`.
+CTA principal sobre fondo oscuro → usar **Botón especular** (abajo) con estas mismas clases.
 
 ### Botón secundario
-- Sobre claro: `rounded-lg bg-primary-light px-4 py-2 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white`
-- Sobre oscuro: `rounded-lg border border-white/20 bg-white/5 px-7 py-3 text-sm font-medium text-text-muted backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white`
+- Sobre claro: `rounded-full bg-primary-light px-4 py-2 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white`
+- Sobre oscuro: `rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white`
+  (no `text-text-muted` sobre oscuro: no alcanza contraste 4.5:1).
+
+### Íconos en botones
+Un solo ícono **direccional al final** que dice qué va a pasar; el botón lleva `group`.
+- Navega a otra página → `<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />`
+- Baja dentro de la misma página (ancla) → `<ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />`
+- Nada de íconos al inicio + al final en el mismo botón, ni chevrons (`ChevronRight`), ni íconos decorativos.
 
 ### Card
 ```tsx
@@ -143,6 +171,12 @@ Card estática (sin hover): quita `group`, `transition-all` y los `hover:*`.
 ```
 Error de campo/formulario: `rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs font-medium text-red-500`.
 
+**Input sobre oscuro** (formulario de Contacto): etiqueta visible siempre (`mb-2 block text-xs font-medium
+text-white/65`, nunca solo placeholder) +
+`w-full rounded-lg border border-line-dark-strong bg-white/[0.04] py-3 pl-10 pr-3 text-sm text-white
+placeholder-white/35 hover:border-white/25 focus:border-primary focus:ring-2 focus:ring-primary/30`.
+Error sobre oscuro: `border-red-500/30 bg-red-500/10 text-red-300` con `role="alert"`.
+
 ### Lista con check
 ```tsx
 <li className="flex items-center gap-1.5 text-xs text-text-secondary">
@@ -162,6 +196,106 @@ Error de campo/formulario: `rounded-lg border border-red-500/20 bg-red-500/10 p-
   {/* H3 + párrafo */}
 </div>
 ```
+
+### Tarjeta sobre oscuro
+```tsx
+<div className="rounded-2xl border border-line-dark bg-surface-dark p-6 transition-colors hover:border-line-dark-strong hover:bg-surface-dark-hover">
+```
+Sin `shadow-card` (las sombras no se ven sobre negro); para destacar una, `shadow-glow`.
+Títulos `text-white`, cuerpo `text-white/65`, etiquetas `text-xs uppercase tracking-wider text-white/55`.
+
+### Encabezado de sección sobre oscuro
+Alineado a la izquierda, sin pill: etiqueta con guion violeta + H2 grande + párrafo.
+```tsx
+<p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+  <span className="h-px w-8 bg-primary" /> Etiqueta
+</p>
+<h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">…</h2>
+<p className="mt-5 text-pretty text-base leading-relaxed text-white/65 sm:text-lg">…</p>
+```
+Ritmo de sección oscura: `relative overflow-hidden bg-bg-dark py-24 sm:py-32` + la rejilla sutil de
+"Decoración" con `[mask-image:radial-gradient(ellipse_at_X%_Y%,black_5%,transparent_60%)]` (varía X/Y por
+sección para que no se repita) + un blob `bg-primary/10 blur-3xl`. Si la sección tiene un bloque `sticky`, usa
+`overflow-clip` en lugar de `overflow-hidden` (hidden crea un contenedor de scroll y rompe el sticky). Listas: `divide-y divide-line-dark border-y border-line-dark`
+con numeración `font-mono text-primary-light/60` (`01`, `02`…).
+
+### Tarjeta foco (`src/ui/primitivos/tarjeta-foco.tsx`)
+Tarjeta sobre oscuro con un foco violeta que sigue al puntero (solo CSS). Jerarquía dentro de la
+tarjeta: mini ilustración de interfaz (o ícono) → número `01` → **nombre de lo que ofreces** (lo más
+grande) → descripción → lista → enlace. Nada de lemas en mayúsculas por encima del título. Íconos y checks en `text-primary-light`
+(el verde queda para estados). Para ofertas del mismo peso, tarjetas iguales en fila (`md:grid-cols-3`).
+Enlace de la tarjeta = **píldora**: botón secundario sobre oscuro que se tiñe con el hover de la tarjeta
+(`group-hover:border-primary/50 group-hover:bg-primary/15`) y se llena al pasar sobre ella
+(`hover:!bg-primary hover:!border-primary`); usa `group/enlace` para animar su propia flecha.
+
+### Mini ilustraciones de interfaz (`src/ui/marketing/home/ilustraciones-servicios.tsx`)
+Para que una tarjeta **muestre** lo que ofrece en lugar de solo decirlo: una mini UI en un marco
+`h-40 rounded-xl border border-line-dark bg-bg-deep/40`, con barras en degradado `primary-hover → primary`.
+El color extra entra **solo como estado** (verde = en línea, ámbar = reabastecer); nunca colores por
+industria. Se animan con `group-hover` de la tarjeta, siempre bajo `motion-safe:`, y llevan `aria-hidden`.
+Datos genéricos, nunca de clientes reales.
+
+### Galería en acordeón (`src/ui/primitivos/galeria-acordeon.tsx`)
+Adaptada de React Bits `AccordionGallery`, **sin GSAP** (transiciones CSS). Paneles de fotos que se
+abren con hover (mouse), toque o flechas del teclado; los cerrados van en gris y oscurecidos, así las
+fotos de clientes con colores propios (naranjas, rojos) no compiten con la paleta hasta que se abren.
+Uso: casos de éxito con 3–5 fotos reales. Fotos en `public/clientes/<cliente>/` como WebP sin metadatos.
+Mockups de apps móviles (PNG/WebP con el teléfono y fondo transparente): `ajuste: "contener"` — se
+muestran completos y centrados sobre un resplandor violeta, sin recortar.
+
+### Pasos / línea de tiempo sobre oscuro (`home/process.tsx`)
+`<ol>` en `lg:grid-cols-5` (vertical en móvil) con una línea que une nodos redondos
+(`h-12 w-12 rounded-full border-line-dark-strong bg-bg-dark text-primary-light`; en hover se llenan de
+`primary`). Debajo: número `01` en mono, título y descripción. Nada de tarjetas por paso.
+
+### Acordeón de preguntas sobre oscuro (`faq/index.tsx`)
+Título fijo a la izquierda (`lg:sticky`, sección con `overflow-clip`) y preguntas a la derecha en
+`divide-y divide-line-dark border-y`, sin tarjetas. Botón con `aria-expanded`/`aria-controls`; ícono `+`
+en círculo que rota 45° a `×` y se llena de `primary` al abrir. Respuesta con transición
+`grid-rows-[0fr] → [1fr]` e `inert` mientras está cerrada. La primera pregunta abre por defecto.
+
+### CTA final (`src/ui/marketing/cta-final.tsx`, `<CTAFinal />` con textos por página)
+El sitio cierra como abrió: panel `rounded-2xl border-line-dark bg-bg-deep` dentro de la sección
+`bg-dark`, con la imagen fija del velo **invertida** (`-scale-y-100`, bajada `translate-y-[15%]` para que
+la luz nazca bajo el botón), filo de luz violeta arriba, etiqueta centrada con guiones, H2 de 60 px,
+botón especular morado y una línea de confianza (`text-white/55`). Un solo CTA.
+
+### Footer (`src/ui/marketing/footer/index.tsx`)
+Oscuro (`bg-dark`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
+"Agendar consulta", columnas Navegación / Servicios / Contacto, barra inferior con © "BR TECH
+Digital Systems" y redes como botón-ícono redondo. Sin marca de agua.
+**No exponer correos personales**: el contacto va siempre al formulario (`/contacto`).
+
+### Superficie de vidrio (`src/ui/primitivos/glass-surface.tsx`)
+"Liquid glass" adaptado de React Bits. Refracción SVG en Chrome/Edge; vidrio esmerilado en Safari/Firefox.
+```tsx
+<GlassSurface borderRadius={28} tint="21 17 39" tintOpacity={0.4} saturation={1.5}>…</GlassSurface>
+```
+- `tint` = canales RGB de un token (hoy solo `bg-dark` → `"21 17 39"`). Texto encima siempre blanco.
+- Uso actual: **solo el navbar**. Necesita contenido detrás para lucir; no lo pongas sobre fondos lisos.
+
+### Botón especular (`src/ui/primitivos/boton-especular.tsx`)
+Reflejo WebGL en el borde que sigue al puntero (React Bits `SpecularButton`). Acepta `href` (→ `<Link>`).
+```tsx
+<BotonEspecular href="/contacto" className="…clases de botón primario…">Agendar</BotonEspecular>
+```
+- **Solo CTA principales sobre fondo oscuro o morado**, máximo 3 por página (cada uno es un contexto WebGL).
+- Sobre botón blanco pasar `baseColor="#F1EBFF"` (`primary-light`).
+
+### Velo oscuro (`src/ui/primitivos/velo-oscuro.tsx`)
+Fondo animado WebGL (React Bits `DarkVeil`) con colores originales (`hueShift={0}`), sobre `bg-bg-deep`.
+```tsx
+<section className="relative overflow-hidden bg-bg-deep">
+  <div className="absolute inset-0"><VeloOscuro hueShift={0} /></div>
+  <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-bg-deep" />
+  <div className="relative …">contenido</div>
+</section>
+```
+- **Exclusivo del hero de Inicio.** Heros internos usan `bg-bg-dark` + grid sutil.
+
+### Entrada escalonada
+`motion-safe:animate-aparecer` (keyframe en `globals.css`) + `style={{ animationDelay: "120ms" }}` en pasos
+de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
 
 ### Decoración (opcional, no abusar)
 - Blob: `absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl`
@@ -211,8 +345,13 @@ Marca los elementos no imprimibles con `className="no-print"`.
 
 1. Un solo acento: `primary`. El verde/ámbar son **solo** semánticos (estado), no decorativos.
 2. Cards siempre `bg-surface` + `border-border`; nunca cards sin borde sobre fondo blanco.
-3. Radios: botón/imput `rounded-lg`, contenedor `rounded-2xl`, pill `rounded-full`. Nada intermedio.
+3. Radios: botón y pill `rounded-full`, input `rounded-lg`, contenedor `rounded-2xl`. Nada intermedio.
 4. Texto: jerarquía `text-primary` → `text-secondary` → `text-muted`. No usar negro puro ni grises de Tailwind sueltos.
-5. Toda transición es `transition-all` (o `transition-colors`) — sin duraciones custom.
+   Sobre oscuro: `text-white`, `text-white/85`, `text-white/75`, `text-white/55` (metadatos). El negro puro
+   solo existe como fondo (`bg-deep`), nunca como color de texto.
+5. Interacciones simples: `transition-all` (o `transition-colors`) con la duración por defecto. Duraciones
+   propias solo en los primitivos de movimiento (vidrio, velo, navbar al hacer scroll, menú móvil).
 6. Móvil primero: clase base = móvil, `sm:`/`md:`/`lg:` para escalar.
 7. Copys en español, tono formal-cercano. Montos con separador de miles y símbolo `$` + `MXN` cuando haya ambigüedad.
+8. Movimiento: todo efecto animado respeta `prefers-reduced-motion` (`motion-safe:` en CSS; los primitivos
+   WebGL ya lo detectan). Los efectos WebGL se pausan fuera de pantalla.

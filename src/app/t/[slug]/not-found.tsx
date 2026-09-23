@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { ChevronRight, FileQuestion } from "lucide-react"
+import { ArrowRight, FileQuestion } from "lucide-react"
 
 export default function TicketNoEncontrado() {
   return (
@@ -32,10 +32,10 @@ export default function TicketNoEncontrado() {
 
         <Link
           href="/"
-          className="group mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
+          className="group mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
         >
           Ir al inicio
-          <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
     </main>

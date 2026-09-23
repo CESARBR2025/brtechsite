@@ -16,7 +16,7 @@ export function BotonImprimir({
     <button
       type="button"
       onClick={() => window.print()}
-      className={`no-print inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] ${clase}`}
+      className={`no-print inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] ${clase}`}
     >
       <Printer className="h-4 w-4" />
       Descargar / Imprimir

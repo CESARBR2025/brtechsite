@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { useSearchParams } from "next/navigation"
-import { ChevronRight, Loader2, Lock } from "lucide-react"
+import { ArrowRight, Loader2, Lock } from "lucide-react"
 import { iniciarSesion } from "@/src/app/(panel)/panel/acciones"
 import type { EstadoFormulario } from "@/src/app/(panel)/panel/tipos"
 
@@ -40,7 +40,7 @@ export function FormularioLogin() {
       <button
         type="submit"
         disabled={pendiente}
-        className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
+        className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
       >
         {pendiente ? (
           <>
@@ -49,7 +49,7 @@ export function FormularioLogin() {
         ) : (
           <>
             Entrar
-            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </>
         )}
       </button>
