@@ -23,7 +23,11 @@ métrico (`Inter Fallback`, evita saltos de layout). No declares `font-family` a
 | `success-light` | `#D1FAE5` | `bg-success-light` | Fondo de pills de estado positivo |
 | `warning` | `#F59E0B` | `bg-warning` `text-warning` | "Pendiente", alertas, ratings |
 | `bg-dark` | `#151127` | `bg-bg-dark` | Tinte del navbar de vidrio, footer, heros oscuros de páginas internas, bloque "Conoce más" |
-| `bg-deep` | `#000000` | `bg-bg-deep` | **Solo** hero de Inicio, detrás del velo animado (ver §3 "Velo oscuro"). Negro puro para maximizar el contraste del violeta |
+| `bg-deep` | `#000000` | `bg-bg-deep` | Lienzo oscuro continuo de Inicio (hero con velo, secciones rediseñadas) y **footer**. Negro puro para maximizar el contraste del violeta |
+| `surface-dark` | `white / 3%` | `bg-surface-dark` | Tarjetas y paneles sobre fondo oscuro |
+| `surface-dark-hover` | `white / 6%` | `hover:bg-surface-dark-hover` | Hover de tarjeta o botón-ícono sobre oscuro |
+| `line-dark` | `white / 8%` | `border-line-dark` `divide-line-dark` | Bordes finos y divisores sobre oscuro |
+| `line-dark-strong` | `white / 16%` | `hover:border-line-dark-strong` | Borde en hover/foco sobre oscuro |
 | `text-primary` | `#111827` | `text-text-primary` | Títulos, montos grandes |
 | `text-secondary` | `#374151` | `text-text-secondary` | Párrafos, labels de formulario |
 | `text-muted` | `#6B7280` | `text-text-muted` | Texto atenuado, placeholders, metadatos |
@@ -57,6 +61,7 @@ esas landings de venta personalizadas. Ninguna otra feature usa acento distinto 
 | `shadow-modal` | modales / diálogos |
 | `shadow-lg shadow-primary/25` | botón primario (glow de marca) |
 | `shadow-lg shadow-success/25` | confirmaciones en verde |
+| `shadow-glow` | resplandor violeta difuso de una tarjeta destacada sobre oscuro |
 
 ### Tipografía
 
@@ -77,6 +82,11 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 ---
 
 ## 2. Layout
+
+> **Dirección (sept 2026): Inicio es un lienzo oscuro continuo** (`bg-deep`) del hero al footer.
+> El ritmo entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el
+> cambio de color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
+> Servicios y Contacto se migrarán al mismo sistema; mientras tanto conservan sus secciones claras.
 
 ```tsx
 // Sección estándar
@@ -176,6 +186,19 @@ Error de campo/formulario: `rounded-lg border border-red-500/20 bg-red-500/10 p-
   {/* H3 + párrafo */}
 </div>
 ```
+
+### Tarjeta sobre oscuro
+```tsx
+<div className="rounded-2xl border border-line-dark bg-surface-dark p-6 transition-colors hover:border-line-dark-strong hover:bg-surface-dark-hover">
+```
+Sin `shadow-card` (las sombras no se ven sobre negro); para destacar una, `shadow-glow`.
+Títulos `text-white`, cuerpo `text-white/65`, etiquetas `text-xs uppercase tracking-wider text-white/55`.
+
+### Footer (`src/ui/marketing/footer/index.tsx`)
+Oscuro (`bg-deep`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
+"Agendar consulta", columnas Navegación / Servicios / Contacto, barra inferior con © "BR TECH
+Digital Systems" y redes como botón-ícono redondo. Sin marca de agua.
+**No exponer correos personales**: el contacto va siempre al formulario (`/contacto`).
 
 ### Superficie de vidrio (`src/ui/primitivos/glass-surface.tsx`)
 "Liquid glass" adaptado de React Bits. Refracción SVG en Chrome/Edge; vidrio esmerilado en Safari/Firefox.

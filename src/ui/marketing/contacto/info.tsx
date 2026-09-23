@@ -1,13 +1,6 @@
-import { Mail, MapPin, Clock, ExternalLink } from "lucide-react"
+import { MapPin, Clock } from "lucide-react"
 
 const contactInfo = [
-  {
-    icon: Mail,
-    label: "Correo",
-    value: "barcenasrosalescesarivan@gmail.com",
-    href: "mailto:barcenasrosalescesarivan@gmail.com",
-    action: "Enviar correo",
-  },
   {
     icon: MapPin,
     label: "Ubicación",
@@ -35,41 +28,16 @@ export function ContactInfo() {
         </h3>
         <div className="mt-5 flex flex-col gap-4">
           {contactInfo.map((item) => (
-            <div key={item.label}>
-              {item.href ? (
-                <a
-                  href={item.href}
-                  className="flex items-center gap-4 rounded-xl bg-bg-section p-4 transition-colors hover:bg-primary-light/50"
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-text-muted">{item.label}</p>
-                    <p className="truncate text-sm font-medium text-text-primary">
-                      {item.value}
-                    </p>
-                  </div>
-                  {item.action && (
-                    <span className="hidden sm:flex items-center gap-1 text-xs font-medium text-primary sm:opacity-0 sm:group-hover:opacity-100">
-                      {item.action}
-                      <ExternalLink className="h-3 w-3" />
-                    </span>
-                  )}
-                </a>
-              ) : (
-                <div className="flex items-center gap-4 rounded-xl bg-bg-section p-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-text-muted">{item.label}</p>
-                    <p className="text-sm font-medium text-text-primary">
-                      {item.value}
-                    </p>
-                  </div>
-                </div>
-              )}
+            <div key={item.label} className="flex items-center gap-4 rounded-xl bg-bg-section p-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
+                <item.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs text-text-muted">{item.label}</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {item.value}
+                </p>
+              </div>
             </div>
           ))}
         </div>

@@ -141,6 +141,7 @@ export function BotonEspecular({
       return // sin WebGL: el botón queda normal
     }
     const gl = renderer.gl
+    if (!gl) return // ogl no lanza error si no hay contexto; el botón queda normal
     gl.clearColor(0, 0, 0, 0)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)

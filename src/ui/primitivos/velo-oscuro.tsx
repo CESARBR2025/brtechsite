@@ -151,6 +151,7 @@ export function VeloOscuro({
       return // sin WebGL: se queda la imagen fija
     }
     const gl = renderer.gl
+    if (!gl) return // ogl no lanza error si no hay contexto; se queda la imagen fija
     const canvas = gl.canvas
     canvas.className = "block opacity-0 transition-opacity duration-[400ms] ease-out"
     parent.appendChild(canvas)

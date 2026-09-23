@@ -9,6 +9,12 @@
   --color-warning: #F59E0B;
   --color-bg-dark: #151127;
   --color-bg-deep: #000000;
+
+  /* Superficies sobre fondo oscuro (bg-deep / bg-dark) */
+  --color-surface-dark: rgb(255 255 255 / 0.03);
+  --color-surface-dark-hover: rgb(255 255 255 / 0.06);
+  --color-line-dark: rgb(255 255 255 / 0.08);
+  --color-line-dark-strong: rgb(255 255 255 / 0.16);
   --color-text-primary: #111827;
   --color-text-secondary: #374151;
   --color-text-muted: #6B7280;
@@ -29,6 +35,7 @@
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
   --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.08);
   --shadow-hover: 0 6px 20px rgba(120, 54, 226, 0.15), 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 80px -20px rgba(120, 54, 226, 0.45);
 }
 
 /* Fuente: next/font expone Inter en --font-inter (nombre interno con hash) */
