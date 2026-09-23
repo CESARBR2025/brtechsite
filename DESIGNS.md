@@ -234,6 +234,17 @@ Uso: casos de éxito con 3–5 fotos reales. Fotos en `public/clientes/<cliente>
 Mockups de apps móviles (PNG/WebP con el teléfono y fondo transparente): `ajuste: "contener"` — se
 muestran completos y centrados sobre un resplandor violeta, sin recortar.
 
+### Pasos / línea de tiempo sobre oscuro (`home/process.tsx`)
+`<ol>` en `lg:grid-cols-5` (vertical en móvil) con una línea que une nodos redondos
+(`h-12 w-12 rounded-full border-line-dark-strong bg-bg-dark text-primary-light`; en hover se llenan de
+`primary`). Debajo: número `01` en mono, título y descripción. Nada de tarjetas por paso.
+
+### Acordeón de preguntas sobre oscuro (`faq/index.tsx`)
+Título fijo a la izquierda (`lg:sticky`, sección con `overflow-clip`) y preguntas a la derecha en
+`divide-y divide-line-dark border-y`, sin tarjetas. Botón con `aria-expanded`/`aria-controls`; ícono `+`
+en círculo que rota 45° a `×` y se llena de `primary` al abrir. Respuesta con transición
+`grid-rows-[0fr] → [1fr]` e `inert` mientras está cerrada. La primera pregunta abre por defecto.
+
 ### Footer (`src/ui/marketing/footer/index.tsx`)
 Oscuro (`bg-dark`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
 "Agendar consulta", columnas Navegación / Servicios / Contacto, barra inferior con © "BR TECH
