@@ -13,7 +13,7 @@ export default function ContactoPage() {
   return (
     <>
       <ContactoHero />
-      <section className="relative bg-bg-dark pb-24 sm:pb-32">
+      <section className="relative overflow-hidden bg-bg-dark pb-24 sm:pb-32">
         <div className="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[1.3fr_0.7fr] lg:gap-16 lg:px-8">
           <ContactForm />
           <ContactInfo />
