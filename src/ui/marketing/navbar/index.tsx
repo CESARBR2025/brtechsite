@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Menu, X, ChevronRight } from "lucide-react"
+import { GlassSurface } from "@/src/ui/primitivos/glass-surface"
+import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 
 const navItems = [
   { label: "Inicio", href: "/" },
@@ -12,90 +14,141 @@ const navItems = [
   { label: "Contacto", href: "/contacto" },
 ]
 
+// bg-dark (#151127) en canales RGB para el tinte del vidrio
+const TINTE_BG_DARK = "21 17 39"
+
+const focusRing =
+  "outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
+
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false)
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [mobileOpen])
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/"
     return pathname.startsWith(href)
   }
 
+  const tabClass = (href: string) =>
+    `rounded-full px-4 py-2 text-sm font-medium transition-colors ${focusRing} ${
+      isActive(href)
+        ? "bg-white/10 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)]"
+        : "text-white/65 hover:bg-white/5 hover:text-white"
+    }`
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-bg-dark">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.png"
-            alt="BR TECH"
-            width={566}
-            height={191}
-            priority
-            className="h-9 w-auto sm:h-10"
-          />
-        </Link>
-
-        <nav className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${isActive(item.href)
-                ? "bg-primary-light text-primary"
-                : "text-text-muted hover:bg-white/10 hover:text-white"
-                }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="hidden md:block">
-          <Link
-            href="/contacto"
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
-          >
-            Agendar Consulta
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="flex md:hidden items-center justify-center rounded-md p-2 text-text-muted hover:bg-white/10"
-          aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+    <header className="fixed inset-x-0 top-3 z-50 px-3 sm:top-4 sm:px-4">
+      <div
+        className={`mx-auto transition-[max-width] duration-500 ease-out ${
+          scrolled ? "max-w-4xl" : "max-w-5xl"
+        }`}
+      >
+        <GlassSurface
+          borderRadius={28}
+          tint={TINTE_BG_DARK}
+          tintOpacity={scrolled || mobileOpen ? 0.72 : 0.4}
+          saturation={1.5}
+          brightness={50}
+          opacity={0.93}
+          blur={11}
+          distortionScale={-160}
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
+          <div className="flex h-14 items-center justify-between gap-4 pl-5 pr-2">
+            <Link href="/" className={`flex shrink-0 items-center rounded-full ${focusRing}`}>
+              <Image
+                src="/logo.png"
+                alt="BR TECH"
+                width={566}
+                height={191}
+                priority
+                className="h-8 w-auto"
+              />
+            </Link>
 
-      {mobileOpen && (
-        <div className="md:hidden border-t border-white/10 bg-bg-dark px-4 pb-4 pt-2">
-          <nav className="flex flex-col gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className={`rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${isActive(item.href)
-                  ? "bg-primary-light text-primary"
-                  : "text-text-muted hover:bg-white/10 hover:text-white"
-                  }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <Link
-            href="/contacto"
-            onClick={() => setMobileOpen(false)}
-            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+            <nav className="hidden items-center gap-1 md:flex">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className={tabClass(item.href)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+
+            <BotonEspecular
+              href="/contacto"
+              className={`group hidden items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8),inset_0_1px_0_rgba(255,255,255,0.2)] transition-colors hover:bg-primary-hover md:inline-flex ${focusRing}`}
+            >
+              Agendar Consulta
+              <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </BotonEspecular>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className={`flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white md:hidden ${focusRing}`}
+              aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={mobileOpen}
+              aria-controls="menu-movil"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+
+          {/* Menú móvil: se despliega dentro del mismo vidrio */}
+          <div
+            id="menu-movil"
+            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out md:hidden ${
+              mobileOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
+            inert={!mobileOpen}
           >
-            Agendar Consulta
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-      )}
+            <div className="overflow-hidden">
+              <div className="border-t border-white/10 px-3 pb-3 pt-2">
+                <nav className="flex flex-col gap-1">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      className={tabClass(item.href)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+                <Link
+                  href="/contacto"
+                  onClick={() => setMobileOpen(false)}
+                  className={`mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8)] transition-colors hover:bg-primary-hover ${focusRing}`}
+                >
+                  Agendar Consulta
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </GlassSurface>
+      </div>
     </header>
   )
 }

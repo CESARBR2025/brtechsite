@@ -6,7 +6,7 @@ export function ServiciosHero() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px]" />
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -bottom-32 right-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-      <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 pb-24 pt-36 sm:px-6 sm:pb-32 sm:pt-44 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-text-muted">
             <Sparkles className="h-3.5 w-3.5 text-primary" />

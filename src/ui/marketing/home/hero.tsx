@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronRight, ChevronDown, Sparkles } from "lucide-react"
+import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 
 const clientes = [
   { marca: "Parrilla Norteña", sucursal: "Sucursal Lomas" },
@@ -20,7 +21,7 @@ export function HeroSection() {
       <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 pb-24 pt-36 sm:px-6 sm:pb-32 sm:pt-44 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
@@ -40,16 +41,16 @@ export function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
+            <BotonEspecular
               href="/contacto"
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
             >
               Agendar Consulta Gratuita
               <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            </BotonEspecular>
             <Link
               href="/#proyectos"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 bg-white/5 px-7 py-3 text-sm font-medium text-text-muted shadow-lg backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-7 py-3 text-sm font-medium text-text-muted shadow-lg backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white sm:w-auto"
             >
               Ver proyectos
             </Link>

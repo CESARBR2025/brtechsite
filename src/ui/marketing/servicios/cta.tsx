@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Calendar, ChevronRight, MessageCircle, Sparkles } from "lucide-react"
+import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 
 export function ServiciosCTA() {
   return (
@@ -21,17 +22,17 @@ export function ServiciosCTA() {
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
+          <BotonEspecular
             href="/contacto"
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl sm:w-auto"
+            className="group inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl sm:w-auto"
           >
             <Calendar className="h-4 w-4" />
             Agendar Asesoría Gratis
-            <ChevronRight className="h-4 w-4" />
-          </Link>
+            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </BotonEspecular>
           <Link
             href="/#faq"
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 px-6 py-3 text-sm font-medium text-text-muted transition-colors hover:bg-white/10 hover:text-white sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-text-muted transition-colors hover:bg-white/10 hover:text-white sm:w-auto"
           >
             <MessageCircle className="h-4 w-4" />
             Ver FAQ
