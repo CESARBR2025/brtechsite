@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ChevronRight, Sparkles } from "lucide-react"
+import { ArrowRight, Sparkles } from "lucide-react"
 
 /** CTA al final del ticket: lleva al cliente a conocer el sistema BR TECH. */
 export function BloqueConoceMas() {
@@ -31,7 +31,7 @@ export function BloqueConoceMas() {
           className="group mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
         >
           Ver qué hacemos
-          <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
     </section>

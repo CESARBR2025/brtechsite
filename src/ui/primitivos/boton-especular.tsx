@@ -7,7 +7,6 @@
  * Cambios respecto al original:
  * - Renderiza un <Link> si recibe `href`; el estilo (fondo, padding, radio) lo
  *   pone quien lo usa vía `className`.
- * - `ogl` se carga con import dinámico (chunk aparte).
  * - El loop de render solo corre en pantalla y mientras el destello está vivo.
  * - Dispositivos táctiles: barrido automático. `prefers-reduced-motion`:
  *   destello estático, sin animación.
@@ -15,6 +14,7 @@
 
 import { useEffect, useRef, type MouseEventHandler, type ReactNode, type Ref } from "react"
 import Link from "next/link"
+import { Renderer, Program, Mesh, Triangle, Color } from "ogl"
 
 const PAD = 20
 
@@ -129,171 +129,159 @@ export function BotonEspecular({
     const fx = fxRef.current
     if (!el || !fx) return
 
-    let cancelado = false
-    let limpiar = () => {}
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const tactil = window.matchMedia("(hover: none)").matches
+    const autoAnimar = tactil && !reducido
 
-    import("ogl").then(({ Renderer, Program, Mesh, Triangle, Color }) => {
-      if (cancelado) return
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    let renderer: Renderer
+    try {
+      renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true, dpr })
+    } catch {
+      return // sin WebGL: el botón queda normal
+    }
+    const gl = renderer.gl
+    gl.clearColor(0, 0, 0, 0)
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-      const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      const tactil = window.matchMedia("(hover: none)").matches
-      const autoAnimar = tactil && !reducido
+    const geometry = new Triangle(gl)
+    if (geometry.attributes.uv) delete geometry.attributes.uv
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      let renderer: InstanceType<typeof Renderer>
-      try {
-        renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true, dpr })
-      } catch {
-        return // sin WebGL: el botón queda normal
-      }
-      const gl = renderer.gl
-      gl.clearColor(0, 0, 0, 0)
-      gl.enable(gl.BLEND)
-      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
-
-      const geometry = new Triangle(gl)
-      if (geometry.attributes.uv) delete geometry.attributes.uv
-
-      const program = new Program(gl, {
-        vertex: VERT,
-        fragment: FRAG,
-        uniforms: {
-          uCenter: { value: [0, 0] },
-          uHalfSize: { value: [1, 1] },
-          uRadius: { value: 0 },
-          uAngle: { value: 2.4 },
-          uPx: { value: dpr },
-          uLineColor: { value: [1, 1, 1] },
-          uBaseColor: { value: [0.28, 0.12, 0.64] },
-          uIntensity: { value: 1 },
-          uShineSize: { value: 0.17 },
-          uShineFade: { value: 0.7 },
-          uThickness: { value: 1 },
-          uBaseWidth: { value: dpr },
-        },
-      })
-      const mesh = new Mesh(gl, { geometry, program })
-      fx.appendChild(gl.canvas)
-
-      const tam = { w: 1, h: 1 }
-      const lineC = new Color()
-      const baseC = new Color()
-
-      let angle = 2.4
-      let idleAngle = 2.4
-      let bright = reducido ? 0.6 : 0
-      let pointerAngle: number | null = null
-      let proximityT = 0
-      let visible = true
-      let raf = 0
-      let last = 0
-
-      const pintar = () => {
-        const p = propsRef.current
-        lineC.set(p.lineColor)
-        baseC.set(p.baseColor)
-        program.uniforms.uAngle.value = angle
-        program.uniforms.uRadius.value = Math.min(p.radius, Math.min(tam.w, tam.h) / 2) * dpr
-        program.uniforms.uLineColor.value = [lineC.r, lineC.g, lineC.b]
-        program.uniforms.uBaseColor.value = [baseC.r, baseC.g, baseC.b]
-        program.uniforms.uIntensity.value = p.intensity * bright
-        program.uniforms.uShineSize.value = (p.shineSize * Math.PI) / 180
-        program.uniforms.uShineFade.value = (p.shineFade * Math.PI) / 180
-        program.uniforms.uThickness.value = p.thickness * dpr
-        renderer.render({ scene: mesh })
-      }
-
-      const resize = () => {
-        // Tamaño fraccional + centro explícito: el SDF queda pegado al borde CSS.
-        const rect = el.getBoundingClientRect()
-        tam.w = rect.width
-        tam.h = rect.height
-        renderer.setSize(rect.width + PAD * 2, rect.height + PAD * 2)
-        program.uniforms.uCenter.value = [(PAD + rect.width / 2) * dpr, (PAD + rect.height / 2) * dpr]
-        program.uniforms.uHalfSize.value = [(rect.width / 2) * dpr, (rect.height / 2) * dpr]
-        if (!raf) pintar()
-      }
-
-      const frame = (now: number) => {
-        const dt = Math.min((now - last) / 1000, 0.05)
-        last = now
-        const p = propsRef.current
-
-        idleAngle += p.speed * dt
-        const target = !autoAnimar && pointerAngle != null ? pointerAngle : idleAngle
-        const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
-        angle += diff * (1 - Math.exp(-dt * 7))
-
-        const brightTarget = autoAnimar ? 1 : proximityT
-        bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8))
-
-        pintar()
-
-        // Se detiene cuando sale de pantalla o el destello ya se apagó.
-        const apagado = !autoAnimar && proximityT === 0 && bright < 0.002
-        if (!visible || apagado) {
-          if (apagado) {
-            bright = 0
-            pintar()
-          }
-          raf = 0
-          return
-        }
-        raf = requestAnimationFrame(frame)
-      }
-
-      const arrancar = () => {
-        if (reducido || raf || !visible) return
-        last = performance.now()
-        raf = requestAnimationFrame(frame)
-      }
-
-      const onPointerMove = (e: PointerEvent) => {
-        const rect = el.getBoundingClientRect()
-        const cx = rect.left + rect.width / 2
-        const cy = rect.top + rect.height / 2
-        const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right)
-        const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom)
-        const dist = Math.hypot(dx, dy)
-        if (dist === 0) {
-          // Sobre el botón la luz se asienta en la diagonal y se mece con el cursor.
-          const nx = (e.clientX - cx) / (rect.width / 2)
-          const ny = (cy - e.clientY) / (rect.height / 2)
-          pointerAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15
-        } else {
-          pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx)
-        }
-        const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1))
-        proximityT = t * t * (3 - 2 * t)
-        if (proximityT > 0 || bright > 0.002) arrancar()
-      }
-
-      const ro = new ResizeObserver(resize)
-      ro.observe(el)
-      resize()
-
-      const io = new IntersectionObserver(([entry]) => {
-        visible = entry.isIntersecting
-        if (visible && autoAnimar) arrancar()
-      })
-      io.observe(el)
-
-      if (!reducido && !autoAnimar) window.addEventListener("pointermove", onPointerMove, { passive: true })
-      if (autoAnimar) arrancar()
-
-      limpiar = () => {
-        cancelAnimationFrame(raf)
-        ro.disconnect()
-        io.disconnect()
-        window.removeEventListener("pointermove", onPointerMove)
-        if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas)
-        gl.getExtension("WEBGL_lose_context")?.loseContext()
-      }
+    const program = new Program(gl, {
+      vertex: VERT,
+      fragment: FRAG,
+      uniforms: {
+        uCenter: { value: [0, 0] },
+        uHalfSize: { value: [1, 1] },
+        uRadius: { value: 0 },
+        uAngle: { value: 2.4 },
+        uPx: { value: dpr },
+        uLineColor: { value: [1, 1, 1] },
+        uBaseColor: { value: [0.28, 0.12, 0.64] },
+        uIntensity: { value: 1 },
+        uShineSize: { value: 0.17 },
+        uShineFade: { value: 0.7 },
+        uThickness: { value: 1 },
+        uBaseWidth: { value: dpr },
+      },
     })
+    const mesh = new Mesh(gl, { geometry, program })
+    fx.appendChild(gl.canvas)
+
+    const tam = { w: 1, h: 1 }
+    const lineC = new Color()
+    const baseC = new Color()
+
+    let angle = 2.4
+    let idleAngle = 2.4
+    let bright = reducido ? 0.6 : 0
+    let pointerAngle: number | null = null
+    let proximityT = 0
+    let visible = true
+    let raf = 0
+    let last = 0
+
+    const pintar = () => {
+      const p = propsRef.current
+      lineC.set(p.lineColor)
+      baseC.set(p.baseColor)
+      program.uniforms.uAngle.value = angle
+      program.uniforms.uRadius.value = Math.min(p.radius, Math.min(tam.w, tam.h) / 2) * dpr
+      program.uniforms.uLineColor.value = [lineC.r, lineC.g, lineC.b]
+      program.uniforms.uBaseColor.value = [baseC.r, baseC.g, baseC.b]
+      program.uniforms.uIntensity.value = p.intensity * bright
+      program.uniforms.uShineSize.value = (p.shineSize * Math.PI) / 180
+      program.uniforms.uShineFade.value = (p.shineFade * Math.PI) / 180
+      program.uniforms.uThickness.value = p.thickness * dpr
+      renderer.render({ scene: mesh })
+    }
+
+    const resize = () => {
+      // Tamaño fraccional + centro explícito: el SDF queda pegado al borde CSS.
+      const rect = el.getBoundingClientRect()
+      tam.w = rect.width
+      tam.h = rect.height
+      renderer.setSize(rect.width + PAD * 2, rect.height + PAD * 2)
+      program.uniforms.uCenter.value = [(PAD + rect.width / 2) * dpr, (PAD + rect.height / 2) * dpr]
+      program.uniforms.uHalfSize.value = [(rect.width / 2) * dpr, (rect.height / 2) * dpr]
+      if (!raf) pintar()
+    }
+
+    const frame = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05)
+      last = now
+      const p = propsRef.current
+
+      idleAngle += p.speed * dt
+      const target = !autoAnimar && pointerAngle != null ? pointerAngle : idleAngle
+      const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI
+      angle += diff * (1 - Math.exp(-dt * 7))
+
+      const brightTarget = autoAnimar ? 1 : proximityT
+      bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8))
+
+      pintar()
+
+      // Se detiene cuando sale de pantalla o el destello ya se apagó.
+      const apagado = !autoAnimar && proximityT === 0 && bright < 0.002
+      if (!visible || apagado) {
+        if (apagado) {
+          bright = 0
+          pintar()
+        }
+        raf = 0
+        return
+      }
+      raf = requestAnimationFrame(frame)
+    }
+
+    const arrancar = () => {
+      if (reducido || raf || !visible) return
+      last = performance.now()
+      raf = requestAnimationFrame(frame)
+    }
+
+    const onPointerMove = (e: PointerEvent) => {
+      const rect = el.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right)
+      const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom)
+      const dist = Math.hypot(dx, dy)
+      if (dist === 0) {
+        // Sobre el botón la luz se asienta en la diagonal y se mece con el cursor.
+        const nx = (e.clientX - cx) / (rect.width / 2)
+        const ny = (cy - e.clientY) / (rect.height / 2)
+        pointerAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15
+      } else {
+        pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx)
+      }
+      const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1))
+      proximityT = t * t * (3 - 2 * t)
+      if (proximityT > 0 || bright > 0.002) arrancar()
+    }
+
+    const ro = new ResizeObserver(resize)
+    ro.observe(el)
+    resize()
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting
+      if (visible && autoAnimar) arrancar()
+    })
+    io.observe(el)
+
+    if (!reducido && !autoAnimar) window.addEventListener("pointermove", onPointerMove, { passive: true })
+    if (autoAnimar) arrancar()
 
     return () => {
-      cancelado = true
-      limpiar()
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+      io.disconnect()
+      window.removeEventListener("pointermove", onPointerMove)
+      if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas)
+      gl.getExtension("WEBGL_lose_context")?.loseContext()
     }
   }, [])
 

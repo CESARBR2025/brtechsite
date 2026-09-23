@@ -2,10 +2,10 @@ import Link from "next/link"
 import {
   ShoppingCart,
   Settings,
+  ArrowRight,
   Globe,
   Check,
   X,
-  ChevronRight,
   Clock,
   Star,
   TrendingUp,
@@ -364,10 +364,10 @@ export function ServiceList() {
 
                   <Link
                     href="/contacto"
-                    className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl"
+                    className="group mt-8 inline-flex items-center gap-1.5 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl"
                   >
                     Cotiza este servicio
-                    <ChevronRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </div>
               </div>

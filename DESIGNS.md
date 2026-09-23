@@ -101,8 +101,8 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 
 ### Botón primario
 ```tsx
-<button className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70">
-  Texto <ArrowRight className="h-4 w-4" />
+<button className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70">
+  Texto <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
 </button>
 ```
 Variante énfasis: `bg-gradient-to-r from-primary to-primary-hover shadow-primary/30`.
@@ -113,8 +113,11 @@ CTA principal sobre fondo oscuro → usar **Botón especular** (abajo) con estas
 - Sobre oscuro: `rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white`
   (no `text-text-muted` sobre oscuro: no alcanza contraste 4.5:1).
 
-> **Migración:** los botones de marketing ya son `rounded-full`. Los de formularios, panel y ticket
-> siguen en `rounded-lg`; al tocarlos, pásalos a `rounded-full`.
+### Íconos en botones
+Un solo ícono **direccional al final** que dice qué va a pasar; el botón lleva `group`.
+- Navega a otra página → `<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />`
+- Baja dentro de la misma página (ancla) → `<ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />`
+- Nada de íconos al inicio + al final en el mismo botón, ni chevrons (`ChevronRight`), ni íconos decorativos.
 
 ### Card
 ```tsx
@@ -203,7 +206,7 @@ Fondo animado WebGL (React Bits `DarkVeil`) con colores originales (`hueShift={0
 
 ### Entrada escalonada
 `motion-safe:animate-aparecer` (keyframe en `globals.css`) + `style={{ animationDelay: "120ms" }}` en pasos
-de 120 ms: badge → H1 → párrafo → botones → prueba social. Solo en heros.
+de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
 
 ### Decoración (opcional, no abusar)
 - Blob: `absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl`

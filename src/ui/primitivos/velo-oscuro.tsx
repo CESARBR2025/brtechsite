@@ -4,15 +4,20 @@
  * Fondo animado "velo oscuro", adaptado de React Bits (DarkVeil). Un shader
  * WebGL (CPPN) dibuja un velo difuso sobre negro.
  * Cambios respecto al original:
+ * - Imagen fija (`poster`) del primer cuadro, visible desde el HTML: no hay
+ *   espera. El canvas arranca en ese mismo instante (TIEMPO_INICIAL) y entra
+ *   con un fundido corto encima. También es el fallback sin WebGL.
  * - Resolución interna reducida (el velo es difuso, no se nota) y ~30 fps.
  * - Se pausa fuera de pantalla y con la pestaña oculta.
- * - `prefers-reduced-motion`: un solo cuadro fijo.
+ * - `prefers-reduced-motion`: no crea WebGL; se queda la imagen fija.
  * - uResolution en píxeles del buffer (el original deformaba en Retina) y el
  *   canvas se mantiene al 100% del contenedor.
  * - Aparece con fundido tras el primer cuadro y libera el contexto al desmontar.
  */
 
 import { useEffect, useRef } from "react"
+import Image from "next/image"
+import { Renderer, Program, Mesh, Triangle, Vec2 } from "ogl"
 
 const VERT = `
 attribute vec2 position;
@@ -99,6 +104,13 @@ void main(){
 
 const FPS = 30
 
+/**
+ * Instante del shader con el que arranca la animación. `public/fondos/velo-poster.webp`
+ * se generó en este mismo instante (hueShift 0, 1500×500, proporción 3:1 para que
+ * `object-cover` recorte igual que el shader). Si cambias uno, regenera el otro.
+ */
+export const TIEMPO_INICIAL = 3
+
 export interface VeloOscuroProps {
   /** Giro de tono en grados (0 = original; -4 lo alinea con primary #7836E2). */
   hueShift?: number
@@ -107,6 +119,8 @@ export interface VeloOscuroProps {
   noiseIntensity?: number
   /** Fracción de la resolución CSS a la que se renderiza. */
   resolutionScale?: number
+  /** Imagen fija del primer cuadro (ver TIEMPO_INICIAL). */
+  poster?: string
   className?: string
 }
 
@@ -116,125 +130,131 @@ export function VeloOscuro({
   warpAmount = 0,
   noiseIntensity = 0,
   resolutionScale = 0.5,
+  poster,
   className = "",
 }: VeloOscuroProps) {
-  const ref = useRef<HTMLCanvasElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const canvas = ref.current
-    const parent = canvas?.parentElement
-    if (!canvas || !parent) return
+    const parent = ref.current
+    if (!parent) return
 
-    let cancelado = false
-    let limpiar = () => {}
+    // Con movimiento reducido basta la imagen fija.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
-    import("ogl").then(({ Renderer, Program, Mesh, Triangle, Vec2 }) => {
-      if (cancelado) return
+    // Canvas nuevo en cada montaje: reusar uno cuyo contexto ya se liberó
+    // (p. ej. doble montaje de StrictMode) lo dejaría muerto.
+    let renderer: Renderer
+    try {
+      renderer = new Renderer({ dpr: 1 })
+    } catch {
+      return // sin WebGL: se queda la imagen fija
+    }
+    const gl = renderer.gl
+    const canvas = gl.canvas
+    canvas.className = "block opacity-0 transition-opacity duration-[400ms] ease-out"
+    parent.appendChild(canvas)
 
-      let renderer: InstanceType<typeof Renderer>
-      try {
-        renderer = new Renderer({ canvas, dpr: 1 })
-      } catch {
-        return // sin WebGL: queda el color de fondo del contenedor
-      }
-      const gl = renderer.gl
-
-      const program = new Program(gl, {
-        vertex: VERT,
-        fragment: FRAG,
-        uniforms: {
-          uTime: { value: 0 },
-          uResolution: { value: new Vec2() },
-          uHueShift: { value: hueShift },
-          uNoise: { value: noiseIntensity },
-          uScan: { value: 0 },
-          uScanFreq: { value: 0 },
-          uWarp: { value: warpAmount },
-          uLightMode: { value: 0 },
-        },
-      })
-      const mesh = new Mesh(gl, { geometry: new Triangle(gl), program })
-
-      const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      // Con movimiento reducido se congela en un cuadro vistoso.
-      let tiempo = reducido ? 3 : 0
-      let visible = true
-      let raf = 0
-      let ultimo = 0
-      let mostrado = false
-
-      const pintar = () => {
-        program.uniforms.uTime.value = tiempo
-        renderer.render({ scene: mesh })
-        if (!mostrado) {
-          mostrado = true
-          canvas.style.opacity = "1"
-        }
-      }
-
-      const resize = () => {
-        const w = Math.max(1, Math.round(parent.clientWidth * resolutionScale))
-        const h = Math.max(1, Math.round(parent.clientHeight * resolutionScale))
-        renderer.setSize(w, h)
-        // ogl fija el tamaño CSS en px; lo devolvemos al 100% del contenedor.
-        canvas.style.width = "100%"
-        canvas.style.height = "100%"
-        program.uniforms.uResolution.value.set(gl.canvas.width, gl.canvas.height)
-        if (!raf) pintar()
-      }
-
-      const frame = (now: number) => {
-        raf = requestAnimationFrame(frame)
-        const dt = now - ultimo
-        if (dt < 1000 / FPS - 2) return
-        ultimo = now
-        tiempo += (Math.min(dt, 100) / 1000) * speed
-        pintar()
-      }
-
-      const actualizarLoop = () => {
-        const debeCorrer = !reducido && visible && document.visibilityState === "visible"
-        if (debeCorrer && !raf) {
-          ultimo = performance.now()
-          raf = requestAnimationFrame(frame)
-        } else if (!debeCorrer && raf) {
-          cancelAnimationFrame(raf)
-          raf = 0
-        }
-      }
-
-      const ro = new ResizeObserver(resize)
-      ro.observe(parent)
-      resize()
-
-      const io = new IntersectionObserver(([entry]) => {
-        visible = entry.isIntersecting
-        actualizarLoop()
-      })
-      io.observe(parent)
-      document.addEventListener("visibilitychange", actualizarLoop)
-      actualizarLoop()
-
-      limpiar = () => {
-        cancelAnimationFrame(raf)
-        ro.disconnect()
-        io.disconnect()
-        document.removeEventListener("visibilitychange", actualizarLoop)
-        gl.getExtension("WEBGL_lose_context")?.loseContext()
-      }
+    const program = new Program(gl, {
+      vertex: VERT,
+      fragment: FRAG,
+      uniforms: {
+        uTime: { value: 0 },
+        uResolution: { value: new Vec2() },
+        uHueShift: { value: hueShift },
+        uNoise: { value: noiseIntensity },
+        uScan: { value: 0 },
+        uScanFreq: { value: 0 },
+        uWarp: { value: warpAmount },
+        uLightMode: { value: 0 },
+      },
     })
+    const mesh = new Mesh(gl, { geometry: new Triangle(gl), program })
+
+    let tiempo = TIEMPO_INICIAL
+    let visible = true
+    let raf = 0
+    let ultimo = 0
+    let mostrado = false
+
+    const pintar = () => {
+      program.uniforms.uTime.value = tiempo
+      renderer.render({ scene: mesh })
+      if (!mostrado) {
+        mostrado = true
+        canvas.style.opacity = "1"
+      }
+    }
+
+    const resize = () => {
+      const w = Math.max(1, Math.round(parent.clientWidth * resolutionScale))
+      const h = Math.max(1, Math.round(parent.clientHeight * resolutionScale))
+      renderer.setSize(w, h)
+      // ogl fija el tamaño CSS en px; lo devolvemos al 100% del contenedor.
+      canvas.style.width = "100%"
+      canvas.style.height = "100%"
+      program.uniforms.uResolution.value.set(gl.canvas.width, gl.canvas.height)
+      if (!raf) pintar()
+    }
+
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame)
+      const dt = now - ultimo
+      if (dt < 1000 / FPS - 2) return
+      ultimo = now
+      tiempo += (Math.min(dt, 100) / 1000) * speed
+      pintar()
+    }
+
+    const actualizarLoop = () => {
+      const debeCorrer = visible && document.visibilityState === "visible"
+      if (debeCorrer && !raf) {
+        ultimo = performance.now()
+        raf = requestAnimationFrame(frame)
+      } else if (!debeCorrer && raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      }
+    }
+
+    const ro = new ResizeObserver(resize)
+    ro.observe(parent)
+    resize()
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting
+      actualizarLoop()
+    })
+    io.observe(parent)
+    document.addEventListener("visibilitychange", actualizarLoop)
+    actualizarLoop()
 
     return () => {
-      cancelado = true
-      limpiar()
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+      io.disconnect()
+      document.removeEventListener("visibilitychange", actualizarLoop)
+      canvas.remove()
+      gl.getExtension("WEBGL_lose_context")?.loseContext()
     }
   }, [hueShift, speed, warpAmount, noiseIntensity, resolutionScale])
 
   return (
-    <canvas
-      ref={ref}
-      aria-hidden="true"
-      className={`block h-full w-full opacity-0 transition-opacity duration-1000 ease-out ${className}`}
-    />
+    <>
+      {poster && (
+        <Image
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          fill
+          preload
+          fetchPriority="high"
+          unoptimized
+          sizes="100vw"
+          className="object-cover"
+        />
+      )}
+      <div ref={ref} aria-hidden="true" className={`relative h-full w-full ${className}`} />
+    </>
   )
 }

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ArrowDown, ArrowRight } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 import { VeloOscuro } from "@/src/ui/primitivos/velo-oscuro"
 
@@ -9,16 +9,17 @@ const retraso = (ms: number) => ({ animationDelay: `${ms}ms` })
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-bg-deep">
+    // Al menos una pantalla completa (svh: descuenta la barra del navegador móvil)
+    <section className="relative flex min-h-svh items-center overflow-hidden bg-bg-deep">
       {/* Velo animado (WebGL) con sus colores originales sobre negro puro */}
       <div className="absolute inset-0">
-        <VeloOscuro hueShift={0} />
+        <VeloOscuro hueShift={0} poster="/fondos/velo-poster.webp" />
       </div>
 
       {/* Funde el velo hacia el borde inferior */}
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-bg-deep" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-24 pt-36 sm:px-6 sm:pb-32 sm:pt-44 lg:px-8">
+      <div className="relative mx-auto w-full max-w-7xl px-4 pb-20 pt-32 sm:px-6 sm:pb-24 sm:pt-36 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           {/* Qué hacemos */}
           <div
@@ -58,30 +59,16 @@ export function HeroSection() {
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
             >
               Agendar Consulta Gratuita
-              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </BotonEspecular>
             <Link
               href="/#proyectos"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:w-auto"
+              className="group inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:w-auto"
             >
               Ver proyectos
+              <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
             </Link>
           </div>
-
-          {/* Prueba social discreta */}
-          <p
-            style={retraso(480)}
-            className="mt-10 inline-flex items-center gap-2 text-xs text-white/55 sm:text-sm motion-safe:animate-aparecer"
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 motion-safe:animate-ping" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
-            </span>
-            <span>
-              <span className="font-medium text-white/80">Parrilla Norteña Soft</span>, nuestro primer
-              sistema, opera hoy en 2 sucursales
-            </span>
-          </p>
         </div>
       </div>
     </section>

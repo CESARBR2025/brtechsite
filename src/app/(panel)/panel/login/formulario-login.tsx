@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { useSearchParams } from "next/navigation"
-import { ChevronRight, Loader2, Lock } from "lucide-react"
+import { ArrowRight, Loader2, Lock } from "lucide-react"
 import { iniciarSesion } from "@/src/app/(panel)/panel/acciones"
 import type { EstadoFormulario } from "@/src/app/(panel)/panel/tipos"
 
@@ -49,7 +49,7 @@ export function FormularioLogin() {
         ) : (
           <>
             Entrar
-            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </>
         )}
       </button>

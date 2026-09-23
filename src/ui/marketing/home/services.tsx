@@ -91,7 +91,7 @@ export function ServicesSection() {
                   className="inline-flex items-center gap-1 rounded-full bg-primary-light px-3 py-1.5 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white"
                 >
                   Más detalles
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
             </div>

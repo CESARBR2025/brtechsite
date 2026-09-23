@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ChevronRight, Calendar, MessageCircle, Sparkles } from "lucide-react"
+import { ArrowDown, ArrowRight, Sparkles } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 
 export function CTASection() {
@@ -30,16 +30,15 @@ export function CTASection() {
             baseColor="#F1EBFF"
             className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-primary shadow-lg transition-all hover:bg-white/90 hover:shadow-xl active:scale-[0.98] sm:w-auto"
           >
-            <Calendar className="h-4 w-4" />
             Agendar Ahora
-            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </BotonEspecular>
           <Link
             href="/#faq"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto"
+            className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto"
           >
-            <MessageCircle className="h-4 w-4" />
             ¿Preguntas antes? Lee nuestro FAQ
+            <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
           </Link>
         </div>
       </div>
