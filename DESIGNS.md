@@ -23,7 +23,7 @@ métrico (`Inter Fallback`, evita saltos de layout). No declares `font-family` a
 | `success-light` | `#D1FAE5` | `bg-success-light` | Fondo de pills de estado positivo |
 | `warning` | `#F59E0B` | `bg-warning` `text-warning` | "Pendiente", alertas, ratings |
 | `bg-dark` | `#151127` | `bg-bg-dark` | **Fondo de todas las secciones oscuras** (con rejilla + resplandor), footer, heros de páginas internas, tinte del navbar de vidrio, bloque "Conoce más" |
-| `bg-deep` | `#000000` | `bg-bg-deep` | **Exclusivo del hero de Inicio** (detrás del velo). Negro puro para maximizar el contraste del violeta; su borde inferior funde a `bg-dark` |
+| `bg-deep` | `#000000` | `bg-bg-deep` | **Solo donde vive el velo:** hero de Inicio y el panel del CTA final (su eco). Negro puro para maximizar el contraste del violeta; el hero funde a `bg-dark` |
 | `surface-dark` | `white / 3%` | `bg-surface-dark` | Tarjetas y paneles sobre fondo oscuro |
 | `surface-dark-hover` | `white / 6%` | `hover:bg-surface-dark-hover` | Hover de tarjeta o botón-ícono sobre oscuro |
 | `line-dark` | `white / 8%` | `border-line-dark` `divide-line-dark` | Bordes finos y divisores sobre oscuro |
@@ -244,6 +244,12 @@ Título fijo a la izquierda (`lg:sticky`, sección con `overflow-clip`) y pregun
 `divide-y divide-line-dark border-y`, sin tarjetas. Botón con `aria-expanded`/`aria-controls`; ícono `+`
 en círculo que rota 45° a `×` y se llena de `primary` al abrir. Respuesta con transición
 `grid-rows-[0fr] → [1fr]` e `inert` mientras está cerrada. La primera pregunta abre por defecto.
+
+### CTA final (`home/cta.tsx`)
+El sitio cierra como abrió: panel `rounded-2xl border-line-dark bg-bg-deep` dentro de la sección
+`bg-dark`, con la imagen fija del velo **invertida** (`-scale-y-100`, bajada `translate-y-[15%]` para que
+la luz nazca bajo el botón), filo de luz violeta arriba, etiqueta centrada con guiones, H2 de 60 px,
+botón especular morado y una línea de confianza (`text-white/55`). Un solo CTA.
 
 ### Footer (`src/ui/marketing/footer/index.tsx`)
 Oscuro (`bg-dark`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
