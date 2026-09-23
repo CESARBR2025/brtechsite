@@ -1,5 +1,4 @@
-import Link from "next/link"
-import { ArrowDown, ArrowRight, Sparkles } from "lucide-react"
+import { ArrowRight, Sparkles } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 
 export function CTASection() {
@@ -33,13 +32,6 @@ export function CTASection() {
             Agendar Ahora
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </BotonEspecular>
-          <Link
-            href="/#faq"
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto"
-          >
-            ¿Preguntas antes? Lee nuestro FAQ
-            <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
-          </Link>
         </div>
       </div>
     </section>

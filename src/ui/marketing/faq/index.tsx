@@ -6,7 +6,7 @@ import { ChevronDown, HelpCircle } from "lucide-react"
 const faqs = [
   {
     q: "¿Cuánto cuesta un proyecto?",
-    a: "Depende de complejidad. Nuestro rango es $3,000 — $15,000 por proyecto. Ofrecemos cotización gratuita.",
+    a: "Depende del alcance: cada sistema se cotiza según cómo opera tu negocio. La cotización es gratuita y sin compromiso.",
   },
   {
     q: "¿Cuánto toma?",

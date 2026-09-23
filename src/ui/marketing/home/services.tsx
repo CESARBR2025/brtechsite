@@ -5,10 +5,9 @@ const services = [
   {
     icon: ShoppingCart,
     title: "Sistema POS para Restaurantes",
-    tagline: "Obten el control de tu operación",
+    tagline: "Obtén el control de tu operación",
     description:
       "Creamos tu herramienta diseñada a tu restaurante gestionando: mesas, pedidos, cocina e inventario integrados en una sola plataforma.",
-    price: "Desde $7,000 MXN",
     features: ["Control de caja", "Gestión de mesas", "Órdenes en tiempo real", "Control de cocina"],
   },
   {
@@ -17,7 +16,6 @@ const services = [
     tagline: "Elimina tu venda de stock faltante",
     description:
       "Sistema para controlar entradas, salidas y existencias en tiempo real. Reduce errores y evita fugas de inventario.",
-    price: "Desde $6,000 MXN",
     features: ["Stock en tiempo real", "Alertas de inventario", "Movimientos registrados"],
   },
   {
@@ -25,16 +23,9 @@ const services = [
     title: "Tu negocio digital",
     tagline: "Haz que te encuentren",
     description:
-      "Paginas web enfocadas en conversión para restaurantes y negocios locales. Diseñadas para generar reservas o pedidos.",
-    price: "Desde $3,000 MXN",
+      "Páginas web enfocadas en conversión para restaurantes y negocios locales. Diseñadas para generar reservas o pedidos.",
     features: ["Optimización de conversión", "Diseño responsive", "Integración con Email o pedidos"],
   },
-]
-
-const serviceIconsList = [
-  { icon: ShoppingCart, label: "POS" },
-  { icon: Settings, label: "Inventarios" },
-  { icon: Globe, label: "Web" },
 ]
 
 export function ServicesSection() {
@@ -50,6 +41,10 @@ export function ServicesSection() {
           <h2 className="mt-4 text-balance text-[26px] font-bold tracking-tight text-text-primary sm:text-[34px]">
             Servicios que Transforman
           </h2>
+          <p className="mt-4 text-pretty text-base leading-relaxed text-text-secondary">
+            No forzamos tu negocio a encajar en una herramienta: construimos la
+            herramienta que encaja con tu negocio.
+          </p>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
@@ -82,10 +77,7 @@ export function ServicesSection() {
                   </li>
                 ))}
               </ul>
-              <div className="relative mt-4 flex items-center justify-between border-t border-border pt-4">
-                <p className="text-lg font-bold text-text-primary">
-                  {service.price}
-                </p>
+              <div className="relative mt-4 border-t border-border pt-4">
                 <Link
                   href={`/servicios#${service.title.toLowerCase().replace(/\s+/g, "-")}`}
                   className="inline-flex items-center gap-1 rounded-full bg-primary-light px-3 py-1.5 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white"
