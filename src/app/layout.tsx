@@ -8,9 +8,9 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "BR TECH - Transformación Digital para PyMEs",
+  title: "BR TECH Digital Systems",
   description:
-    "Automatización de procesos, e-commerce y sistemas personalizados que escalan con tu negocio.",
+    "Software a la medida para empresas: sistemas multisucursal para restaurantes, control de inventarios y páginas web.",
 }
 
 export default function RootLayout({
