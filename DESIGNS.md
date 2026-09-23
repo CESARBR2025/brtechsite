@@ -87,8 +87,8 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 > todo lo demás, footer incluido, va sobre `bg-dark` con rejilla desvanecida + un resplandor. El ritmo
 > entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el cambio de
 > color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
-> **Servicios** ya está en el mismo sistema (hero + un bloque por servicio + "Cómo trabajamos" + `CTAFinal`).
-> Contacto se migrará; mientras tanto conserva sus secciones claras.
+> **Todo el sitio de marketing** (Inicio, Servicios, Contacto) usa este sistema oscuro. Las recetas claras
+> de abajo (card blanca, input claro) quedan para el panel y el ticket público.
 > **Sin montos en el sitio de marketing:** la inversión se cotiza. En Servicios solo se listan los
 > factores que definen la inversión (sin precios); el contenido vive en `servicios/datos.ts`.
 
@@ -170,6 +170,12 @@ Card estática (sin hover): quita `group`, `transition-all` y los `hover:*`.
 </div>
 ```
 Error de campo/formulario: `rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs font-medium text-red-500`.
+
+**Input sobre oscuro** (formulario de Contacto): etiqueta visible siempre (`mb-2 block text-xs font-medium
+text-white/65`, nunca solo placeholder) +
+`w-full rounded-lg border border-line-dark-strong bg-white/[0.04] py-3 pl-10 pr-3 text-sm text-white
+placeholder-white/35 hover:border-white/25 focus:border-primary focus:ring-2 focus:ring-primary/30`.
+Error sobre oscuro: `border-red-500/30 bg-red-500/10 text-red-300` con `role="alert"`.
 
 ### Lista con check
 ```tsx

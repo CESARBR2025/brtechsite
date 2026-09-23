@@ -1,67 +1,66 @@
-import { MapPin, Clock } from "lucide-react"
+import { Clock, MapPin } from "lucide-react"
 
-const contactInfo = [
+const siguientesPasos = [
   {
-    icon: MapPin,
-    label: "Ubicación",
-    value: "San Juan del Río, Querétaro, MX",
+    titulo: "Leemos tu mensaje",
+    descripcion: "Te respondemos en menos de 24 horas para entender tu necesidad.",
   },
   {
-    icon: Clock,
-    label: "Horario",
-    value: "Lun — Vie, 9:00 — 18:00",
+    titulo: "Diagnóstico sin costo",
+    descripcion: "Revisamos contigo cómo opera tu negocio y qué conviene resolver primero.",
+  },
+  {
+    titulo: "Recibes tu propuesta",
+    descripcion: "En 48 horas tienes una propuesta personalizada, sin contrato ni compromiso.",
   },
 ]
 
-const stats = [
-  { label: "Cadena en producción", value: "1" },
-  { label: "Sucursales activas", value: "2" },
-  { label: "Respuesta promedio", value: "24 h" },
+const datos = [
+  { icon: MapPin, label: "Ubicación", value: "San Juan del Río, Querétaro, MX" },
+  { icon: Clock, label: "Horario", value: "Lun — Vie, 9:00 — 18:00" },
 ]
 
 export function ContactInfo() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
-        <h3 className="text-base font-bold text-text-primary">
-          Información de contacto
-        </h3>
-        <div className="mt-5 flex flex-col gap-4">
-          {contactInfo.map((item) => (
-            <div key={item.label} className="flex items-center gap-4 rounded-xl bg-bg-section p-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
-                <item.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs text-text-muted">{item.label}</p>
-                <p className="text-sm font-medium text-text-primary">
-                  {item.value}
+    <div className="space-y-10 lg:pt-4">
+      <div>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-white/55">
+          Qué pasa después
+        </h2>
+        <ol className="relative mt-6">
+          <span
+            aria-hidden="true"
+            className="absolute bottom-5 left-4 top-5 w-px bg-gradient-to-b from-primary via-primary/40 to-transparent"
+          />
+          {siguientesPasos.map((p, i) => (
+            <li key={p.titulo} className="relative grid grid-cols-[2rem_1fr] gap-x-4 pb-7 last:pb-0">
+              <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-line-dark-strong bg-bg-dark font-mono text-xs tabular-nums text-primary-light">
+                {i + 1}
+              </span>
+              <div className="pt-1">
+                <h3 className="text-base font-semibold text-white">{p.titulo}</h3>
+                <p className="mt-1 text-pretty text-sm leading-relaxed text-white/65">
+                  {p.descripcion}
                 </p>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
 
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
-        <h3 className="text-base font-bold text-text-primary">
-          Confianza que respalda
-        </h3>
-        <div className="mt-5 grid grid-cols-3 gap-4">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-lg font-bold text-primary sm:text-xl">
-                {s.value}
-              </p>
-              <p className="mt-0.5 text-[11px] leading-tight text-text-muted sm:text-xs">
-                {s.label}
-              </p>
+      <dl className="divide-y divide-line-dark border-y border-line-dark">
+        {datos.map((d) => (
+          <div key={d.label} className="flex items-center gap-4 py-4">
+            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-line-dark bg-surface-dark text-primary-light">
+              <d.icon className="h-5 w-5" />
+            </span>
+            <div>
+              <dt className="text-xs text-white/55">{d.label}</dt>
+              <dd className="text-sm font-medium text-white">{d.value}</dd>
             </div>
-          ))}
-        </div>
-      </div>
-
-
+          </div>
+        ))}
+      </dl>
     </div>
   )
 }
