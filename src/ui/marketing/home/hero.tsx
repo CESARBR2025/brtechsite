@@ -16,8 +16,8 @@ export function HeroSection() {
         <VeloOscuro hueShift={0} poster="/fondos/velo-poster.webp" />
       </div>
 
-      {/* Funde el velo hacia el borde inferior */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-bg-deep" />
+      {/* Funde el velo hacia bg-dark, el fondo de las secciones siguientes */}
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-bg-dark" />
 
       <div className="relative mx-auto w-full max-w-7xl px-4 pb-20 pt-32 sm:px-6 sm:pb-24 sm:pt-36 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">

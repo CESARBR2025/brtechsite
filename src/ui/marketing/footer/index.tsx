@@ -14,7 +14,7 @@ const columnas = [
   {
     titulo: "Servicios",
     enlaces: [
-      { label: "Sistema POS para restaurantes", href: "/servicios#sistema-pos-para-restaurantes" },
+      { label: "Software multisucursal para restaurantes", href: "/servicios#sistema-pos-para-restaurantes" },
       { label: "Control de inventarios", href: "/servicios#control-de-inventarios" },
       { label: "Páginas web", href: "/servicios#tu-negocio-digital" },
     ],
@@ -41,7 +41,7 @@ const enlace =
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-bg-deep">
+    <footer className="relative overflow-hidden bg-bg-dark">
       {/* Filo de luz superior + resplandor */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
       <div className="absolute left-1/2 top-0 h-48 w-[36rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-3xl" />

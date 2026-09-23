@@ -22,8 +22,8 @@ métrico (`Inter Fallback`, evita saltos de layout). No declares `font-family` a
 | `success` | `#10B981` | `bg-success` `text-success` | Estado OK, "Publicado", "Pagado", indicadores positivos |
 | `success-light` | `#D1FAE5` | `bg-success-light` | Fondo de pills de estado positivo |
 | `warning` | `#F59E0B` | `bg-warning` `text-warning` | "Pendiente", alertas, ratings |
-| `bg-dark` | `#151127` | `bg-bg-dark` | Tinte del navbar de vidrio, footer, heros oscuros de páginas internas, bloque "Conoce más" |
-| `bg-deep` | `#000000` | `bg-bg-deep` | Lienzo oscuro continuo de Inicio (hero con velo, secciones rediseñadas) y **footer**. Negro puro para maximizar el contraste del violeta |
+| `bg-dark` | `#151127` | `bg-bg-dark` | **Fondo de todas las secciones oscuras** (con rejilla + resplandor), footer, heros de páginas internas, tinte del navbar de vidrio, bloque "Conoce más" |
+| `bg-deep` | `#000000` | `bg-bg-deep` | **Exclusivo del hero de Inicio** (detrás del velo). Negro puro para maximizar el contraste del violeta; su borde inferior funde a `bg-dark` |
 | `surface-dark` | `white / 3%` | `bg-surface-dark` | Tarjetas y paneles sobre fondo oscuro |
 | `surface-dark-hover` | `white / 6%` | `hover:bg-surface-dark-hover` | Hover de tarjeta o botón-ícono sobre oscuro |
 | `line-dark` | `white / 8%` | `border-line-dark` `divide-line-dark` | Bordes finos y divisores sobre oscuro |
@@ -83,9 +83,10 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 
 ## 2. Layout
 
-> **Dirección (sept 2026): Inicio es un lienzo oscuro continuo** (`bg-deep`) del hero al footer.
-> El ritmo entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el
-> cambio de color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
+> **Dirección (sept 2026): Inicio es un lienzo oscuro continuo.** El hero es negro total (`bg-deep`);
+> todo lo demás, footer incluido, va sobre `bg-dark` con rejilla desvanecida + un resplandor. El ritmo
+> entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el cambio de
+> color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
 > Servicios y Contacto se migrarán al mismo sistema; mientras tanto conservan sus secciones claras.
 
 ```tsx
@@ -194,8 +195,47 @@ Error de campo/formulario: `rounded-lg border border-red-500/20 bg-red-500/10 p-
 Sin `shadow-card` (las sombras no se ven sobre negro); para destacar una, `shadow-glow`.
 Títulos `text-white`, cuerpo `text-white/65`, etiquetas `text-xs uppercase tracking-wider text-white/55`.
 
+### Encabezado de sección sobre oscuro
+Alineado a la izquierda, sin pill: etiqueta con guion violeta + H2 grande + párrafo.
+```tsx
+<p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+  <span className="h-px w-8 bg-primary" /> Etiqueta
+</p>
+<h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">…</h2>
+<p className="mt-5 text-pretty text-base leading-relaxed text-white/65 sm:text-lg">…</p>
+```
+Ritmo de sección oscura: `relative overflow-hidden bg-bg-dark py-24 sm:py-32` + la rejilla sutil de
+"Decoración" con `[mask-image:radial-gradient(ellipse_at_X%_Y%,black_5%,transparent_60%)]` (varía X/Y por
+sección para que no se repita) + un blob `bg-primary/10 blur-3xl`. Si la sección tiene un bloque `sticky`, usa
+`overflow-clip` en lugar de `overflow-hidden` (hidden crea un contenedor de scroll y rompe el sticky). Listas: `divide-y divide-line-dark border-y border-line-dark`
+con numeración `font-mono text-primary-light/60` (`01`, `02`…).
+
+### Tarjeta foco (`src/ui/primitivos/tarjeta-foco.tsx`)
+Tarjeta sobre oscuro con un foco violeta que sigue al puntero (solo CSS). Jerarquía dentro de la
+tarjeta: mini ilustración de interfaz (o ícono) → número `01` → **nombre de lo que ofreces** (lo más
+grande) → descripción → lista → enlace. Nada de lemas en mayúsculas por encima del título. Íconos y checks en `text-primary-light`
+(el verde queda para estados). Para ofertas del mismo peso, tarjetas iguales en fila (`md:grid-cols-3`).
+Enlace de la tarjeta = **píldora**: botón secundario sobre oscuro que se tiñe con el hover de la tarjeta
+(`group-hover:border-primary/50 group-hover:bg-primary/15`) y se llena al pasar sobre ella
+(`hover:!bg-primary hover:!border-primary`); usa `group/enlace` para animar su propia flecha.
+
+### Mini ilustraciones de interfaz (`src/ui/marketing/home/ilustraciones-servicios.tsx`)
+Para que una tarjeta **muestre** lo que ofrece en lugar de solo decirlo: una mini UI en un marco
+`h-40 rounded-xl border border-line-dark bg-bg-deep/40`, con barras en degradado `primary-hover → primary`.
+El color extra entra **solo como estado** (verde = en línea, ámbar = reabastecer); nunca colores por
+industria. Se animan con `group-hover` de la tarjeta, siempre bajo `motion-safe:`, y llevan `aria-hidden`.
+Datos genéricos, nunca de clientes reales.
+
+### Galería en acordeón (`src/ui/primitivos/galeria-acordeon.tsx`)
+Adaptada de React Bits `AccordionGallery`, **sin GSAP** (transiciones CSS). Paneles de fotos que se
+abren con hover (mouse), toque o flechas del teclado; los cerrados van en gris y oscurecidos, así las
+fotos de clientes con colores propios (naranjas, rojos) no compiten con la paleta hasta que se abren.
+Uso: casos de éxito con 3–5 fotos reales. Fotos en `public/clientes/<cliente>/` como WebP sin metadatos.
+Mockups de apps móviles (PNG/WebP con el teléfono y fondo transparente): `ajuste: "contener"` — se
+muestran completos y centrados sobre un resplandor violeta, sin recortar.
+
 ### Footer (`src/ui/marketing/footer/index.tsx`)
-Oscuro (`bg-deep`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
+Oscuro (`bg-dark`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
 "Agendar consulta", columnas Navegación / Servicios / Contacto, barra inferior con © "BR TECH
 Digital Systems" y redes como botón-ícono redondo. Sin marca de agua.
 **No exponer correos personales**: el contacto va siempre al formulario (`/contacto`).
