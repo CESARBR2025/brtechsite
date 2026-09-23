@@ -272,7 +272,7 @@ export function FormularioTicket({
           <button
             type="button"
             onClick={() => setItems((p) => [...p, filaVacia()])}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary-light px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary-light px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white"
           >
             <Plus className="h-3.5 w-3.5" /> Agregar
           </button>
@@ -391,7 +391,7 @@ export function FormularioTicket({
         <button
           type="submit"
           disabled={guardando}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70"
         >
           {guardando ? (
             <>

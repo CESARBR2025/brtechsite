@@ -145,7 +145,7 @@ export function ContactForm() {
           <button
             type="submit"
             disabled={isPending} // Deshabilitar mientras envía
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] sm:w-auto disabled:opacity-70 disabled:pointer-events-none"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary-hover hover:shadow-xl active:scale-[0.98] sm:w-auto disabled:opacity-70 disabled:pointer-events-none"
           >
             {isPending ? (
               <>

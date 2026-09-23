@@ -88,7 +88,7 @@ export function ServicesSection() {
                 </p>
                 <Link
                   href={`/servicios#${service.title.toLowerCase().replace(/\s+/g, "-")}`}
-                  className="inline-flex items-center gap-1 rounded-lg bg-primary-light px-3 py-1.5 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white"
+                  className="inline-flex items-center gap-1 rounded-full bg-primary-light px-3 py-1.5 text-sm font-medium text-primary transition-all hover:bg-primary hover:text-white"
                 >
                   Más detalles
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

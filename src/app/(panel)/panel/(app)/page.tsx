@@ -17,7 +17,7 @@ import { BadgeEstado, BadgePago } from "@/src/ui/primitivos/badge-estado"
 export const dynamic = "force-dynamic"
 
 const PILL =
-  "inline-flex items-center gap-1 rounded-lg bg-bg-section px-2.5 py-1 text-xs font-medium text-text-secondary transition-colors hover:bg-border"
+  "inline-flex items-center gap-1 rounded-full bg-bg-section px-2.5 py-1 text-xs font-medium text-text-secondary transition-colors hover:bg-border"
 
 function Kpi({
   icono: Icono,
@@ -73,7 +73,7 @@ export default async function PaginaPanel() {
             </div>
             <Link
               href="/panel/nuevo"
-              className="group inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary-hover px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" />
               Nuevo ticket
@@ -110,7 +110,7 @@ export default async function PaginaPanel() {
               </p>
               <Link
                 href="/panel/nuevo"
-                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
               >
                 <Plus className="h-4 w-4" />
                 Nuevo ticket
@@ -164,7 +164,7 @@ export default async function PaginaPanel() {
                   <div className="relative mt-3 flex flex-wrap items-center gap-2">
                     <Link
                       href={`/panel/${t.id}`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-primary-light px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white"
+                      className="inline-flex items-center gap-1 rounded-full bg-primary-light px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white"
                     >
                       Editar
                     </Link>

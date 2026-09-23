@@ -12,7 +12,7 @@ import type { EstadoFormulario } from "@/src/app/(panel)/panel/tipos"
 import type { EstadoTicket } from "@/src/modules/tickets/domain/estado-ticket"
 
 const BTN =
-  "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+  "inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
 
 export function AccionesTicket({
   id,
