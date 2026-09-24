@@ -11,6 +11,7 @@ export const EMPRESA = {
   estado: "Querétaro",
   pais: "MX",
   horario: "Lun — Vie, 9:00 — 18:00",
+  fundador: "César Iván Bárcenas Rosales",
 }
 
 const WHATSAPP_NUMERO = "524272011625"

@@ -66,6 +66,12 @@ export const negocioJsonLd = {
     opens: "09:00",
     closes: "18:00",
   },
+  founder: {
+    "@type": "Person",
+    name: EMPRESA.fundador,
+    jobTitle: "Fundador",
+    sameAs: [REDES.instagram, REDES.linkedin],
+  },
   hasMap: REDES.google,
   sameAs: [REDES.google, REDES.linkedin, REDES.instagram],
 }
