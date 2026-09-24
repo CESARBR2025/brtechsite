@@ -37,7 +37,7 @@ export function HeroSection() {
           >
             Tu negocio es diferente.{" "}
             <span className="bg-gradient-to-br from-primary-light from-30% to-primary bg-clip-text text-transparent">
-              Tu software también debería de serlo
+              Tu software también debería serlo
             </span>
           </h1>
 
