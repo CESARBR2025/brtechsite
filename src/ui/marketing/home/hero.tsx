@@ -36,7 +36,7 @@ export function HeroSection() {
             className="mt-7 text-balance text-[40px] font-bold leading-[1.05] tracking-[-0.035em] text-white sm:text-6xl lg:text-7xl motion-safe:animate-aparecer"
           >
             Tu negocio es diferente.{" "}
-            <span className="bg-gradient-to-br from-primary-light from-30% to-primary bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-br from-primary-light from-30% to-primary bg-clip-text text-transparent">
               Tu software también debería serlo
             </span>
           </h1>
