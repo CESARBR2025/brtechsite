@@ -6,6 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   ChevronDown,
+  ClipboardList,
   ExternalLink,
   Globe,
   LogOut,
@@ -43,8 +44,10 @@ const SECCIONES: SeccionNav[] = [
     ],
   },
   {
-    titulo: "Software Managment",
-    items: [],
+    titulo: "Software a la medida",
+    items: [
+      { href: "/panel/levantamientos", label: "Levantamientos", icon: ClipboardList },
+    ],
   },
 ]
 
@@ -127,7 +130,7 @@ function ContenidoBarra({ children }: { children: React.ReactNode }) {
         />
       </Link>
       <div className="mt-6 flex-1 overflow-y-auto">{children}</div>
-      <p className="px-3 text-[11px] text-text-muted/70">BR TECH DS · Tickets</p>
+      <p className="px-3 text-[11px] text-text-muted/70">BR TECH DS · Panel</p>
     </>
   )
 }
@@ -191,6 +194,10 @@ function PildoraUsuario() {
 
 export function ShellPanel({ children }: { children: React.ReactNode }) {
   const [drawer, setDrawer] = useState(false)
+  const pathname = usePathname()
+  const titulo = pathname.startsWith("/panel/levantamientos")
+    ? "Levantamientos"
+    : "Panel de tickets"
 
   return (
     <div className="min-h-screen bg-bg-section">
@@ -237,7 +244,7 @@ export function ShellPanel({ children }: { children: React.ReactNode }) {
               <Menu className="h-5 w-5" />
             </button>
             <span className="text-sm font-semibold text-text-primary">
-              Panel de tickets
+              {titulo}
             </span>
           </div>
           <PildoraUsuario />
