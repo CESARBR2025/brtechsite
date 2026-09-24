@@ -1,4 +1,5 @@
-import { Clock, MapPin } from "lucide-react"
+import { ArrowUpRight, Clock, MapPin } from "lucide-react"
+import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 
 const siguientesPasos = [
   {
@@ -16,8 +17,8 @@ const siguientesPasos = [
 ]
 
 const datos = [
-  { icon: MapPin, label: "Ubicación", value: "San Juan del Río, Querétaro, MX" },
-  { icon: Clock, label: "Horario", value: "Lun — Vie, 9:00 — 18:00" },
+  { icon: MapPin, label: "Ubicación", value: `${EMPRESA.ciudad}, ${EMPRESA.estado}, ${EMPRESA.pais}` },
+  { icon: Clock, label: "Horario", value: EMPRESA.horario },
 ]
 
 export function ContactInfo() {
@@ -49,6 +50,28 @@ export function ContactInfo() {
       </div>
 
       <dl className="divide-y divide-line-dark border-y border-line-dark">
+        {/* WhatsApp: la vía más rápida; el enlace cubre toda la fila */}
+        <div className="group relative flex items-center gap-4 py-4">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-line-dark bg-surface-dark text-primary-light transition-colors group-hover:border-line-dark-strong group-hover:bg-surface-dark-hover">
+            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+              <path d={WHATSAPP.path} />
+            </svg>
+          </span>
+          <div className="flex-1">
+            <dt className="text-xs text-white/55">WhatsApp</dt>
+            <dd className="text-sm font-medium text-white">
+              <a
+                href={WHATSAPP.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-primary"
+              >
+                {WHATSAPP.visible}
+              </a>
+            </dd>
+          </div>
+          <ArrowUpRight className="h-4 w-4 text-white/55 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white" />
+        </div>
         {datos.map((d) => (
           <div key={d.label} className="flex items-center gap-4 py-4">
             <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-line-dark bg-surface-dark text-primary-light">

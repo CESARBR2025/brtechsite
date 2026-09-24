@@ -1,5 +1,6 @@
 import { Navbar } from "@/src/ui/marketing/navbar"
 import { Footer } from "@/src/ui/marketing/footer"
+import { BotonWhatsApp } from "@/src/ui/marketing/boton-whatsapp"
 
 export default function MarketingLayout({
   children,
@@ -11,6 +12,7 @@ export default function MarketingLayout({
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <BotonWhatsApp />
     </>
   )
 }
