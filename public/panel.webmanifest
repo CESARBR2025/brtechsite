@@ -1,0 +1,35 @@
+{
+  "id": "/panel",
+  "name": "BR TECH Panel",
+  "short_name": "BR TECH",
+  "description": "Tickets de servicio y levantamientos de BR TECH Digital Systems.",
+  "lang": "es-MX",
+  "start_url": "/panel/levantamientos",
+  "scope": "/panel/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#151127",
+  "theme_color": "#151127",
+  "icons": [
+    { "src": "/pwa/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo levantamiento",
+      "url": "/panel/levantamientos/nuevo",
+      "icons": [{ "src": "/pwa/icono-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Levantamientos",
+      "url": "/panel/levantamientos",
+      "icons": [{ "src": "/pwa/icono-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Nuevo ticket",
+      "url": "/panel/nuevo",
+      "icons": [{ "src": "/pwa/icono-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

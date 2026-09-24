@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { cerrarSesion } from "@/src/app/(panel)/panel/acciones"
+import { InstalarApp } from "./pwa"
 
 interface ItemNav {
   href: string
@@ -130,6 +131,9 @@ function ContenidoBarra({ children }: { children: React.ReactNode }) {
         />
       </Link>
       <div className="mt-6 flex-1 overflow-y-auto">{children}</div>
+      <div className="mb-3">
+        <InstalarApp />
+      </div>
       <p className="px-3 text-[11px] text-text-muted/70">BR TECH DS · Panel</p>
     </>
   )
