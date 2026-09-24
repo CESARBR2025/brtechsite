@@ -21,7 +21,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={inter.variable}>
-      <body className="min-h-screen bg-background font-sans antialiased overflow-x-hidden">
+      {/* Extensiones del navegador (p. ej. ColorZilla) agregan atributos al body
+          antes de hidratar; solo se ignoran las diferencias de atributos del body. */}
+      <body
+        className="min-h-screen bg-background font-sans antialiased overflow-x-hidden"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

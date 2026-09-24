@@ -160,8 +160,14 @@ src/app/           Solo routing y composición: la página llama a un caso de us
 ### Módulos actuales
 
 - `tickets/` — tickets de servicio. Público en `/t/[slug]`, captura en `/panel`.
+- `levantamientos/` — requisitos del primer acercamiento con un cliente nuevo. Captura con
+  guardado automático en `/panel/levantamientos`; página pública "Diagnóstico de tu proyecto"
+  en `/d/[slug]`. El contenido es JSONB validado por el dominio (`domain/contenido.ts`, zod,
+  con versión de esquema); las notas internas nunca salen en el DTO público.
 - `contacto/` — formulario de contacto (adaptador Resend).
-- `panel/` — sesión del panel (cookie HMAC, la valida `src/proxy.ts`).
+- `panel/` — sesión del panel (cookie HMAC, la valida `src/proxy.ts`). Las server actions del
+  panel además llaman a `exigirSesionPanel()`: una action se puede invocar con POST desde
+  cualquier ruta, así que el proxy no basta.
 - `shared/` — `Dinero`, errores, puertos `Reloj`/`GeneradorId`, `pool`, `env` (zod).
 
 ### Base de datos
