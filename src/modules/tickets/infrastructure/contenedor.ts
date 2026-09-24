@@ -35,13 +35,12 @@ function construir() {
   }
 }
 
-const glob = globalThis as unknown as {
-  __brtechTickets?: ReturnType<typeof construir>
-}
+// Caché a nivel de módulo (no en globalThis): así una recarga en caliente
+// reconstruye los casos de uso con el código nuevo. El pool, que sí debe
+// sobrevivir a las recargas, ya vive en globalThis dentro de getPool().
+let instancia: ReturnType<typeof construir> | null = null
 
 export function tickets() {
-  if (!glob.__brtechTickets) {
-    glob.__brtechTickets = construir()
-  }
-  return glob.__brtechTickets
+  instancia ??= construir()
+  return instancia
 }

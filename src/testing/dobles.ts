@@ -9,6 +9,15 @@ import {
   SlugTicket,
 } from "@/src/modules/tickets/domain/slug-ticket"
 import type { Ticket } from "@/src/modules/tickets/domain/ticket"
+import type { Levantamiento } from "@/src/modules/levantamientos/domain/levantamiento"
+import type {
+  FiltroLevantamientos,
+  RepositorioLevantamientos,
+} from "@/src/modules/levantamientos/domain/repositorio-levantamientos"
+import {
+  type GeneradorSlugLevantamiento,
+  SlugLevantamiento,
+} from "@/src/modules/levantamientos/domain/slug-levantamiento"
 
 export class RelojFijo implements Reloj {
   constructor(private instante: Date) {}
@@ -66,5 +75,49 @@ export class RepositorioTicketsEnMemoria implements RepositorioTickets {
   async siguienteFolio(): Promise<string> {
     this.folio += 1
     return `BRT-${String(this.folio).padStart(6, "0")}`
+  }
+}
+
+export class GeneradorSlugLevantamientoSecuencial
+  implements GeneradorSlugLevantamiento
+{
+  private n = 0
+  nuevo(): SlugLevantamiento {
+    this.n += 1
+    return SlugLevantamiento.desde(`diagtest${String(this.n).padStart(4, "0")}`)
+  }
+}
+
+export class RepositorioLevantamientosEnMemoria
+  implements RepositorioLevantamientos
+{
+  private readonly porId = new Map<string, Levantamiento>()
+  private folio = 0
+
+  async guardar(levantamiento: Levantamiento): Promise<void> {
+    this.porId.set(levantamiento.id, levantamiento)
+  }
+
+  async obtenerPorId(id: string): Promise<Levantamiento | null> {
+    return this.porId.get(id) ?? null
+  }
+
+  async obtenerPorSlug(slug: SlugLevantamiento): Promise<Levantamiento | null> {
+    for (const l of this.porId.values()) {
+      if (l.slug.valor === slug.valor) return l
+    }
+    return null
+  }
+
+  async listar(filtro: FiltroLevantamientos = {}): Promise<Levantamiento[]> {
+    let lista = [...this.porId.values()]
+    if (filtro.estado) lista = lista.filter((l) => l.estado === filtro.estado)
+    lista.sort((a, b) => b.creadoEn.getTime() - a.creadoEn.getTime())
+    return filtro.limite ? lista.slice(0, filtro.limite) : lista
+  }
+
+  async siguienteFolio(): Promise<string> {
+    this.folio += 1
+    return `BRD-${String(this.folio).padStart(6, "0")}`
   }
 }

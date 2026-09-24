@@ -291,7 +291,8 @@ Fondo animado WebGL (React Bits `DarkVeil`) con colores originales (`hueShift={0
   <div className="relative …">contenido</div>
 </section>
 ```
-- **Exclusivo del hero de Inicio.** Heros internos usan `bg-bg-dark` + grid sutil.
+- **Exclusivo del hero de Inicio** y, como excepción, del hero del Diagnóstico de tu proyecto
+  (`/d/[slug]`, pieza de venta que debe impresionar al abrirse). Heros internos usan `bg-bg-dark` + grid sutil.
 
 ### Entrada escalonada
 `motion-safe:animate-aparecer` (keyframe en `globals.css`) + `style={{ animationDelay: "120ms" }}` en pasos
@@ -324,10 +325,30 @@ de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
 - Bloque "Conoce más": sección `bg-bg-dark` con blob violeta, H2 en blanco, botón secundario sobre oscuro → enlaza a `/` con `?ref=ticket`.
 - Moneda: formatear con `Intl.NumberFormat("es-MX", { style: "currency", currency })`.
 
+### Diagnóstico de tu proyecto (`/d/[slug]`, `src/ui/levantamientos/diagnostico.tsx`)
+- Mismo lenguaje que el ticket: **hero oscuro** (`bg-dark` + rejilla + resplandor, H1 = nombre del
+  proyecto con la última palabra en degradado) y **cuerpo claro** (`bg-section`) con tarjetas
+  blancas (`surface` + `border` + `shadow-card`). La ficha del proyecto es una tarjeta blanca con
+  filo violeta montada sobre el hero (`-mt-20`), como el documento del ticket.
+- Secciones numeradas `01…` (etiqueta con guion violeta + H2 `text-text-primary`) que **solo
+  aparecen si tienen información**.
+- Acentos oscuros puntuales para que no se vea plano: encabezado de cada flujo, el bloque "Lo que
+  el sistema entregará" y la columna "Imprescindible" (`bg-dark` + rejilla + `shadow-glow`).
+- "Punto de dolor" y fechas críticas en `border-warning/30 bg-warning/10` (ámbar = alerta).
+- Cierra con `<CTAFinal>` oscuro apuntando a WhatsApp (`href`, `nota`).
+- **Capa de impacto** (`efectos-diagnostico.tsx`): hero a pantalla completa con el velo, cifras
+  en vidrio que se cuentan solas (`Contador`, solo datos capturados), resumen ejecutivo generado
+  de la captura, barra de progreso de lectura, índice lateral de puntos (`xl`) y aparición de cada
+  sección al hacer scroll (`Revelar`). Encabezados con número gigante en contorno a la derecha.
+  Todo respeta `prefers-reduced-motion`.
+
 ### Panel de captura (`/panel/...`)
 - Fondo `bg-bg-section`, contenido en cards `bg-surface`.
 - Filas de ítems dinámicas usando la **receta de Input**; total en vivo con la tipografía de "Monto grande".
 - Acciones: "Guardar borrador" = botón secundario; "Publicar" = botón primario.
+- Captura en reunión (levantamientos): secciones plegables con número/check de completitud,
+  barra fija con progreso segmentado e indicador de guardado automático. Inputs `text-base
+  sm:text-sm` (con 14 px iOS hace zoom al enfocar); opciones de catálogo como chips táctiles.
 
 ### Impresión / PDF
 ```css
