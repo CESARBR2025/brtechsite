@@ -97,7 +97,7 @@ export function Navbar() {
               href="/contacto"
               className={`group hidden items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8),inset_0_1px_0_rgba(255,255,255,0.2)] transition-colors hover:bg-primary-hover md:inline-flex ${focusRing}`}
             >
-              Agendar Consulta
+              Agendar consulta
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </BotonEspecular>
 
@@ -141,7 +141,7 @@ export function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className={`group mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8)] transition-colors hover:bg-primary-hover ${focusRing}`}
                 >
-                  Agendar Consulta
+                  Agendar consulta
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
