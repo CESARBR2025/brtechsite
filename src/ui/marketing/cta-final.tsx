@@ -7,6 +7,8 @@ interface Props {
   titulo?: string
   texto?: string
   boton?: string
+  href?: string
+  nota?: string
 }
 
 /** CTA de cierre de página: panel con el velo invertido (eco del hero). */
@@ -15,6 +17,8 @@ export function CTAFinal({
   titulo = "¿Listo para llevar tu negocio al siguiente nivel?",
   texto = "Cuéntanos cómo funciona tu negocio por dentro y te proponemos la solución correcta.",
   boton = "Agendar consulta gratuita",
+  href = "/contacto",
+  nota = "Cotización gratuita y sin compromiso",
 }: Props) {
   return (
     <section className="relative bg-bg-dark px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
@@ -46,14 +50,14 @@ export function CTAFinal({
 
           <div className="mt-10 flex flex-col items-center gap-4">
             <BotonEspecular
-              href="/contacto"
+              href={href}
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto sm:text-base"
             >
               {boton}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </BotonEspecular>
             <p className="text-xs text-white/55 sm:text-sm">
-              Cotización gratuita y sin compromiso
+              {nota}
             </p>
           </div>
         </div>
