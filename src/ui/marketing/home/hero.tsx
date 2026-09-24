@@ -58,7 +58,7 @@ export function HeroSection() {
               href="/contacto"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
             >
-              Agendar Consulta Gratuita
+              Agendar consulta gratuita
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </BotonEspecular>
             <Link
