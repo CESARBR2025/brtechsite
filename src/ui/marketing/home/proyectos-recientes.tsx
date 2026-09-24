@@ -1,45 +1,8 @@
 import Link from "next/link"
 import { ArrowRight, Check } from "lucide-react"
 import { GaleriaAcordeon } from "@/src/ui/primitivos/galeria-acordeon"
+import { proyectos } from "@/src/ui/marketing/proyectos/datos"
 
-const proyectos = [
-  {
-    cliente: "Parrilla Norteña",
-    titulo: "ParrillaNorteña Soft",
-    subtitulo: "Control total de operación diaria multisucursal",
-    resumen:
-      "Software a la medida que opera todas las sucursales como una sola. Centraliza la toma de órdenes, el control de caja y la operación diaria del restaurante, con control completo del flujo y menos merma operativa.",
-    galeria: [
-      {
-        src: "/clientes/parrilla-nortena/galeria-punto-de-venta.webp",
-        alt: "Punto de venta de ParrillaNorteña Soft en operación dentro del restaurante",
-        etiqueta: "Punto de venta en operación",
-      },
-      {
-        src: "/clientes/parrilla-nortena/galeria-caja-sucursal.webp",
-        alt: "Caja de una sucursal de Parrilla Norteña con ParrillaNorteña Soft en pantalla",
-        etiqueta: "Caja en sucursal",
-      },
-      {
-        src: "/clientes/parrilla-nortena/galeria-app-movil.webp",
-        alt: "App móvil de ParrillaNorteña Soft en un iPhone, en la pantalla de inicio de sesión",
-        etiqueta: "App móvil iOS y Android",
-        ajuste: "contener" as const,
-      },
-    ],
-    datos: [
-      { valor: "2", etiqueta: "sucursales conectadas" },
-      { valor: "2026", etiqueta: "en producción" },
-    ],
-    puntos: [
-      "Operación multisucursal centralizada en un solo sistema",
-      "Toma de órdenes y control de caja en tiempo real",
-      "Flujo visible de punta a punta: de la orden al corte de caja",
-      "Menos merma y errores por captura manual",
-    ],
-    estado: "En producción · 2026",
-  },
-]
 
 export function ProyectosRecientesSection() {
   return (
@@ -120,13 +83,22 @@ export function ProyectosRecientesSection() {
                   ))}
                 </ul>
 
-                <Link
-                  href="/contacto"
-                  className="group/enlace mt-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white outline-none transition-all hover:border-primary hover:bg-primary hover:shadow-lg hover:shadow-primary/30 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
-                >
-                  Quiero un sistema así
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover/enlace:translate-x-1" />
-                </Link>
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+                  <Link
+                    href="/contacto"
+                    className="group/enlace inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white outline-none transition-all hover:border-primary hover:bg-primary hover:shadow-lg hover:shadow-primary/30 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
+                  >
+                    Quiero un sistema así
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover/enlace:translate-x-1" />
+                  </Link>
+                  <Link
+                    href={`/proyectos/${p.slug}`}
+                    className="group/caso inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-white/80 outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    Ver caso completo
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover/caso:translate-x-1" />
+                  </Link>
+                </div>
               </div>
             </article>
           ))}
