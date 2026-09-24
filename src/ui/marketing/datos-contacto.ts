@@ -27,4 +27,6 @@ export const WHATSAPP = {
 export const REDES = {
   linkedin: "https://www.linkedin.com/in/cesar-ivan-barcenas-rosales-a74a83378/",
   instagram: "https://www.instagram.com/cesarbr_dev/",
+  // Perfil de Negocio de Google (enlace permanente por CID)
+  google: "https://maps.google.com/?cid=3807320804895732616",
 }

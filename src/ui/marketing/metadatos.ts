@@ -66,5 +66,6 @@ export const negocioJsonLd = {
     opens: "09:00",
     closes: "18:00",
   },
-  sameAs: [REDES.linkedin, REDES.instagram],
+  hasMap: REDES.google,
+  sameAs: [REDES.google, REDES.linkedin, REDES.instagram],
 }
