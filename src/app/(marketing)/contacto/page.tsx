@@ -1,13 +1,14 @@
-import type { Metadata } from "next"
+import { metadatosPagina } from "@/src/ui/marketing/metadatos"
 import { ContactoHero } from "@/src/ui/marketing/contacto/hero"
 import { ContactForm } from "@/src/ui/marketing/contacto/form"
 import { ContactInfo } from "@/src/ui/marketing/contacto/info"
 
-export const metadata: Metadata = {
-  title: "Contacto | BR TECH Digital Systems",
-  description:
+export const metadata = metadatosPagina({
+  titulo: "Contacto | BR TECH Digital Systems",
+  descripcion:
     "Cuéntanos sobre tu negocio: asesoría sin costo, respuesta en menos de 24 horas y propuesta en 48 horas.",
-}
+  ruta: "/contacto",
+})
 
 export default function ContactoPage() {
   return (
