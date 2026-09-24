@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { EMPRESA, REDES, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 
 const columnas = [
   {
@@ -23,14 +24,19 @@ const columnas = [
 
 const socialLinks = [
   {
+    label: "WhatsApp",
+    href: WHATSAPP.url,
+    path: WHATSAPP.path,
+  },
+  {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/cesar-ivan-barcenas-rosales-a74a83378/",
+    href: REDES.linkedin,
     // Marca oficial (lucide-react ya no incluye íconos de marca)
     path: "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.125 2.062 2.062 0 0 1 0 4.125zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z",
   },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/cesarbr_dev/",
+    href: REDES.instagram,
     // Glifo relleno (evenodd): marco redondeado, lente y punto
     path: "M8 2h8a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6V8a6 6 0 0 1 6-6zM8 4a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4V8a4 4 0 0 0-4-4H8zM12 7a5 5 0 1 1 0 10a5 5 0 0 1 0-10zM12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6zM17.5 5.25a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 0 1 0-2.5z",
   },
@@ -96,8 +102,15 @@ export function Footer() {
                   Escríbenos
                 </Link>
               </li>
-              <li>San Juan del Río, Querétaro</li>
-              <li>Lun — Vie, 9:00 — 18:00</li>
+              <li>
+                <a href={WHATSAPP.url} target="_blank" rel="noopener noreferrer" className={enlace}>
+                  WhatsApp {WHATSAPP.visible}
+                </a>
+              </li>
+              <li>
+                {EMPRESA.ciudad}, {EMPRESA.estado}
+              </li>
+              <li>{EMPRESA.horario}</li>
             </ul>
           </div>
         </div>
