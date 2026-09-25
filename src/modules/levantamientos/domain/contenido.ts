@@ -139,6 +139,13 @@ export const esquemaContenido = z.object({
       .nullable()
       .default(null),
     participantes: texto(LARGO),
+    /** Frase del hero del diagnóstico: el dolor del cliente convertido en resultado. */
+    promesa: texto(),
+    /** Cifras de su operación para el hero (ej. "5" · "camionetas"). */
+    cifras: z
+      .array(z.object({ id, valor: texto(20), etiqueta: texto(60) }))
+      .max(4)
+      .default([]),
   }),
   problema: bloque({
     situacionActual: texto(LARGO),
@@ -269,6 +276,7 @@ export function normalizarContenido(crudo: unknown): Contenido {
       ...r,
       destinatarioId: ref(r.destinatarioId),
     })),
+    contexto: { ...c.contexto, cifras: sinVacios(c.contexto.cifras) },
     recursos: { ...c.recursos, hardware: sinVacios(c.recursos.hardware) },
     restricciones: {
       ...c.restricciones,

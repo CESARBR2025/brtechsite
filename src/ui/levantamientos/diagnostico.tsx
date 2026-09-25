@@ -205,6 +205,7 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
   const nombreActor = (id: string | null) => (id ? actor.get(id) ?? null : null)
 
   const titulo = d.proyectoNombre ?? "Tu proyecto"
+  const promesa = c.contexto.promesa
 
   const ficha = [
     ["Negocio", d.cliente.nombre],
@@ -292,13 +293,13 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
           </span>
         </div>
 
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-40 pt-10 text-center sm:px-6 sm:pb-44">
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-16 pt-10 text-center sm:px-6 sm:pb-20">
           <span
             style={retraso(0)}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm motion-safe:animate-aparecer"
+            className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm motion-safe:animate-aparecer"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_2px_rgba(120,54,226,0.7)]" />
-            Diagnóstico de tu proyecto
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_8px_2px_rgba(120,54,226,0.7)]" />
+            <span className="truncate">Tu diagnóstico especial está listo</span>
           </span>
 
           <p
@@ -308,26 +309,54 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
             Hola, <span className="font-semibold text-white">{saludo}</span>
           </p>
 
-          <p
-            style={retraso(200)}
-            className="mt-3 text-base text-white/65 sm:text-lg motion-safe:animate-aparecer"
-          >
-            Este será tu próximo sistema
-          </p>
+          {!promesa && (
+            <p
+              style={retraso(200)}
+              className="mt-3 text-base text-white/65 sm:text-lg motion-safe:animate-aparecer"
+            >
+              Este será tu próximo sistema
+            </p>
+          )}
 
           <h1
             style={retraso(280)}
-            className="mt-2 text-balance bg-gradient-to-br from-white from-25% via-primary-light to-primary bg-clip-text pb-2 text-[46px] font-bold leading-[1.02] tracking-[-0.04em] text-transparent sm:text-7xl lg:text-8xl motion-safe:animate-aparecer"
+            className={`${promesa ? "mt-3" : "mt-2"} text-balance bg-gradient-to-br from-white from-25% via-primary-light to-primary bg-clip-text pb-2 text-[46px] font-bold leading-[1.02] tracking-[-0.04em] text-transparent sm:text-7xl lg:text-8xl motion-safe:animate-aparecer`}
           >
             {titulo}
           </h1>
 
+          {promesa && (
+            <p
+              style={retraso(340)}
+              className="mt-4 max-w-2xl text-balance text-lg font-medium leading-snug text-white/80 sm:text-2xl motion-safe:animate-aparecer"
+            >
+              {promesa}
+            </p>
+          )}
+
+          {c.contexto.cifras.length > 0 && (
+            <dl
+              style={retraso(400)}
+              className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 motion-safe:animate-aparecer sm:gap-x-7"
+            >
+              {c.contexto.cifras.map((x, i) => (
+                <div key={x.id} className="flex items-center gap-5 sm:gap-7">
+                  {i > 0 && <span aria-hidden="true" className="h-1 w-1 rounded-full bg-primary-light/50" />}
+                  <div className="flex items-baseline gap-1.5">
+                    <dd className="text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">{x.valor}</dd>
+                    <dt className="text-sm text-white/60 sm:text-base">{x.etiqueta}</dt>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          )}
+
           <a
             href="#resumen"
-            style={retraso(360)}
-            className="group mt-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-5 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_24px_-4px_rgba(120,54,226,0.6)] backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/25 active:scale-[0.98] motion-safe:animate-aparecer"
+            style={retraso(460)}
+            className="group mt-9 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-5 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_24px_-4px_rgba(120,54,226,0.6)] backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/25 active:scale-[0.98] motion-safe:animate-aparecer"
           >
-            ¡Dale un vistazo!
+            Ver cómo lo vamos a lograr
             <ArrowDown className="h-4 w-4 text-primary-light motion-safe:animate-bounce" aria-hidden="true" />
           </a>
 
@@ -340,14 +369,15 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
             </span>
           )}
         </div>
+
       </section>
 
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Resumen ejecutivo: tarjeta blanca montada sobre el hero */}
+        {/* Resumen ejecutivo: primera tarjeta después del hero (el hero ocupa toda la pantalla) */}
         <div
           id="resumen"
           style={retraso(480)}
-          className="relative -mt-20 scroll-mt-10 overflow-hidden rounded-3xl border border-border bg-surface shadow-modal motion-safe:animate-aparecer"
+          className="relative mt-12 scroll-mt-10 overflow-hidden rounded-3xl sm:mt-16 border border-border bg-surface shadow-modal motion-safe:animate-aparecer"
         >
           <div className="h-1 bg-gradient-to-r from-primary-hover via-primary to-primary-light" />
           <div className="grid lg:grid-cols-[1.35fr_1fr]">
