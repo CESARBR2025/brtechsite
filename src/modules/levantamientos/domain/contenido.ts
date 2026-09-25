@@ -111,6 +111,16 @@ const esquemaFechasCriticas = z.preprocess(
   lista(esquemaFechaCritica),
 )
 
+const esquemaPregunta = z.object({
+  id,
+  /** Agrupa las preguntas en la página del cliente (ej. "Críticas"). */
+  grupo: texto(),
+  texto: texto(LARGO),
+  /** La escribe solo el cliente; el guardado del panel nunca la sobrescribe. */
+  respuesta: texto(LARGO),
+  respondidaEn: z.iso.datetime().nullable().default(null),
+})
+
 export const esquemaContenido = z.object({
   contexto: bloque({
     /** Persona con la que se hizo la reunión (a quien se saluda en el diagnóstico). */
@@ -183,7 +193,8 @@ export const esquemaContenido = z.object({
       nivel: z.enum(NIVELES_PRIORIDAD).default("imprescindible"),
     }),
   ),
-  preguntasAbiertas: lista(z.object({ id, texto: texto(LARGO) })),
+  /** Preguntas al cliente: las captura el panel y las responde el cliente desde /d/[slug]. */
+  preguntasAbiertas: lista(esquemaPregunta),
   proximosPasos: lista(z.object({ id, texto: texto(LARGO) })),
   adjuntos: lista(z.object({ id, nombre: texto(), descripcion: texto(LARGO) })),
   notasInternas: texto(20_000),
@@ -194,6 +205,7 @@ export type Actor = Contenido["actores"][number]
 export type Flujo = Contenido["flujos"][number]
 export type PasoFlujo = Flujo["pasos"][number]
 export type FechaCritica = Contenido["restricciones"]["fechasCriticas"][number]
+export type Pregunta = Contenido["preguntasAbiertas"][number]
 export type Coordenadas = NonNullable<Contenido["contexto"]["coordenadas"]>
 
 // --- Normalización ---

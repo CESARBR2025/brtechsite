@@ -132,6 +132,13 @@ export class Levantamiento {
   get esPublico(): boolean {
     return this.props.estado === "publicado"
   }
+  /** Todas las preguntas al cliente tienen respuesta (sin preguntas, cuenta como completo). */
+  get preguntasCompletas(): boolean {
+    return this.props.contenido.preguntasAbiertas.every((p) => p.respuesta.length > 0)
+  }
+  get preguntasPendientes(): number {
+    return this.props.contenido.preguntasAbiertas.filter((p) => !p.respuesta).length
+  }
   get completitud(): Record<ClaveSeccion, boolean> {
     return completitud(this.props.contenido)
   }
@@ -162,11 +169,57 @@ export class Levantamiento {
     this.tocar(reloj)
   }
 
-  /** Sustituye el contenido completo (el panel siempre manda todo). */
+  /**
+   * Sustituye el contenido completo (el panel siempre manda todo). Las
+   * respuestas a las preguntas son del cliente: se conservan las guardadas,
+   * aunque el panel mande una copia vieja.
+   */
   reemplazarContenido(crudo: unknown, reloj: Reloj): void {
     this.garantizarEditable()
-    this.props.contenido = normalizarContenido(crudo)
+    const previas = new Map(
+      this.props.contenido.preguntasAbiertas.map((p) => [p.id, p]),
+    )
+    const nuevo = normalizarContenido(crudo)
+    this.props.contenido = {
+      ...nuevo,
+      preguntasAbiertas: nuevo.preguntasAbiertas.map((p) => ({
+        ...p,
+        respuesta: previas.get(p.id)?.respuesta ?? "",
+        respondidaEn: previas.get(p.id)?.respondidaEn ?? null,
+      })),
+    }
     this.tocar(reloj)
+  }
+
+  /**
+   * El cliente responde las preguntas desde su diagnóstico publicado. Solo se
+   * tocan las preguntas que existen y cuya respuesta cambió. Devuelve si hubo cambios.
+   */
+  responderPreguntas(
+    respuestas: { id: string; respuesta: string }[],
+    reloj: Reloj,
+  ): boolean {
+    if (!this.esPublico) {
+      throw new OperacionNoPermitida(
+        "Solo se pueden responder preguntas de un diagnóstico publicado",
+      )
+    }
+    const nuevas = new Map(respuestas.map((r) => [r.id, r.respuesta.trim()]))
+    const ahora = reloj.ahora().toISOString()
+    let cambio = false
+    const preguntas = this.props.contenido.preguntasAbiertas.map((p) => {
+      const respuesta = nuevas.get(p.id)
+      if (respuesta === undefined || respuesta === p.respuesta) return p
+      if (respuesta.length > 5000) {
+        throw new DatosInvalidos("La respuesta es demasiado larga")
+      }
+      cambio = true
+      return { ...p, respuesta, respondidaEn: respuesta ? ahora : null }
+    })
+    if (!cambio) return false
+    this.props.contenido = { ...this.props.contenido, preguntasAbiertas: preguntas }
+    this.tocar(reloj)
+    return true
   }
 
   publicar(reloj: Reloj): void {

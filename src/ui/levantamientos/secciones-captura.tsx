@@ -606,32 +606,66 @@ export function CuerpoSeccion({
     case "pendientes":
       return (
         <div className="space-y-6">
-          {(
-            [
-              ["preguntasAbiertas", "Preguntas abiertas", "Agregar pregunta", "Pregunta"],
-              ["proximosPasos", "Próximos pasos", "Agregar paso", "Paso"],
-            ] as const
-          ).map(([k, titulo, agregar, singular]) => (
-            <div key={k}>
-              <p className="mb-2 text-sm font-medium text-text-secondary">{titulo}</p>
-              <ListaEditable
-                items={c[k]}
-                onChange={(v) => fijar(k, v)}
-                crear={() => ({ id: nuevoId(), texto: "" })}
-                agregar={agregar}
-                titulo={(x) => x.texto || singular}
-              >
-                {(x, set) => (
+          <div>
+            <p className="mb-2 text-sm font-medium text-text-secondary">Preguntas al cliente</p>
+            <ListaEditable
+              items={c.preguntasAbiertas}
+              onChange={(v) => fijar("preguntasAbiertas", v)}
+              crear={() => ({ id: nuevoId(), grupo: "", texto: "", respuesta: "", respondidaEn: null })}
+              agregar="Agregar pregunta"
+              titulo={(x) => (x.respuesta ? "✓ " : "") + (x.texto || "Pregunta")}
+            >
+              {(x, set) => (
+                <>
                   <Campo
-                    etiqueta={singular}
+                    etiqueta="Grupo"
+                    placeholder="Críticas, Importantes…"
+                    valor={x.grupo}
+                    onChange={(v) => set({ grupo: v })}
+                  />
+                  <Campo
+                    etiqueta="Pregunta"
                     filas={2}
                     valor={x.texto}
                     onChange={(v) => set({ texto: v })}
                   />
-                )}
-              </ListaEditable>
-            </div>
-          ))}
+                  <div className="rounded-xl border border-border bg-bg-section px-4 py-3">
+                    <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
+                      Respuesta del cliente
+                      {x.respondidaEn &&
+                        ` · ${new Date(x.respondidaEn).toLocaleString("es-MX", {
+                          timeZone: "America/Mexico_City",
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}`}
+                    </p>
+                    <p className="mt-1 whitespace-pre-line text-sm text-text-primary">
+                      {x.respuesta || "Sin responder. La captura el cliente desde su diagnóstico."}
+                    </p>
+                  </div>
+                </>
+              )}
+            </ListaEditable>
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-text-secondary">Próximos pasos</p>
+            <ListaEditable
+              items={c.proximosPasos}
+              onChange={(v) => fijar("proximosPasos", v)}
+              crear={() => ({ id: nuevoId(), texto: "" })}
+              agregar="Agregar paso"
+              titulo={(x) => x.texto || "Paso"}
+            >
+              {(x, set) => (
+                <Campo
+                  etiqueta="Paso"
+                  filas={2}
+                  valor={x.texto}
+                  onChange={(v) => set({ texto: v })}
+                />
+              )}
+            </ListaEditable>
+          </div>
         </div>
       )
 

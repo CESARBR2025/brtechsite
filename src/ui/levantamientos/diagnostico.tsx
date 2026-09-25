@@ -7,7 +7,6 @@ import {
   Bell,
   CheckCircle2,
   FileText,
-  HelpCircle,
   ImageIcon,
   Paperclip,
   Send,
@@ -35,6 +34,7 @@ import {
 import { formatearFechaHora } from "./fechas"
 import { VeloOscuro } from "@/src/ui/primitivos/velo-oscuro"
 import { BarraLectura, Contador, IndiceSecciones, Revelar } from "./efectos-diagnostico"
+import { PreguntasCliente } from "./preguntas-cliente"
 
 /*
  * Mismo lenguaje que el ticket público: hero oscuro de marca, cuerpo claro con
@@ -232,7 +232,7 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
   )
   const hayTerreno =
     hayRecursos || c.integraciones.length > 0 || hayVolumen || hayRestricciones
-  const haySiguiente = c.proximosPasos.length > 0 || c.preguntasAbiertas.length > 0
+  const haySiguiente = c.proximosPasos.length > 0
 
   const dolores = c.flujos.reduce((k, f) => k + f.pasos.filter((p) => p.dolor).length, 0)
   const cifras = [
@@ -257,6 +257,7 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
     { id: "prioridades", titulo: "Prioridades", mostrar: c.prioridades.length > 0 },
     { id: "material", titulo: "Material de apoyo", mostrar: c.adjuntos.length > 0 },
     { id: "siguiente", titulo: "Lo que sigue", mostrar: haySiguiente },
+    { id: "preguntas", titulo: "Preguntas al cliente", mostrar: c.preguntasAbiertas.length > 0 },
   ].filter((x) => x.mostrar)
   const num = (id: string) => indice.findIndex((x) => x.id === id)
 
@@ -924,7 +925,7 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
         {/* Lo que sigue */}
         {haySiguiente && (
           <Seccion id="siguiente" indice={num("siguiente")} etiqueta="Lo que sigue" titulo="Próximos pasos">
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="max-w-3xl">
               {c.proximosPasos.length > 0 && (
                 <div className={`${TARJETA} p-6 sm:p-8`}>
                   <ol className="relative">
@@ -940,39 +941,49 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
                   </ol>
                 </div>
               )}
-              {c.preguntasAbiertas.length > 0 && (
-                <div className={`${TARJETA} overflow-hidden`}>
-                  <p className="border-b border-border px-6 py-4 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                    Por confirmar contigo
-                  </p>
-                  <ul className="divide-y divide-border">
-                    {c.preguntasAbiertas.map((q) => (
-                      <li key={q.id} className="flex items-start gap-3 px-6 py-4 text-sm text-text-primary sm:text-base">
-                        <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                        <span className="whitespace-pre-line">{q.texto}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
+          </Seccion>
+        )}
+
+        {/* Preguntas al cliente: siempre al final, las responde el cliente aquí mismo */}
+        {c.preguntasAbiertas.length > 0 && (
+          <Seccion
+            id="preguntas"
+            indice={num("preguntas")}
+            etiqueta="Tu turno"
+            titulo="Preguntas al cliente:"
+            texto="Para cerrar el diseño necesitamos estos datos de tu operación. Escribe tus respuestas aquí mismo; si alguna no la sabes todavía, déjala en blanco y la vemos juntos."
+          >
+            <PreguntasCliente slug={d.slug} preguntas={c.preguntasAbiertas} />
           </Seccion>
         )}
       </div>
 
       <div className="mt-8">
-        <CTAFinal
-          etiqueta={d.confirmado ? "Diagnóstico confirmado" : "Tu opinión cuenta"}
-          titulo={d.confirmado ? "Gracias por confirmarlo" : "¿Lo entendimos bien?"}
-          texto={
-            d.confirmado
-              ? "Con esto ya podemos diseñar tu sistema. Si surge algo nuevo, escríbenos y lo sumamos."
-              : "Si algo no refleja cómo trabajas, dínoslo y lo ajustamos antes de diseñar tu sistema."
-          }
-          boton="Escribir por WhatsApp"
-          href={enlaceWhatsApp}
-          nota={`Horario de atención: ${EMPRESA.horario}`}
-        />
+        {d.preguntasPendientes > 0 ? (
+          <CTAFinal
+            etiqueta="Un paso más"
+            titulo="Responde las preguntas para continuar"
+            texto={`Te ${d.preguntasPendientes === 1 ? "falta 1 pregunta" : `faltan ${d.preguntasPendientes} preguntas`} por responder. En cuanto las completes, se activa el botón para escribirnos.`}
+            boton="Escribir por WhatsApp"
+            deshabilitado
+            enlaceSecundario={{ texto: "Ir a las preguntas ↑", href: "#preguntas" }}
+            nota={`Horario de atención: ${EMPRESA.horario}`}
+          />
+        ) : (
+          <CTAFinal
+            etiqueta={d.confirmado ? "Diagnóstico confirmado" : "Tu opinión cuenta"}
+            titulo={d.confirmado ? "Gracias por confirmarlo" : "¿Lo entendimos bien?"}
+            texto={
+              d.confirmado
+                ? "Con esto ya podemos diseñar tu sistema. Si surge algo nuevo, escríbenos y lo sumamos."
+                : "Si algo no refleja cómo trabajas, dínoslo y lo ajustamos antes de diseñar tu sistema."
+            }
+            boton="Escribir por WhatsApp"
+            href={enlaceWhatsApp}
+            nota={`Horario de atención: ${EMPRESA.horario}`}
+          />
+        )}
       </div>
 
       <footer className="border-t border-line-dark bg-bg-dark px-4 py-8 text-center text-xs text-white/55">
