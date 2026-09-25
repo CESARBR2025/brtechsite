@@ -119,6 +119,37 @@ export function CuerpoSeccion({
             valor={c.contexto.participantes}
             onChange={(v) => mezclar("contexto", { participantes: v })}
           />
+          <Campo
+            etiqueta="Promesa del diagnóstico"
+            filas={2}
+            placeholder="Su dolor convertido en resultado: “Cada caja, cada parada y cada peso: bajo control y sin papel.”"
+            valor={c.contexto.promesa}
+            onChange={(v) => mezclar("contexto", { promesa: v })}
+          />
+          <div>
+            <p className="mb-2 text-sm font-medium text-text-secondary">
+              Cifras de su operación <span className="font-normal text-text-muted">(hasta 4, salen en el hero)</span>
+            </p>
+            <ListaEditable
+              items={c.contexto.cifras}
+              onChange={(v) => mezclar("contexto", { cifras: v.slice(0, 4) })}
+              crear={() => ({ id: nuevoId(), valor: "", etiqueta: "" })}
+              agregar="Agregar cifra"
+              titulo={(x) => [x.valor, x.etiqueta].filter(Boolean).join(" ") || "Cifra"}
+            >
+              {(x, set) => (
+                <div className="grid grid-cols-[6rem_1fr] gap-3">
+                  <Campo etiqueta="Valor" placeholder="5" valor={x.valor} onChange={(v) => set({ valor: v })} />
+                  <Campo
+                    etiqueta="Qué es"
+                    placeholder="camionetas"
+                    valor={x.etiqueta}
+                    onChange={(v) => set({ etiqueta: v })}
+                  />
+                </div>
+              )}
+            </ListaEditable>
+          </div>
         </div>
       )
 
