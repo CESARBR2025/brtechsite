@@ -14,6 +14,8 @@ export interface DiagnosticoPublicoDTO {
   fechaReunion: string // YYYY-MM-DD
   publicadoEn: string | null
   confirmado: boolean
+  /** Cuántas "Preguntas al cliente" faltan por responder (0 = todas respondidas). */
+  preguntasPendientes: number
   contenido: ContenidoPublicoDTO
 }
 
@@ -65,6 +67,7 @@ export function aDiagnosticoPublicoDTO(l: Levantamiento): DiagnosticoPublicoDTO 
     fechaReunion: fechaISO(l.fechaReunion),
     publicadoEn: l.publicadoEn?.toISOString() ?? null,
     confirmado: l.confirmadoEn !== null,
+    preguntasPendientes: l.preguntasPendientes,
     contenido: publico,
   }
 }

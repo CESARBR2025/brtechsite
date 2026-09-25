@@ -7,6 +7,7 @@ import {
 import {
   GeneradorIdSecuencial,
   GeneradorSlugLevantamientoSecuencial,
+  NotificadorRespuestasEnMemoria,
   RelojFijo,
   RepositorioLevantamientosEnMemoria,
 } from "@/src/testing/dobles"
@@ -16,6 +17,7 @@ import { CrearLevantamiento } from "./crear-levantamiento"
 import type { DatosGeneralesEntrada } from "./entrada"
 import { GuardarLevantamiento } from "./guardar-levantamiento"
 import { ObtenerDiagnosticoPublico } from "./obtener-diagnostico-publico"
+import { ResponderPreguntas } from "./responder-preguntas"
 
 const generales: DatosGeneralesEntrada = {
   clienteNombre: "Clínica Dental Sonrisa",
@@ -128,5 +130,109 @@ describe("Casos de uso de levantamientos", () => {
     await expect(
       guardar.ejecutar("fantasma", { generales, contenido }),
     ).rejects.toBeInstanceOf(RecursoNoEncontrado)
+  })
+
+  describe("Preguntas al cliente", () => {
+    const conPreguntas = {
+      ...contenido,
+      preguntasAbiertas: [
+        { id: "q1", grupo: "Críticas", texto: "¿Cuántas citas al día?" },
+        { id: "q2", grupo: "Críticas", texto: "¿Quién agenda?" },
+      ],
+    }
+
+    it("el cliente responde desde el diagnóstico publicado", async () => {
+      const responder = new ResponderPreguntas(repo, new NotificadorRespuestasEnMemoria(), reloj)
+      const r = await crear.ejecutar(generales)
+      await guardar.ejecutar(r.id, { generales, contenido: conPreguntas })
+      await estado.publicar(r.id)
+
+      await responder.ejecutar(r.slug, [
+        { id: "q1", respuesta: "  Unas 30  " },
+        { id: "inexistente", respuesta: "se ignora" },
+      ])
+
+      const [q1, q2] = (await publico.ejecutar(r.slug)).contenido.preguntasAbiertas
+      expect(q1).toMatchObject({ respuesta: "Unas 30", respondidaEn: "2026-09-24T12:00:00.000Z" })
+      expect(q2).toMatchObject({ respuesta: "", respondidaEn: null })
+    })
+
+    it("el guardado del panel no borra las respuestas del cliente", async () => {
+      const responder = new ResponderPreguntas(repo, new NotificadorRespuestasEnMemoria(), reloj)
+      const r = await crear.ejecutar(generales)
+      await guardar.ejecutar(r.id, { generales, contenido: conPreguntas })
+      await estado.publicar(r.id)
+      await responder.ejecutar(r.slug, [{ id: "q2", respuesta: "La recepcionista" }])
+
+      // El panel manda su copia vieja (sin respuesta) y edita el texto
+      await guardar.ejecutar(r.id, {
+        generales,
+        contenido: {
+          ...conPreguntas,
+          preguntasAbiertas: [
+            ...conPreguntas.preguntasAbiertas.slice(0, 1),
+            { id: "q2", grupo: "Críticas", texto: "¿Quién agenda las citas?", respuesta: "" },
+          ],
+        },
+      })
+
+      const q2 = (await publico.ejecutar(r.slug)).contenido.preguntasAbiertas[1]
+      expect(q2).toMatchObject({ texto: "¿Quién agenda las citas?", respuesta: "La recepcionista" })
+    })
+
+    it("un borrador no acepta respuestas", async () => {
+      const responder = new ResponderPreguntas(repo, new NotificadorRespuestasEnMemoria(), reloj)
+      const r = await crear.ejecutar(generales)
+      await guardar.ejecutar(r.id, { generales, contenido: conPreguntas })
+      await expect(
+        responder.ejecutar(r.slug, [{ id: "q1", respuesta: "x" }]),
+      ).rejects.toBeInstanceOf(RecursoNoEncontrado)
+    })
+  
+    it("al quedar todas respondidas avisa una vez con las respuestas", async () => {
+      const notificador = new NotificadorRespuestasEnMemoria()
+      const responder = new ResponderPreguntas(repo, notificador, reloj)
+      const r = await crear.ejecutar(generales)
+      await guardar.ejecutar(r.id, { generales, contenido: conPreguntas })
+      await estado.publicar(r.id)
+
+      const parcial = await responder.ejecutar(r.slug, [{ id: "q1", respuesta: "30" }])
+      expect(parcial).toEqual({ preguntasPendientes: 1, aviso: null })
+      expect((await publico.ejecutar(r.slug)).preguntasPendientes).toBe(1)
+
+      const final = await responder.ejecutar(r.slug, [{ id: "q2", respuesta: "Recepción" }])
+      expect(final).toEqual({ preguntasPendientes: 0, aviso: "enviado" })
+      expect(notificador.enviados).toHaveLength(1)
+      expect(notificador.enviados[0]).toMatchObject({
+        folio: "BRD-000001",
+        esActualizacion: false,
+        preguntas: [
+          { grupo: "Críticas", texto: "¿Cuántas citas al día?", respuesta: "30" },
+          { grupo: "Críticas", texto: "¿Quién agenda?", respuesta: "Recepción" },
+        ],
+      })
+
+      // Reenviar lo mismo no avisa; corregir una respuesta sí, como actualización
+      await responder.ejecutar(r.slug, [{ id: "q2", respuesta: "Recepción" }])
+      expect(notificador.enviados).toHaveLength(1)
+      await responder.ejecutar(r.slug, [{ id: "q2", respuesta: "La recepcionista" }])
+      expect(notificador.enviados[1].esActualizacion).toBe(true)
+    })
+
+    it("si el correo falla, las respuestas igual quedan guardadas", async () => {
+      const notificador = new NotificadorRespuestasEnMemoria()
+      notificador.falla = true
+      const responder = new ResponderPreguntas(repo, notificador, reloj)
+      const r = await crear.ejecutar(generales)
+      await guardar.ejecutar(r.id, { generales, contenido: conPreguntas })
+      await estado.publicar(r.id)
+
+      const res = await responder.ejecutar(r.slug, [
+        { id: "q1", respuesta: "30" },
+        { id: "q2", respuesta: "Recepción" },
+      ])
+      expect(res.aviso).toBe("fallido")
+      expect((await publico.ejecutar(r.slug)).preguntasPendientes).toBe(0)
+    })
   })
 })

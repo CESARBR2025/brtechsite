@@ -8,7 +8,9 @@ import { ConsultarLevantamientos } from "../application/consultar-levantamientos
 import { CrearLevantamiento } from "../application/crear-levantamiento"
 import { GuardarLevantamiento } from "../application/guardar-levantamiento"
 import { ObtenerDiagnosticoPublico } from "../application/obtener-diagnostico-publico"
+import { ResponderPreguntas } from "../application/responder-preguntas"
 import { generadorSlugLevantamientoNanoid } from "./generador-slug-nanoid"
+import { NotificadorRespuestasResend } from "./notificador-respuestas-resend"
 import { RepositorioLevantamientosPostgres } from "./repositorio-levantamientos-postgres"
 
 /**
@@ -28,6 +30,11 @@ function construir() {
     cambiarEstado: new CambiarEstadoLevantamiento(repo, relojSistema),
     consultarLevantamientos: new ConsultarLevantamientos(repo),
     obtenerDiagnosticoPublico: new ObtenerDiagnosticoPublico(repo),
+    responderPreguntas: new ResponderPreguntas(
+      repo,
+      new NotificadorRespuestasResend(),
+      relojSistema,
+    ),
   }
 }
 

@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Lock } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 
 interface Props {
@@ -9,6 +9,9 @@ interface Props {
   boton?: string
   href?: string
   nota?: string
+  /** Muestra el botón apagado (sin enlace) y, opcionalmente, un enlace a lo que falta. */
+  deshabilitado?: boolean
+  enlaceSecundario?: { texto: string; href: string }
 }
 
 /** CTA de cierre de página: panel con el velo invertido (eco del hero). */
@@ -19,6 +22,8 @@ export function CTAFinal({
   boton = "Agendar consulta gratuita",
   href = "/contacto",
   nota = "Cotización gratuita y sin compromiso",
+  deshabilitado = false,
+  enlaceSecundario,
 }: Props) {
   return (
     <section className="relative bg-bg-dark px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
@@ -49,13 +54,32 @@ export function CTAFinal({
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4">
-            <BotonEspecular
-              href={href}
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto sm:text-base"
-            >
-              {boton}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </BotonEspecular>
+            {deshabilitado ? (
+              <span
+                role="link"
+                aria-disabled="true"
+                className="inline-flex w-full cursor-not-allowed select-none items-center justify-center gap-2 rounded-full border border-line-dark-strong bg-white/5 px-8 py-4 text-sm font-semibold text-white/40 sm:w-auto sm:text-base"
+              >
+                <Lock className="h-4 w-4" aria-hidden="true" />
+                {boton}
+              </span>
+            ) : (
+              <BotonEspecular
+                href={href}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto sm:text-base"
+              >
+                {boton}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </BotonEspecular>
+            )}
+            {enlaceSecundario && (
+              <a
+                href={enlaceSecundario.href}
+                className="text-sm font-semibold text-primary-light underline-offset-4 transition-colors hover:text-white hover:underline"
+              >
+                {enlaceSecundario.texto}
+              </a>
+            )}
             <p className="text-xs text-white/55 sm:text-sm">
               {nota}
             </p>

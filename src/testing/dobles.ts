@@ -11,6 +11,10 @@ import {
 import type { Ticket } from "@/src/modules/tickets/domain/ticket"
 import type { Levantamiento } from "@/src/modules/levantamientos/domain/levantamiento"
 import type {
+  NotificadorRespuestas,
+  RespuestasCompletas,
+} from "@/src/modules/levantamientos/domain/notificador-respuestas"
+import type {
   FiltroLevantamientos,
   RepositorioLevantamientos,
 } from "@/src/modules/levantamientos/domain/repositorio-levantamientos"
@@ -18,6 +22,15 @@ import {
   type GeneradorSlugLevantamiento,
   SlugLevantamiento,
 } from "@/src/modules/levantamientos/domain/slug-levantamiento"
+
+export class NotificadorRespuestasEnMemoria implements NotificadorRespuestas {
+  enviados: RespuestasCompletas[] = []
+  falla = false
+  async respuestasCompletas(datos: RespuestasCompletas): Promise<void> {
+    if (this.falla) throw new Error("Correo caído")
+    this.enviados.push(datos)
+  }
+}
 
 export class RelojFijo implements Reloj {
   constructor(private instante: Date) {}
