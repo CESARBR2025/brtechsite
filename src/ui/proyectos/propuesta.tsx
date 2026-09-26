@@ -44,7 +44,8 @@ import { formatearFecha, nombreDePila } from "@/src/ui/formato"
 import { BarraLectura, Revelar } from "@/src/ui/levantamientos/efectos-diagnostico"
 import { CTAFinal } from "@/src/ui/marketing/cta-final"
 import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
-import { VeloOscuro } from "@/src/ui/primitivos/velo-oscuro"
+import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
+import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 import { AceptarPropuesta } from "./aceptar-propuesta"
 import { NavbarPropuesta } from "./navbar-propuesta"
 import { ETIQUETA_IMPACTO } from "./etiquetas"
@@ -622,63 +623,64 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
         enlaces={atajos}
       />
 
-      {/* Hero: saludar e impactar. Pensado primero para celular (100svh). */}
+      {/*
+        Hero tipo portada: reflector de luz, rótulo del documento, nombre del
+        sistema y una línea de apoyo. Los datos del documento van al pie.
+      */}
       <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
+        {/* Resplandor base (también es el respaldo sin WebGL) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,rgba(120,54,226,0.32),transparent_70%)]"
+        />
         <div className="absolute inset-0 -z-10">
-          <VeloOscuro hueShift={0} poster="/fondos/velo-poster.webp" />
+          <OndasGradiente />
         </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-bg-deep/30 via-transparent to-bg-dark" />
-        <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/5 bg-gradient-to-b from-transparent to-bg-deep/80" />
 
         {/* pt deja libre el espacio del encabezado de vidrio (fijo) */}
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-16 pt-28 text-center sm:px-6 sm:pb-20 sm:pt-32">
-          <span
-            style={retraso(0)}
-            className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm motion-safe:animate-aparecer"
-          >
-            <span
-              className={`h-1.5 w-1.5 shrink-0 rounded-full ${p.aceptacion ? "bg-success shadow-[0_0_8px_2px_rgba(16,185,129,0.6)]" : "bg-primary shadow-[0_0_8px_2px_rgba(120,54,226,0.7)]"}`}
-            />
-            <span className="truncate">{p.aceptacion ? "Propuesta aceptada" : "Tu propuesta está lista"}</span>
-          </span>
-
-          <p
-            style={retraso(120)}
-            className="mt-8 text-balance text-2xl font-medium tracking-tight text-white/85 sm:text-3xl motion-safe:animate-aparecer"
-          >
-            Hola, <span className="font-semibold text-white">{saludo}</span>
-          </p>
-
-          {!c.ficha.promesa && (
-            <p style={retraso(200)} className="mt-3 text-base text-white/65 sm:text-lg motion-safe:animate-aparecer">
-              Esto es lo que vamos a construir juntos
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-28 text-center sm:px-6 sm:pt-32">
+          <div style={retraso(0)} className="flex flex-col items-center gap-3 motion-safe:animate-aparecer">
+            <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70 sm:gap-4 sm:text-xs">
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
+              Propuesta de desarrollo
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
             </p>
-          )}
+            {p.aceptacion && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Aceptada
+              </span>
+            )}
+          </div>
 
-          <h1
-            style={retraso(280)}
-            className={`${c.ficha.promesa ? "mt-3" : "mt-2"} text-balance bg-gradient-to-br from-white from-25% via-primary-light to-primary bg-clip-text pb-2 font-hero text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-transparent sm:text-7xl lg:text-8xl motion-safe:animate-aparecer`}
-          >
-            {titulo}
+          <h1 className="mt-7 text-balance pb-1 font-hero text-[48px] font-semibold leading-[1.02] tracking-[-0.02em] text-white [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-7xl lg:text-8xl">
+            <TextoDesenfocado texto={titulo} retrasoMs={200} />
           </h1>
 
-          {c.ficha.promesa && (
-            <p
-              style={retraso(340)}
-              className="mt-4 max-w-2xl text-balance text-lg font-medium leading-snug text-white/80 sm:text-2xl motion-safe:animate-aparecer"
-            >
-              {c.ficha.promesa}
-            </p>
-          )}
-
-          <a
-            href="#resumen"
-            style={retraso(460)}
-            className="group mt-9 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-5 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_24px_-4px_rgba(120,54,226,0.6)] backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/25 active:scale-[0.98] motion-safe:animate-aparecer"
+          <p
+            style={retraso(650)}
+            className="mt-6 max-w-2xl text-balance text-base leading-relaxed text-white/65 sm:text-xl motion-safe:animate-aparecer"
           >
-            Ver la propuesta
-            <ArrowDown className="h-4 w-4 text-primary-light motion-safe:animate-bounce" aria-hidden="true" />
-          </a>
+            Hola, <span className="font-medium text-white">{saludo}</span>.{" "}
+            {c.ficha.promesa || "Esto es lo que vamos a construir juntos."}
+          </p>
+        </div>
+
+        {/* Pie de portada: los datos del documento, fuera del centro */}
+        <div style={retraso(850)} className="relative mx-auto w-full max-w-5xl px-5 pb-6 motion-safe:animate-aparecer sm:px-6 sm:pb-8 lg:px-8">
+          <div className="grid items-center gap-4 border-t border-white/10 pt-5 text-xs text-white/50 sm:grid-cols-3 sm:text-sm">
+            <p className="text-center sm:text-left">
+              Empresa cliente: <span className="font-medium text-white/85">{p.cliente.nombre}</span>
+            </p>
+            <a
+              href="#resumen"
+              className="group mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/20 active:scale-[0.98]"
+            >
+              Ver la propuesta
+              <ArrowDown className="h-4 w-4 text-primary-light transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+            </a>
+            <p className="text-center tabular-nums sm:text-right">{formatearFecha(p.fechaPropuesta)}</p>
+          </div>
         </div>
       </section>
 

@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const proyecto = p.proyectoNombre ?? "tu proyecto"
   return {
-    title: `Propuesta: ${proyecto} · BR TECH`,
+    title: `Propuesta de desarrollo: ${proyecto} · BR TECH`,
     description: `Alcance, fases, calendario e inversión del proyecto de ${p.cliente.nombre}.`,
     robots: { index: false, follow: false },
   }
