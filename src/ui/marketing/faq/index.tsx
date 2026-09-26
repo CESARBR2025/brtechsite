@@ -37,17 +37,18 @@ export function FAQSection() {
 
   return (
     <section id="faq" className="relative scroll-mt-24 overflow-clip bg-surface py-24 sm:py-32">
-
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-8">
-        <div className="lg:sticky lg:top-32 lg:self-start">
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* Encabezado centrado; las preguntas van debajo */}
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <span className="h-px w-8 bg-primary" />
             Preguntas frecuentes
+            <span className="h-px w-8 bg-primary" />
           </p>
           <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
             Lo que suelen preguntarnos
           </h2>
-          <p className="mt-5 max-w-sm text-pretty text-base leading-relaxed text-text-secondary">
+          <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-text-secondary">
             ¿Tu duda no está aquí? Cuéntanos de tu negocio y te respondemos.
           </p>
           <Link
@@ -59,13 +60,19 @@ export function FAQSection() {
           </Link>
         </div>
 
-        <ul className="divide-y divide-border border-y border-border">
+        {/* Dos columnas en escritorio, una en celular; items-start: abrir una no estira a su vecina */}
+        <ul className="mt-12 grid items-start gap-4 md:grid-cols-2">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
             const idPregunta = `${base}-p${i}`
             const idRespuesta = `${base}-r${i}`
             return (
-              <li key={faq.q}>
+              <li
+                key={faq.q}
+                className={`rounded-2xl border bg-surface px-5 transition-all sm:px-6 ${
+                  isOpen ? "border-primary/30 shadow-hover" : "border-border shadow-card hover:border-primary/20"
+                }`}
+              >
                 <h3>
                   <button
                     id={idPregunta}
@@ -73,10 +80,10 @@ export function FAQSection() {
                     aria-expanded={isOpen}
                     aria-controls={idRespuesta}
                     onClick={() => setOpenIndex(isOpen ? null : i)}
-                    className="group flex w-full items-center justify-between gap-6 py-6 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="group flex w-full items-center justify-between gap-5 py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <span
-                      className={`text-base font-medium transition-colors sm:text-lg ${
+                      className={`text-base font-medium transition-colors ${
                         isOpen ? "text-text-primary" : "text-text-secondary group-hover:text-text-primary"
                       }`}
                     >
@@ -103,7 +110,7 @@ export function FAQSection() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="max-w-2xl pb-6 pr-14 text-pretty text-sm leading-relaxed text-text-secondary sm:text-base">
+                    <p className="pb-5 pr-12 text-pretty text-sm leading-relaxed text-text-secondary">
                       {faq.a}
                     </p>
                   </div>
