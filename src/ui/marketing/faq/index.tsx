@@ -36,31 +36,30 @@ export function FAQSection() {
   const base = useId()
 
   return (
-    <section id="faq" className="relative scroll-mt-24 overflow-clip bg-bg-dark py-24 sm:py-32">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.06)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_15%_30%,black_5%,transparent_55%)]" />
+    <section id="faq" className="relative scroll-mt-24 overflow-clip bg-surface py-24 sm:py-32">
 
       <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-8">
         <div className="lg:sticky lg:top-32 lg:self-start">
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <span className="h-px w-8 bg-primary" />
             Preguntas frecuentes
           </p>
-          <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
             Lo que suelen preguntarnos
           </h2>
-          <p className="mt-5 max-w-sm text-pretty text-base leading-relaxed text-white/65">
+          <p className="mt-5 max-w-sm text-pretty text-base leading-relaxed text-text-secondary">
             ¿Tu duda no está aquí? Cuéntanos de tu negocio y te respondemos.
           </p>
           <Link
             href="/contacto"
-            className="group mt-8 inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-white outline-none transition-colors hover:text-primary-light focus-visible:ring-2 focus-visible:ring-primary"
+            className="group mt-8 inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-primary outline-none transition-colors hover:text-primary-hover focus-visible:ring-2 focus-visible:ring-primary"
           >
             Escríbenos
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        <ul className="divide-y divide-line-dark border-y border-line-dark">
+        <ul className="divide-y divide-border border-y border-border">
           {faqs.map((faq, i) => {
             const isOpen = openIndex === i
             const idPregunta = `${base}-p${i}`
@@ -78,7 +77,7 @@ export function FAQSection() {
                   >
                     <span
                       className={`text-base font-medium transition-colors sm:text-lg ${
-                        isOpen ? "text-white" : "text-white/80 group-hover:text-white"
+                        isOpen ? "text-text-primary" : "text-text-secondary group-hover:text-text-primary"
                       }`}
                     >
                       {faq.q}
@@ -87,7 +86,7 @@ export function FAQSection() {
                       className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border transition-all ${
                         isOpen
                           ? "rotate-45 border-primary bg-primary text-white"
-                          : "border-line-dark-strong text-white/65 group-hover:border-white/30 group-hover:text-white"
+                          : "border-border text-text-muted group-hover:border-primary/40 group-hover:text-primary"
                       }`}
                     >
                       <Plus className="h-4 w-4" />
@@ -104,7 +103,7 @@ export function FAQSection() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="max-w-2xl pb-6 pr-14 text-pretty text-sm leading-relaxed text-white/65 sm:text-base">
+                    <p className="max-w-2xl pb-6 pr-14 text-pretty text-sm leading-relaxed text-text-secondary sm:text-base">
                       {faq.a}
                     </p>
                   </div>

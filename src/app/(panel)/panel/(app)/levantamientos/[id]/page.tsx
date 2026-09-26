@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, FolderKanban } from "lucide-react"
 import { levantamientos } from "@/src/modules/levantamientos/infrastructure/contenedor"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import { getEnv } from "@/src/modules/shared/infrastructure/config/env"
@@ -47,6 +47,14 @@ export default async function PaginaLevantamiento({ params }: Props) {
           <BadgeEstado estado={dto.estado} />
           {dto.proyectoNombre && (
             <span className="text-sm text-text-secondary">{dto.proyectoNombre}</span>
+          )}
+          {dto.estado !== "archivado" && (
+            <Link
+              href={`/panel/proyectos/nuevo?levantamiento=${dto.id}`}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-primary-light px-3 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+            >
+              <FolderKanban className="h-3.5 w-3.5" /> Crear proyecto
+            </Link>
           )}
         </div>
       </div>

@@ -42,6 +42,8 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
     columna: "id" | "public_slug",
     valor: string,
   ): Promise<Ticket | null> {
+    // Un id que no es uuid no existe (y así Postgres no lanza error de tipo)
+    if (columna === "id" && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(valor)) return null
     const { rows } = await this.pool.query<FilaTicket>(
       `SELECT ${COLUMNAS_TICKET} FROM service_ticket WHERE ${columna} = $1`,
       [valor],

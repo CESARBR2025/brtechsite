@@ -2,7 +2,7 @@
 
 /**
  * Efectos del diagnóstico público: aparición al hacer scroll, cifras que se
- * cuentan solas, barra de progreso de lectura e índice lateral. Todo respeta
+ * cuentan solas y barra de progreso de lectura. Todo respeta
  * `prefers-reduced-motion` y el contenido es legible aunque no corra JS
  * (el SSR ya trae los valores finales).
  */
@@ -124,59 +124,5 @@ export function BarraLectura() {
         className="h-full origin-left scale-x-0 bg-gradient-to-r from-primary-hover via-primary to-primary-light shadow-[0_0_12px_rgba(120,54,226,0.6)]"
       />
     </div>
-  )
-}
-
-/** Índice lateral (pantallas anchas): puntos que marcan la sección en curso. */
-export function IndiceSecciones({ secciones }: { secciones: { id: string; titulo: string }[] }) {
-  const [activa, setActiva] = useState<string | null>(null)
-
-  useEffect(() => {
-    const els = secciones
-      .map((s) => document.getElementById(s.id))
-      .filter((el): el is HTMLElement => el !== null)
-    const obs = new IntersectionObserver(
-      (entradas) => {
-        for (const e of entradas) if (e.isIntersecting) setActiva(e.target.id)
-      },
-      { rootMargin: "-45% 0px -50% 0px" },
-    )
-    els.forEach((el) => obs.observe(el))
-    return () => obs.disconnect()
-  }, [secciones])
-
-  if (secciones.length < 3) return null
-
-  return (
-    <nav
-      aria-label="Secciones del diagnóstico"
-      className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 xl:block"
-    >
-      <ol className="flex flex-col gap-1 rounded-full border border-border/80 bg-surface/80 p-1.5 shadow-elevated backdrop-blur-md">
-        {secciones.map((s, i) => {
-          const actual = s.id === activa
-          return (
-            <li key={s.id} className="group relative">
-              <a
-                href={`#${s.id}`}
-                aria-label={s.titulo}
-                aria-current={actual ? "true" : undefined}
-                className="flex h-7 w-7 items-center justify-center rounded-full"
-              >
-                <span
-                  className={`rounded-full transition-all duration-300 ${
-                    actual ? "h-5 w-1.5 bg-primary" : "h-1.5 w-1.5 bg-text-muted/40 group-hover:bg-primary/60"
-                  }`}
-                />
-              </a>
-              <span className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-bg-dark px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                <span className="mr-1.5 font-mono text-primary-light">{String(i + 1).padStart(2, "0")}</span>
-                {s.titulo}
-              </span>
-            </li>
-          )
-        })}
-      </ol>
-    </nav>
   )
 }

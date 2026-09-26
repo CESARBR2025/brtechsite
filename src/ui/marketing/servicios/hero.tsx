@@ -1,34 +1,38 @@
+import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { ArrowDown } from "lucide-react"
 import { servicios } from "@/src/ui/marketing/servicios/datos"
 
 export function ServiciosHero() {
   return (
     <section className="relative overflow-hidden bg-bg-dark">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.07)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_30%_40%,black_5%,transparent_65%)]" />
-      <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-primary/15 blur-3xl" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      {/* Ondas de marca; el velo lateral protege la lectura del texto (alineado a la izquierda) */}
+      <div className="absolute inset-0">
+        <OndasGradiente />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-r from-bg-dark/90 via-bg-dark/50 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-bg-dark" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-6 sm:pb-28 sm:pt-44 lg:px-8">
         <div className="max-w-3xl">
           <p
             style={{ animationDelay: "0ms" }}
-            className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55 motion-safe:animate-aparecer"
+            className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/75 motion-safe:animate-aparecer sm:gap-4 sm:text-xs"
           >
-            <span className="h-px w-8 bg-primary" />
+            <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
             Servicios
           </p>
           <h1
             style={{ animationDelay: "120ms" }}
-            className="mt-6 text-balance text-[38px] font-bold leading-[1.05] tracking-[-0.035em] text-white sm:text-6xl motion-safe:animate-aparecer"
+            className="mt-6 text-balance font-hero text-[38px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-6xl motion-safe:animate-aparecer"
           >
             Soluciones hechas a la medida de{" "}
-            <span className="bg-gradient-to-br from-primary-light from-30% to-primary bg-clip-text text-transparent">
+            <span>
               tu operación
             </span>
           </h1>
           <p
             style={{ animationDelay: "240ms" }}
-            className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-lg motion-safe:animate-aparecer"
+            className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-xl motion-safe:animate-aparecer"
           >
             Sistemas de venta, control de inventarios y presencia digital,
             diseñados alrededor de cómo trabaja tu negocio, no al revés.
