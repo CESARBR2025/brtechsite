@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ClipboardList,
   ExternalLink,
+  FolderKanban,
   Globe,
   LogOut,
   Menu,
@@ -48,6 +49,7 @@ const SECCIONES: SeccionNav[] = [
     titulo: "Software a la medida",
     items: [
       { href: "/panel/levantamientos", label: "Levantamientos", icon: ClipboardList },
+      { href: "/panel/proyectos", label: "Proyectos", icon: FolderKanban },
     ],
   },
 ]
@@ -201,7 +203,9 @@ export function ShellPanel({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const titulo = pathname.startsWith("/panel/levantamientos")
     ? "Levantamientos"
-    : "Panel de tickets"
+    : pathname.startsWith("/panel/proyectos")
+      ? "Proyectos"
+      : "Panel de tickets"
 
   return (
     <div className="min-h-screen bg-bg-section">

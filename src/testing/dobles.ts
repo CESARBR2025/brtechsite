@@ -23,6 +23,22 @@ import {
   SlugLevantamiento,
 } from "@/src/modules/levantamientos/domain/slug-levantamiento"
 
+import type { Proyecto } from "@/src/modules/proyectos/domain/proyecto"
+import type {
+  FuenteLevantamientos,
+  NotificadorAceptacion,
+  OrigenLevantamiento,
+  PropuestaAceptada,
+} from "@/src/modules/proyectos/domain/puertos"
+import type {
+  FiltroProyectos,
+  RepositorioProyectos,
+} from "@/src/modules/proyectos/domain/repositorio-proyectos"
+import {
+  type GeneradorSlugProyecto,
+  SlugProyecto,
+} from "@/src/modules/proyectos/domain/slug-proyecto"
+
 export class NotificadorRespuestasEnMemoria implements NotificadorRespuestas {
   enviados: RespuestasCompletas[] = []
   falla = false
@@ -132,5 +148,71 @@ export class RepositorioLevantamientosEnMemoria
   async siguienteFolio(): Promise<string> {
     this.folio += 1
     return `BRD-${String(this.folio).padStart(6, "0")}`
+  }
+}
+
+export class GeneradorSlugProyectoSecuencial implements GeneradorSlugProyecto {
+  private n = 0
+  nuevo(): SlugProyecto {
+    this.n += 1
+    return SlugProyecto.desde(`proptest${String(this.n).padStart(4, "0")}`)
+  }
+}
+
+export class RepositorioProyectosEnMemoria implements RepositorioProyectos {
+  private readonly porId = new Map<string, Proyecto>()
+  private folio = 0
+
+  async guardar(proyecto: Proyecto): Promise<void> {
+    this.porId.set(proyecto.id, proyecto)
+  }
+
+  async obtenerPorId(id: string): Promise<Proyecto | null> {
+    return this.porId.get(id) ?? null
+  }
+
+  async obtenerPorSlug(slug: SlugProyecto): Promise<Proyecto | null> {
+    for (const p of this.porId.values()) {
+      if (p.slug.valor === slug.valor) return p
+    }
+    return null
+  }
+
+  async listar(filtro: FiltroProyectos = {}): Promise<Proyecto[]> {
+    let lista = [...this.porId.values()]
+    if (filtro.estado) lista = lista.filter((p) => p.estado === filtro.estado)
+    lista.sort((a, b) => b.creadoEn.getTime() - a.creadoEn.getTime())
+    return filtro.limite ? lista.slice(0, filtro.limite) : lista
+  }
+
+  async siguienteFolio(): Promise<string> {
+    this.folio += 1
+    return `BRP-${String(this.folio).padStart(6, "0")}`
+  }
+}
+
+export class FuenteLevantamientosEnMemoria implements FuenteLevantamientos {
+  constructor(private readonly origenes: OrigenLevantamiento[] = []) {}
+
+  async obtener(id: string): Promise<OrigenLevantamiento | null> {
+    return this.origenes.find((o) => o.id === id) ?? null
+  }
+
+  async listar() {
+    return this.origenes.map(({ id, folio, clienteNombre, proyectoNombre }) => ({
+      id,
+      folio,
+      clienteNombre,
+      proyectoNombre,
+    }))
+  }
+}
+
+export class NotificadorAceptacionEnMemoria implements NotificadorAceptacion {
+  enviados: PropuestaAceptada[] = []
+  falla = false
+  async propuestaAceptada(datos: PropuestaAceptada): Promise<void> {
+    if (this.falla) throw new Error("Correo caído")
+    this.enviados.push(datos)
   }
 }
