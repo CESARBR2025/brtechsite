@@ -43,6 +43,8 @@ export class RepositorioLevantamientosPostgres
     columna: "id" | "public_slug",
     valor: string,
   ): Promise<Levantamiento | null> {
+    // Un id que no es uuid no existe (y así Postgres no lanza error de tipo)
+    if (columna === "id" && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(valor)) return null
     const { rows } = await this.pool.query<FilaLevantamiento>(
       `SELECT ${COLUMNAS} FROM levantamiento WHERE ${columna} = $1`,
       [valor],
