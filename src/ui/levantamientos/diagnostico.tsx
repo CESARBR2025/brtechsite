@@ -320,7 +320,7 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
 
           <h1
             style={retraso(280)}
-            className={`${promesa ? "mt-3" : "mt-2"} text-balance bg-gradient-to-br from-white from-25% via-primary-light to-primary bg-clip-text pb-2 text-[46px] font-bold leading-[1.02] tracking-[-0.04em] text-transparent sm:text-7xl lg:text-8xl motion-safe:animate-aparecer`}
+            className={`${promesa ? "mt-3" : "mt-2"} text-balance bg-gradient-to-br from-white from-25% via-primary-light to-primary bg-clip-text pb-2 font-hero text-[46px] font-semibold leading-[1.02] tracking-[-0.02em] text-transparent sm:text-7xl lg:text-8xl motion-safe:animate-aparecer`}
           >
             {titulo}
           </h1>
