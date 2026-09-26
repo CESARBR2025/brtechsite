@@ -3,14 +3,14 @@
 /**
  * Fondo "ondas de gradiente", adaptado de React Bits (GradientWaves): un campo
  * de olas en raymarching que se desvanece en bruma hacia el horizonte.
- * Shaders sin cambios. Cambios respecto al original (mismo criterio que VeloOscuro):
+ * Shaders sin cambios. Cambios respecto al original:
  * - Colores de marca por defecto: todo violeta (bruma violeta intenso, olas #9D4DFF, crestas violeta claro).
  * - Resolución interna reducida y ~30 fps: el raymarching es costoso y el
  *   resultado es difuso, no se nota.
  * - Paralaje con el puntero escuchado en la ventana (el texto del hero queda
  *   encima del canvas); en pantallas táctiles no aplica.
  * - `prefers-reduced-motion`: pinta un solo cuadro fijo, sin animar ni paralaje.
- * - Sin WebGL 2 queda el fondo CSS del contenedor.
+ * - Resplandor CSS de respaldo desde el HTML: se ve mientras arranca WebGL y sin WebGL 2.
  * - Se pausa fuera de pantalla y con la pestaña oculta; aparece con fundido.
  */
 
@@ -329,5 +329,12 @@ export function OndasGradiente({
     paralaje, grano, resolutionScale,
   ])
 
-  return <div ref={ref} aria-hidden="true" className={`relative h-full w-full ${className}`} />
+  // El resplandor CSS se ve desde el HTML (sin esperar a WebGL) y es el respaldo sin WebGL 2
+  return (
+    <div
+      ref={ref}
+      aria-hidden="true"
+      className={`relative h-full w-full bg-[radial-gradient(120%_75%_at_50%_100%,rgba(157,77,255,0.5),rgba(91,33,230,0.28)_45%,transparent_78%)] ${className}`}
+    />
+  )
 }

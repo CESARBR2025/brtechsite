@@ -30,20 +30,18 @@ const steps = [
 
 export function ProcessSection() {
   return (
-    <section className="relative overflow-hidden bg-bg-dark py-24 sm:py-32">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.06)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_50%_70%,black_5%,transparent_65%)]" />
-      <div className="absolute left-1/2 top-2/3 h-80 w-[40rem] max-w-full -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+    <section className="relative overflow-hidden bg-bg-section py-24 sm:py-32">
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <span className="h-px w-8 bg-primary" />
             Nuestro método
           </p>
-          <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
             Así construimos tu sistema
           </h2>
-          <p className="mt-5 text-pretty text-base leading-relaxed text-white/65 sm:text-lg">
+          <p className="mt-5 text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">
             Tu problema y tu visión, convertidos en una solución hecha a la
             medida de tu negocio.
           </p>
@@ -57,17 +55,17 @@ export function ProcessSection() {
           />
           {steps.map((step, i) => (
             <li key={step.title} className="group relative grid grid-cols-[3rem_1fr] gap-x-5 lg:block">
-              <span className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-line-dark-strong bg-bg-dark text-primary-light transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-white">
+              <span className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface text-primary shadow-sm transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-white">
                 <step.icon className="h-5 w-5" />
               </span>
               <div className="lg:mt-6">
-                <span className="font-mono text-xs tabular-nums text-primary-light/60">
+                <span className="font-mono text-xs tabular-nums text-primary/50">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-1 text-lg font-semibold tracking-tight text-white">
+                <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-text-primary">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-pretty text-sm leading-relaxed text-white/65">
+                <p className="mt-2 text-pretty text-sm leading-relaxed text-text-secondary">
                   {step.description}
                 </p>
               </div>

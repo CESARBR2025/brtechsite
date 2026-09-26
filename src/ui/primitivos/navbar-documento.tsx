@@ -13,15 +13,20 @@ const focusRing =
   "outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
 
 /**
- * Encabezado de vidrio de la propuesta: mismo lenguaje que la barra del sitio,
- * pero con atajos a las secciones clave y el llamado a aceptar.
+ * Encabezado de vidrio de las páginas que se comparten con un cliente
+ * (propuesta, diagnóstico): mismo lenguaje que la barra del sitio, con atajos
+ * a las secciones clave y una acción principal o un estado cumplido.
  */
-export function NavbarPropuesta({
+export function NavbarDocumento({
   enlaces,
-  aceptada,
+  accion,
+  cumplido,
 }: {
   enlaces: { id: string; titulo: string }[]
-  aceptada: boolean
+  /** Botón principal (p. ej. "Aceptar propuesta" → #aceptar). */
+  accion?: { texto: string; href: string } | null
+  /** Si se indica, sustituye a la acción con una etiqueta verde (p. ej. "Aceptada"). */
+  cumplido?: string | null
 }) {
   const [abierto, setAbierto] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -63,19 +68,19 @@ export function NavbarPropuesta({
         : "text-white/65 hover:bg-white/5 hover:text-white"
     }`
 
-  const cta = aceptada ? (
+  const cta = cumplido ? (
     <span className="hidden items-center gap-1.5 rounded-full bg-success/15 px-4 py-2.5 text-sm font-semibold text-success md:inline-flex">
-      <CheckCircle2 className="h-4 w-4" /> Aceptada
+      <CheckCircle2 className="h-4 w-4" /> {cumplido}
     </span>
-  ) : (
+  ) : accion ? (
     <BotonEspecular
-      href="#aceptar"
+      href={accion.href}
       className={`group hidden items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8),inset_0_1px_0_rgba(255,255,255,0.2)] transition-colors hover:bg-primary-hover md:inline-flex ${focusRing}`}
     >
-      Aceptar propuesta
+      {accion.texto}
       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
     </BotonEspecular>
-  )
+  ) : null
 
   return (
     <header className="fixed inset-x-0 top-3 z-50 px-3 sm:top-4 sm:px-4">
@@ -95,12 +100,12 @@ export function NavbarPropuesta({
           distortionScale={-160}
         >
           <div className="flex h-14 items-center justify-between gap-3 pl-5 pr-2">
-            <a href="#" className={`flex shrink-0 items-center rounded-full ${focusRing}`} aria-label="Ir al inicio de la propuesta">
+            <a href="#" className={`flex shrink-0 items-center rounded-full ${focusRing}`} aria-label="Ir al inicio">
               <Image src="/logo.png" alt="BR TECH" width={566} height={191} priority className="h-8 w-auto" />
             </a>
 
             {enlaces.length > 0 && (
-              <nav aria-label="Secciones de la propuesta" className="hidden items-center gap-0.5 md:flex">
+              <nav aria-label="Secciones" className="hidden items-center gap-0.5 md:flex">
                 {enlaces.map((e) => (
                   <a key={e.id} href={`#${e.id}`} aria-current={activa === e.id ? "true" : undefined} className={tabClass(e.id)}>
                     {e.titulo}
@@ -117,7 +122,7 @@ export function NavbarPropuesta({
               className={`flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white md:hidden ${focusRing}`}
               aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={abierto}
-              aria-controls="menu-propuesta"
+              aria-controls="menu-documento"
             >
               {abierto ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -125,7 +130,7 @@ export function NavbarPropuesta({
 
           {/* Menú móvil: se despliega dentro del mismo vidrio */}
           <div
-            id="menu-propuesta"
+            id="menu-documento"
             className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out md:hidden ${
               abierto ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
             }`}
@@ -140,20 +145,20 @@ export function NavbarPropuesta({
                     </a>
                   ))}
                 </nav>
-                {aceptada ? (
+                {cumplido ? (
                   <p className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-success/15 px-4 py-3 text-sm font-semibold text-success">
-                    <CheckCircle2 className="h-4 w-4" /> Propuesta aceptada
+                    <CheckCircle2 className="h-4 w-4" /> {cumplido}
                   </p>
-                ) : (
+                ) : accion ? (
                   <a
-                    href="#aceptar"
+                    href={accion.href}
                     onClick={() => setAbierto(false)}
                     className={`group mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8)] transition-colors hover:bg-primary-hover ${focusRing}`}
                   >
-                    Aceptar propuesta
+                    {accion.texto}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </a>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

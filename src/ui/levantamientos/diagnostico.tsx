@@ -1,9 +1,7 @@
-import Image from "next/image"
 import {
   ArrowDown,
   ArrowRight,
   BarChart3,
-  Lock,
   Bell,
   CheckCircle2,
   FileText,
@@ -32,8 +30,10 @@ import {
   ETIQUETA_TIPO_RESULTADO,
 } from "./etiquetas"
 import { formatearFechaHora } from "./fechas"
-import { VeloOscuro } from "@/src/ui/primitivos/velo-oscuro"
-import { BarraLectura, Contador, IndiceSecciones, Revelar } from "./efectos-diagnostico"
+import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
+import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
+import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
+import { BarraLectura, Contador, Revelar } from "./efectos-diagnostico"
 import { PreguntasCliente } from "./preguntas-cliente"
 
 /*
@@ -78,7 +78,7 @@ function Seccion({
   children: React.ReactNode
 }) {
   return (
-    <section id={id} className="scroll-mt-10 py-12 sm:py-20">
+    <section id={id} className="scroll-mt-28 py-12 sm:py-20">
       <Revelar>
         <div className="relative pr-20 sm:pr-40">
           {/* Número editorial gigante en contorno, al lado del título */}
@@ -261,6 +261,14 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
     { id: "preguntas", titulo: "Preguntas al cliente", mostrar: c.preguntasAbiertas.length > 0 },
   ].filter((x) => x.mostrar)
   const num = (id: string) => indice.findIndex((x) => x.id === id)
+  // Atajos del encabezado: solo las secciones que el cliente más consulta
+  const ATAJOS: Record<string, string> = {
+    problema: "Punto de partida",
+    operacion: "Operación",
+    prioridades: "Prioridades",
+    preguntas: "Preguntas",
+  }
+  const atajos = indice.filter((x) => x.id in ATAJOS).map((x) => ({ id: x.id, titulo: ATAJOS[x.id] }))
 
   const mensajeWhatsApp = `Hola, revisé el diagnóstico ${d.folio} de ${titulo}. `
   const enlaceWhatsApp = `https://wa.me/${WHATSAPP.telefono.replace("+", "")}?text=${encodeURIComponent(mensajeWhatsApp)}`
@@ -268,108 +276,71 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
   return (
     <main className="min-h-screen bg-bg-section">
       <BarraLectura />
-      <IndiceSecciones secciones={indice.map(({ id, titulo }) => ({ id, titulo }))} />
+      <NavbarDocumento
+        enlaces={atajos}
+        accion={
+          c.preguntasAbiertas.length > 0 && d.preguntasPendientes > 0
+            ? { texto: "Responder preguntas", href: "#preguntas" }
+            : null
+        }
+        cumplido={d.confirmado ? "Confirmado" : null}
+      />
 
-      {/* Hero: solo saludar e impactar. Pensado primero para celular (100svh). */}
+      {/*
+        Hero tipo portada (mismo lenguaje que la propuesta): ondas de marca,
+        rótulo del documento, nombre del proyecto y una línea de apoyo. Los
+        datos del documento van al pie.
+      */}
       <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
         <div className="absolute inset-0 -z-10">
-          <VeloOscuro hueShift={0} poster="/fondos/velo-poster.webp" />
+          <OndasGradiente />
         </div>
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-bg-deep/30 via-transparent to-bg-dark" />
-        <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/5 bg-gradient-to-b from-transparent to-bg-deep/80" />
 
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-5 pt-5 sm:px-6 sm:pt-8 lg:px-8">
-          <Image
-            src="/logo.png"
-            alt="BR TECH"
-            width={566}
-            height={191}
-            className="h-8 w-auto sm:h-10"
-            priority
-          />
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/75 backdrop-blur-md">
-            <Lock className="h-3 w-3 text-primary-light" aria-hidden="true" />
-            <span className="font-mono tabular-nums">{d.folio}</span>
-          </span>
-        </div>
-
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-16 pt-10 text-center sm:px-6 sm:pb-20">
-          <span
-            style={retraso(0)}
-            className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm motion-safe:animate-aparecer"
-          >
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_8px_2px_rgba(120,54,226,0.7)]" />
-            <span className="truncate">Tu diagnóstico especial está listo</span>
-          </span>
-
-          <p
-            style={retraso(120)}
-            className="mt-8 text-balance text-2xl font-medium tracking-tight text-white/85 sm:text-3xl motion-safe:animate-aparecer"
-          >
-            Hola, <span className="font-semibold text-white">{saludo}</span>
-          </p>
-
-          {!promesa && (
-            <p
-              style={retraso(200)}
-              className="mt-3 text-base text-white/65 sm:text-lg motion-safe:animate-aparecer"
-            >
-              Este será tu próximo sistema
+        {/* pt deja libre el espacio del encabezado de vidrio (fijo) */}
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-28 text-center sm:px-6 sm:pt-32">
+          <div style={retraso(0)} className="flex flex-col items-center gap-3 motion-safe:animate-aparecer">
+            <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/75 sm:gap-4 sm:text-xs">
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
+              Diagnóstico de tu proyecto
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
             </p>
-          )}
+            {d.confirmado && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Confirmado
+              </span>
+            )}
+          </div>
 
-          <h1
-            style={retraso(280)}
-            className={`${promesa ? "mt-3" : "mt-2"} text-balance bg-gradient-to-br from-white from-25% via-primary-light to-primary bg-clip-text pb-2 font-hero text-[46px] font-semibold leading-[1.02] tracking-[-0.02em] text-transparent sm:text-7xl lg:text-8xl motion-safe:animate-aparecer`}
-          >
-            {titulo}
+          <h1 className="mt-7 text-balance pb-1 font-hero text-[46px] font-semibold leading-[1.02] tracking-[-0.02em] text-white [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-7xl lg:text-8xl">
+            <TextoDesenfocado texto={titulo} retrasoMs={200} />
           </h1>
 
-          {promesa && (
-            <p
-              style={retraso(340)}
-              className="mt-4 max-w-2xl text-balance text-lg font-medium leading-snug text-white/80 sm:text-2xl motion-safe:animate-aparecer"
-            >
-              {promesa}
-            </p>
-          )}
-
-          {c.contexto.cifras.length > 0 && (
-            <dl
-              style={retraso(400)}
-              className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 motion-safe:animate-aparecer sm:gap-x-7"
-            >
-              {c.contexto.cifras.map((x, i) => (
-                <div key={x.id} className="flex items-center gap-5 sm:gap-7">
-                  {i > 0 && <span aria-hidden="true" className="h-1 w-1 rounded-full bg-primary-light/50" />}
-                  <div className="flex items-baseline gap-1.5">
-                    <dd className="text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">{x.valor}</dd>
-                    <dt className="text-sm text-white/60 sm:text-base">{x.etiqueta}</dt>
-                  </div>
-                </div>
-              ))}
-            </dl>
-          )}
-
-          <a
-            href="#resumen"
-            style={retraso(460)}
-            className="group mt-9 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-5 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_24px_-4px_rgba(120,54,226,0.6)] backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/25 active:scale-[0.98] motion-safe:animate-aparecer"
+          <p
+            style={retraso(650)}
+            className="mt-6 max-w-2xl text-balance text-base leading-relaxed text-white/70 sm:text-xl motion-safe:animate-aparecer"
           >
-            Ver cómo lo vamos a lograr
-            <ArrowDown className="h-4 w-4 text-primary-light motion-safe:animate-bounce" aria-hidden="true" />
-          </a>
-
-          {d.confirmado && (
-            <span
-              style={retraso(420)}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success motion-safe:animate-aparecer"
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" /> Confirmado
-            </span>
-          )}
+            Hola, <span className="font-medium text-white">{saludo}</span>.{" "}
+            {promesa || "Este será tu próximo sistema."}
+          </p>
         </div>
 
+        {/* Pie de portada: los datos del documento, fuera del centro */}
+        <div style={retraso(850)} className="relative mx-auto w-full max-w-5xl px-5 pb-6 motion-safe:animate-aparecer sm:px-6 sm:pb-8 lg:px-8">
+          <div className="grid items-center gap-4 border-t border-white/10 pt-5 text-xs text-white/55 sm:grid-cols-3 sm:text-sm">
+            <p className="text-center sm:text-left">
+              Empresa cliente: <span className="font-medium text-white/85">{d.cliente.nombre}</span>
+            </p>
+            <a
+              href="#resumen"
+              className="group mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/20 active:scale-[0.98]"
+            >
+              Ver el diagnóstico
+              <ArrowDown className="h-4 w-4 text-primary-light transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+            </a>
+            <p className="text-center tabular-nums sm:text-right">{formatearFecha(d.fechaReunion)}</p>
+          </div>
+        </div>
       </section>
 
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -377,7 +348,7 @@ export function Diagnostico({ d }: { d: DiagnosticoPublicoDTO }) {
         <div
           id="resumen"
           style={retraso(480)}
-          className="relative mt-12 scroll-mt-10 overflow-hidden rounded-3xl sm:mt-16 border border-border bg-surface shadow-modal motion-safe:animate-aparecer"
+          className="relative mt-12 scroll-mt-28 overflow-hidden rounded-3xl sm:mt-16 border border-border bg-surface shadow-modal motion-safe:animate-aparecer"
         >
           <div className="h-1 bg-gradient-to-r from-primary-hover via-primary to-primary-light" />
           <div className="grid lg:grid-cols-[1.35fr_1fr]">

@@ -7,8 +7,9 @@ import { ArrowUpRight } from "lucide-react"
  * Color: violeta de marca + verde/ámbar solo como estado (en línea, reabastecer).
  */
 
+// Pantalla oscura dentro de una tarjeta clara: se lee como una captura del producto
 const marco =
-  "relative h-40 overflow-hidden rounded-xl border border-line-dark bg-bg-deep/40 p-4"
+  "relative h-40 overflow-hidden rounded-xl border border-bg-dark bg-bg-dark p-4 shadow-[0_12px_28px_-14px_rgba(21,17,39,0.55)]"
 
 const barra = "motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out"
 

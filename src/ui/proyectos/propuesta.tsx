@@ -47,7 +47,7 @@ import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 import { AceptarPropuesta } from "./aceptar-propuesta"
-import { NavbarPropuesta } from "./navbar-propuesta"
+import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
 import { ETIQUETA_IMPACTO } from "./etiquetas"
 
 /*
@@ -618,9 +618,10 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
     <main className="min-h-screen bg-bg-section">
       <BarraLectura />
 
-      <NavbarPropuesta
-        aceptada={p.aceptacion !== null}
+      <NavbarDocumento
         enlaces={atajos}
+        accion={{ texto: "Aceptar propuesta", href: "#aceptar" }}
+        cumplido={p.aceptacion ? "Aceptada" : null}
       />
 
       {/*
