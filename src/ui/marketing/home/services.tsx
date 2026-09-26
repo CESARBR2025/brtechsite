@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, BarChart3, Check, Globe, Store } from "lucide-react"
+import { ArrowRight, BarChart3, Check, Globe, UtensilsCrossed } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 
@@ -52,18 +52,21 @@ interface Frente {
 
 const frentes: Frente[] = [
   {
-    id: "operacion",
-    pestana: "Operación y ventas",
-    icono: Store,
-    titulo: "Toda tu operación en un solo sistema",
+    id: "restaurantes",
+    pestana: "Restaurantes y negocios",
+    icono: UtensilsCrossed,
+    titulo: "Software para restaurantes multisucursal",
     descripcion:
-      "Ventas, pedidos, caja, sucursales o rutas de reparto operando como una sola, hecha a la medida de cómo trabaja tu negocio.",
-    idealPara: ["Restaurantes", "Distribuidoras", "Multisucursal", "Venta en ruta"],
+      "Todas tus sucursales operando como una sola: de la orden en la mesa a la cocina y la barra, y hasta el corte de caja, en tiempo real y desde cualquier dispositivo.",
+    idealPara: ["Restaurantes", "Cafeterías", "Bares", "Cadenas con sucursales"],
     funciones: [
-      "Punto de venta y control de caja con cortes",
-      "Sucursales o rutas conectadas en tiempo real",
-      "Pedidos, órdenes y entregas de punta a punta",
-      "Reportes de ventas sin capturar nada a mano",
+      "Operación en tiempo real de todas tus sucursales",
+      "Órdenes rápidas desde la mesa o el mostrador",
+      "Comandas al instante en cocina y barra",
+      "Menú digital siempre actualizado",
+      "Cortes de caja al cierre, sin diferencias",
+      "Tablero con los indicadores clave del negocio",
+      "App para iPhone y Android",
     ],
     ancla: "sistema-pos-para-restaurantes",
     foto: {
@@ -76,15 +79,18 @@ const frentes: Frente[] = [
     id: "inventarios",
     pestana: "Control de inventarios",
     icono: BarChart3,
-    titulo: "Sabe qué tienes, qué se mueve y qué se pierde",
+    titulo: "Sabe qué tienes, dónde está y cuánto te deja",
     descripcion:
-      "Visibilidad precisa de entradas, salidas y existencias, con un responsable en cada movimiento, para detener las fugas antes de que afecten tu margen.",
-    idealPara: ["Almacenes", "Producción", "Comercios", "Distribuidoras"],
+      "Visibilidad precisa de tu almacén y de tus unidades en ruta: cada movimiento con un responsable, finanzas claras y trato directo con tus comerciantes, para detener las fugas antes de que afecten tu margen.",
+    idealPara: ["Distribuidoras", "Almacenes", "Producción", "Venta en ruta"],
     funciones: [
       "Existencias en tiempo real por producto",
+      "Tus unidades de reparto en el mapa, en tiempo real",
+      "Finanzas claras por unidad y por ruta",
+      "Contacto directo con tus comerciantes",
       "Alertas de reabastecimiento",
-      "Historial completo de movimientos",
       "Merma y devoluciones registradas",
+      "Historial completo de movimientos",
     ],
     ancla: "control-de-inventarios",
     foto: {
@@ -219,7 +225,7 @@ export function ServicesSection() {
               ))}
             </ul>
 
-            <ul className="mt-6 space-y-2.5 border-t border-border pt-6">
+            <ul className="mt-6 grid gap-x-6 gap-y-2.5 border-t border-border pt-6 sm:grid-cols-2">
               {f.funciones.map((x) => (
                 <li key={x} className="flex items-start gap-2.5 text-sm text-text-secondary sm:text-base">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
