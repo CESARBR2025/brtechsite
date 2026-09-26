@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowDown, ArrowRight } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
@@ -8,41 +9,77 @@ import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 // con reduced-motion todo aparece de inmediato.
 const retraso = (ms: number) => ({ animationDelay: `${ms}ms` })
 
+/*
+ * Hero del inicio: texto a la izquierda y, a la derecha, la foto que cuenta lo
+ * que hacemos (el sistema al frente y la operación conectada detrás). La foto
+ * se funde hacia la izquierda con una máscara, sobre las ondas de marca.
+ * En celular la foto ocupa la parte alta y se funde hacia abajo, donde va el texto.
+ */
 export function HeroSection() {
   return (
     // Al menos una pantalla completa (svh: descuenta la barra del navegador móvil)
-    <section className="relative flex min-h-svh items-center overflow-hidden bg-bg-deep">
+    <section className="relative isolate flex min-h-svh items-end overflow-hidden bg-bg-deep lg:items-center">
       {/* Ondas de gradiente violeta (WebGL): el efecto de marca del sitio */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 -z-20">
         <OndasGradiente />
       </div>
 
-      {/* Oscurece el borde inferior: el hero cierra en oscuro y el contenido abre en claro */}
-      <div className="absolute inset-x-0 bottom-0 h-1/5 bg-gradient-to-b from-transparent to-bg-deep/80" />
+      {/* Foto: arriba en celular; a la derecha en escritorio, fundida hacia el texto */}
+      <div className="absolute inset-x-0 top-0 -z-10 h-[62%] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[74%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)]">
+        <Image
+          src="/hero-inicio.webp"
+          alt="Tablet, celular e impresora con el sistema en el mostrador de un negocio, con el almacén, el equipo y la camioneta de reparto conectados al fondo"
+          fill
+          priority
+          sizes="(min-width: 1024px) 74vw, 100vw"
+          className="object-cover object-[72%_center] lg:object-center"
+        />
+      </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-4 pb-20 pt-32 sm:px-6 sm:pb-24 sm:pt-36 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
+      {/* Contraste para el texto: velo lateral en escritorio y oscurecido del borde inferior */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-bg-deep/70 via-bg-deep/20 to-transparent lg:block" />
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/4 bg-gradient-to-b from-transparent to-bg-deep/80" />
+
+      {/* Texto pegado a la izquierda (sin centrar el contenedor) */}
+      <div className="relative w-full px-5 pb-16 pt-32 sm:px-8 sm:pb-20 lg:py-40 lg:pl-16 xl:pl-24">
+        <div className="max-w-3xl">
           {/* Qué hacemos: rótulo en versalitas, mismo lenguaje que la propuesta */}
           <p
             style={retraso(0)}
-            className="flex items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/75 motion-safe:animate-aparecer sm:gap-4 sm:text-xs"
+            className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/75 motion-safe:animate-aparecer sm:gap-4 sm:text-xs"
           >
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
             Software a la medida para empresas
-            <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
           </p>
 
-          {/* Eslogan */}
-          <h1 className="mt-7 text-balance font-hero text-[40px] font-semibold leading-[1.05] tracking-[-0.02em] text-white [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-6xl lg:text-7xl">
-            <TextoDesenfocado texto="Tu negocio es diferente." retrasoMs={120} />{" "}
+          {/* Eslogan (Poppins): una idea por línea */}
+          <h1 className="mt-8 font-display text-[36px] font-semibold leading-[1.12] tracking-[-0.03em] text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.45)] sm:text-[56px] lg:text-[64px]">
             <span className="block">
+              <TextoDesenfocado texto="Tu negocio es diferente." retrasoMs={120} />
+            </span>
+            <span className="mt-1 block text-balance sm:mt-2">
               <TextoDesenfocado texto="Tu software también debería serlo" retrasoMs={460} />
             </span>
           </h1>
 
+          {/* Filete que separa el eslogan de la promesa */}
+          <span
+            style={retraso(750)}
+            aria-hidden="true"
+            className="mt-8 block h-px w-16 bg-gradient-to-r from-primary-light/80 to-transparent motion-safe:animate-aparecer sm:mt-10"
+          />
+
+          {/* Promesa */}
+          <p
+            style={retraso(800)}
+            className="mt-6 max-w-md text-pretty text-base leading-relaxed text-white/75 sm:text-lg motion-safe:animate-aparecer"
+          >
+            Diseñamos software que se adapta a ti, a tu operación y a tu entorno.
+          </p>
+
           <div
-            style={retraso(900)}
-            className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row motion-safe:animate-aparecer"
+            style={retraso(950)}
+            className="mt-10 flex sm:mt-12 flex-col gap-3 sm:flex-row motion-safe:animate-aparecer"
           >
             <BotonEspecular
               href="/contacto"
