@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowDown, ArrowRight } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
+import { evento } from "@/src/ui/analitica"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 
@@ -83,6 +84,7 @@ export function HeroSection() {
           >
             <BotonEspecular
               href="/contacto"
+              atributos={evento("agendar-consulta", { origen: "hero" })}
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
             >
               Agendar consulta gratuita

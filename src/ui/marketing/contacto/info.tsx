@@ -1,5 +1,6 @@
 import { ArrowUpRight, Clock, MapPin } from "lucide-react"
 import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
+import { evento } from "@/src/ui/analitica"
 
 /*
  * Panel oscuro de la tarjeta de contacto: WhatsApp como vía rápida (el canal
@@ -45,6 +46,7 @@ export function ContactInfo() {
           href={WHATSAPP.url}
           target="_blank"
           rel="noopener noreferrer"
+          {...evento("whatsapp", { origen: "contacto" })}
           className="group mt-5 flex items-center gap-4 rounded-2xl bg-success px-5 py-4 text-white shadow-lg shadow-success/25 outline-none transition-all hover:brightness-110 focus-visible:ring-2 focus-visible:ring-success focus-visible:ring-offset-2 focus-visible:ring-offset-bg-deep active:scale-[0.99]"
         >
           <svg viewBox="0 0 24 24" className="h-7 w-7 shrink-0 fill-current" aria-hidden="true">

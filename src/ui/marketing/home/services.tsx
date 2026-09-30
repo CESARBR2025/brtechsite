@@ -6,6 +6,7 @@ import { ArrowRight, Check } from "lucide-react"
 import { WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 import { servicios as frentes } from "@/src/ui/marketing/servicios/datos"
 import { FotoServicio } from "@/src/ui/marketing/servicios/foto-servicio"
+import { evento } from "@/src/ui/analitica"
 
 /*
  * Escaparate de servicios con pestañas: un frente a la vez, en grande, con
@@ -144,6 +145,7 @@ export function ServicesSection() {
           </p>
           <a
             href={enlaceMedida}
+            {...evento("whatsapp", { origen: "servicios-a-la-medida" })}
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-text-primary outline-none transition-all hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"

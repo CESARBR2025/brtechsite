@@ -4,6 +4,7 @@ import { ArrowRight, Check } from "lucide-react"
 import { GaleriaAcordeon } from "@/src/ui/primitivos/galeria-acordeon"
 import { proyectos } from "@/src/ui/marketing/proyectos/datos"
 import { iconoModulo } from "@/src/ui/marketing/proyectos/iconos"
+import { evento } from "@/src/ui/analitica"
 
 /*
  * Caso destacado del home: tarjeta oscura compacta (galería + resumen) sobre
@@ -118,6 +119,7 @@ export function ProyectosRecientesSection() {
                       </Link>
                       <Link
                         href="/contacto"
+                        {...evento("agendar-consulta", { origen: "proyecto-destacado" })}
                         className={`group/enlace inline-flex whitespace-nowrap items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white transition-all hover:border-primary/60 hover:bg-primary/20 ${focusRing}`}
                       >
                         Quiero un sistema así

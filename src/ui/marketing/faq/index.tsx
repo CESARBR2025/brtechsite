@@ -3,6 +3,7 @@
 import { useId, useState } from "react"
 import Link from "next/link"
 import { ArrowRight, Plus } from "lucide-react"
+import { evento } from "@/src/ui/analitica"
 
 const faqs = [
   {
@@ -53,6 +54,7 @@ export function FAQSection() {
           </p>
           <Link
             href="/contacto"
+            {...evento("agendar-consulta", { origen: "faq" })}
             className="group mt-8 inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-primary outline-none transition-colors hover:text-primary-hover focus-visible:ring-2 focus-visible:ring-primary"
           >
             Escríbenos

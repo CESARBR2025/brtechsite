@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight, Check, Minus } from "lucide-react"
 import { servicios } from "@/src/ui/marketing/servicios/datos"
 import { FotoServicio } from "@/src/ui/marketing/servicios/foto-servicio"
+import { evento } from "@/src/ui/analitica"
 
 /*
  * Un servicio por sección, alternando fondo claro y gris y el lado de la foto
@@ -67,6 +68,7 @@ export function ServiceList() {
 
                   <Link
                     href={`/contacto?interes=${s.id}`}
+                    {...evento("cotizar-servicio", { servicio: s.id })}
                     className="group mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/25 outline-none transition-all hover:bg-primary-hover hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98]"
                   >
                     Cotiza este servicio
