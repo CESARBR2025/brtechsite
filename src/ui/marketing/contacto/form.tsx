@@ -6,6 +6,7 @@ import { ArrowRight, Check, HelpCircle, Loader2, Mail, MessageSquare, Phone, Use
 import { enviarMensajeContacto } from "@/src/modules/contacto/infrastructure/acciones-contacto"
 import { servicios } from "@/src/ui/marketing/servicios/datos"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
+import { registrarEvento } from "@/src/ui/analitica"
 
 /*
  * Formulario de contacto (panel claro de la tarjeta). "¿Qué te interesa?" usa
@@ -37,10 +38,15 @@ export function ContactForm({ interesInicial }: { interesInicial?: string }) {
     setIsPending(true)
     setError(null)
 
-    const result = await enviarMensajeContacto(new FormData(e.currentTarget))
+    const datos = new FormData(e.currentTarget)
+    const result = await enviarMensajeContacto(datos)
 
     setIsPending(false)
     if (result.success) {
+      registrarEvento("contacto-enviado", {
+        interes: String(datos.get("interes") ?? "") || "sin-elegir",
+        whatsapp: datos.get("telefono") ? "si" : "no",
+      })
       setSent(true)
     } else {
       setError(result.error || "Hubo un error al enviar el mensaje.")
@@ -73,7 +79,8 @@ export function ContactForm({ interesInicial }: { interesInicial?: string }) {
       <h2 className="font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">Envíanos un mensaje</h2>
       <p className="mt-2 text-sm text-text-secondary sm:text-base">Cuéntanos en qué podemos ayudarte.</p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      {/* data-clarity-mask: lo que escribe el visitante no aparece en las grabaciones */}
+      <form onSubmit={handleSubmit} data-clarity-mask="true" className="mt-8 space-y-6">
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="name" className={etiqueta}>
@@ -169,7 +176,15 @@ export function ContactForm({ interesInicial }: { interesInicial?: string }) {
         )}
 
         <div className="flex flex-col-reverse gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-text-muted">Te responderemos en menos de 24 horas.</p>
+          <p className="text-xs leading-relaxed text-text-muted">
+            Te responderemos en menos de 24 horas.
+            <br />
+            Al enviar aceptas nuestro{" "}
+            <Link href="/privacidad" className="font-medium text-primary underline-offset-4 hover:underline">
+              aviso de privacidad
+            </Link>
+            .
+          </p>
           <BotonEspecular
             type="submit"
             disabled={isPending}
