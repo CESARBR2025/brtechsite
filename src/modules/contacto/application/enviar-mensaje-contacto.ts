@@ -5,6 +5,8 @@ export interface DatosMensajeEntrada {
   nombre: string
   email: string
   mensaje: string
+  interes?: string | null
+  telefono?: string | null
 }
 
 export class EnviarMensajeContacto {

@@ -12,7 +12,7 @@ export function ContactoHero() {
       <div className="absolute inset-0 bg-gradient-to-r from-bg-dark/90 via-bg-dark/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-bg-dark" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-36 sm:px-6 sm:pb-16 sm:pt-44 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-4 pb-28 pt-36 sm:px-6 sm:pb-36 sm:pt-44 lg:px-8">
         <div className="max-w-3xl">
           <p
             style={{ animationDelay: "0ms" }}
@@ -25,10 +25,7 @@ export function ContactoHero() {
             style={{ animationDelay: "120ms" }}
             className="mt-6 text-balance font-hero text-[38px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-6xl motion-safe:animate-aparecer"
           >
-            Cuéntanos sobre tu negocio y{" "}
-            <span>
-              te proponemos la solución ideal
-            </span>
+            Cuéntanos sobre tu negocio y te proponemos la solución ideal
           </h1>
           <p
             style={{ animationDelay: "240ms" }}
