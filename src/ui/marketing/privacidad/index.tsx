@@ -62,8 +62,7 @@ export function AvisoPrivacidad() {
         <article className="mx-auto max-w-3xl space-y-10 px-4 sm:px-6 lg:px-8">
           <Seccion titulo="Responsable de tus datos">
             <p>
-              <strong className="font-semibold text-text-primary">{EMPRESA.nombre}</strong>, a cargo de{" "}
-              {EMPRESA.fundador}, con domicilio en {EMPRESA.ciudad}, {EMPRESA.estado}, México, es responsable del
+              <strong className="font-semibold text-text-primary">{EMPRESA.nombre}</strong>, con domicilio en {EMPRESA.ciudad}, {EMPRESA.estado}, México, es responsable del
               tratamiento de los datos personales que nos proporcionas a través de este sitio, conforme a la Ley
               Federal de Protección de Datos Personales en Posesión de los Particulares.
             </p>
