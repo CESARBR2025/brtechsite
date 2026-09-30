@@ -1,7 +1,7 @@
 import { metadatosPagina } from "@/src/ui/marketing/metadatos"
 import { ServiciosHero } from "@/src/ui/marketing/servicios/hero"
 import { ServiceList } from "@/src/ui/marketing/servicios/service-list"
-import { ServiciosProceso } from "@/src/ui/marketing/servicios/proceso"
+import { ProcessSection } from "@/src/ui/marketing/home/process"
 import { CTAFinal } from "@/src/ui/marketing/cta-final"
 
 export const metadata = metadatosPagina({
@@ -16,7 +16,7 @@ export default function ServiciosPage() {
     <>
       <ServiciosHero />
       <ServiceList />
-      <ServiciosProceso />
+      <ProcessSection />
       <CTAFinal
         etiqueta="Asesoría sin costo"
         titulo="¿No sabes cuál elegir?"

@@ -1,126 +1,18 @@
 "use client"
 
 import { useRef, useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, BarChart3, Check, Globe, UtensilsCrossed } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import { ArrowRight, Check } from "lucide-react"
 import { WHATSAPP } from "@/src/ui/marketing/datos-contacto"
+import { servicios as frentes } from "@/src/ui/marketing/servicios/datos"
+import { FotoServicio } from "@/src/ui/marketing/servicios/foto-servicio"
 
 /*
  * Escaparate de servicios con pestañas: un frente a la vez, en grande, con
- * su foto (public/servicios) y "Ideal para" para mostrar que nos adaptamos a
- * distintos giros sin encasillarnos en uno. Fotos ilustrativas, no de clientes.
+ * su foto y "Ideal para" para mostrar que nos adaptamos a distintos giros sin
+ * encasillarnos en uno. Los datos salen de `servicios/datos.ts` (los comparte
+ * con /servicios).
  */
-
-/** Foto real del frente con una etiqueta de vidrio flotante (el toque de producto). */
-function FotoFrente({ foto }: { foto: Frente["foto"] }) {
-  return (
-    <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-bg-dark shadow-[0_24px_50px_-24px_rgba(21,17,39,0.6)]">
-      <Image
-        src={foto.src}
-        alt={foto.alt}
-        fill
-        sizes="(min-width: 1024px) 600px, 100vw"
-        className="object-cover"
-      />
-      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-bg-deep/50 via-transparent to-transparent" />
-      <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-bg-dark/60 px-3.5 py-2 text-xs font-medium text-white shadow-lg backdrop-blur-md sm:bottom-5 sm:left-5">
-        <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 motion-safe:animate-ping" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
-        </span>
-        {foto.etiqueta}
-      </span>
-    </div>
-  )
-}
-
-interface Frente {
-  id: string
-  pestana: string
-  icono: LucideIcon
-  titulo: string
-  descripcion: string
-  idealPara: string[]
-  funciones: string[]
-  /** Ancla del detalle en /servicios (se conservan las existentes). */
-  ancla: string
-  /** Foto del frente (public/servicios) y el dato que flota encima. */
-  foto: { src: string; alt: string; etiqueta: string }
-}
-
-const frentes: Frente[] = [
-  {
-    id: "restaurantes",
-    pestana: "Restaurantes y negocios",
-    icono: UtensilsCrossed,
-    titulo: "Software para restaurantes multisucursal",
-    descripcion:
-      "Todas tus sucursales operando como una sola: de la orden en la mesa a la cocina y la barra, y hasta el corte de caja, en tiempo real y desde cualquier dispositivo.",
-    idealPara: ["Restaurantes", "Cafeterías", "Bares", "Cadenas con sucursales"],
-    funciones: [
-      "Operación en tiempo real de todas tus sucursales",
-      "Órdenes rápidas desde la mesa o el mostrador",
-      "Comandas al instante en cocina y barra",
-      "Menú digital siempre actualizado",
-      "Cortes de caja al cierre, sin diferencias",
-      "Tablero con los indicadores clave del negocio",
-      "App para iPhone y Android",
-    ],
-    ancla: "sistema-pos-para-restaurantes",
-    foto: {
-      src: "/servicios/operacion.webp",
-      alt: "Mesero con una tablet que muestra el punto de venta en un restaurante, junto a la impresora de tickets",
-      etiqueta: "Operación en vivo · todo en línea",
-    },
-  },
-  {
-    id: "inventarios",
-    pestana: "Control de inventarios",
-    icono: BarChart3,
-    titulo: "Sabe qué tienes, dónde está y cuánto te deja",
-    descripcion:
-      "Visibilidad precisa de tu almacén y de tus unidades en ruta: cada movimiento con un responsable, finanzas claras y trato directo con tus comerciantes, para detener las fugas antes de que afecten tu margen.",
-    idealPara: ["Distribuidoras", "Almacenes", "Producción", "Venta en ruta"],
-    funciones: [
-      "Existencias en tiempo real por producto",
-      "Tus unidades de reparto en el mapa, en tiempo real",
-      "Finanzas claras por unidad y por ruta",
-      "Contacto directo con tus comerciantes",
-      "Alertas de reabastecimiento",
-      "Merma y devoluciones registradas",
-      "Historial completo de movimientos",
-    ],
-    ancla: "control-de-inventarios",
-    foto: {
-      src: "/servicios/inventarios.webp",
-      alt: "Encargado de almacén con una tablet que muestra el control de existencias entre anaqueles de mercancía",
-      etiqueta: "Existencias al día · 1 por reabastecer",
-    },
-  },
-  {
-    id: "web",
-    pestana: "Presencia digital",
-    icono: Globe,
-    titulo: "Una página que convierte visitas en clientes",
-    descripcion:
-      "Presencia digital a la altura de tu marca, diseñada para que te encuentren y te contacten: reservaciones, pedidos y solicitudes directo a tu equipo.",
-    idealPara: ["Restaurantes", "Servicios profesionales", "Comercios", "Marcas locales"],
-    funciones: [
-      "Diseño enfocado en conversión",
-      "Adaptable a cualquier dispositivo",
-      "Solicitudes directo a correo y WhatsApp",
-      "Posicionamiento en buscadores",
-    ],
-    ancla: "tu-negocio-digital",
-    foto: {
-      src: "/servicios/presencia-digital.webp",
-      alt: "Página web de un restaurante abierta en una laptop y un celular sobre la mesa de un café",
-      etiqueta: "Nueva solicitud de contacto",
-    },
-  },
-]
 
 export function ServicesSection() {
   const [activo, setActivo] = useState(0)
@@ -203,7 +95,7 @@ export function ServicesSection() {
           aria-labelledby={`servicio-tab-${f.id}`}
           className="mt-8 grid items-center gap-8 rounded-3xl border border-border bg-surface p-5 shadow-card motion-safe:animate-aparecer sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:p-10"
         >
-          <FotoFrente foto={f.foto} />
+          <FotoServicio foto={f.foto} />
 
           <div>
             <h3 className="text-balance font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
