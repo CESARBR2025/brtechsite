@@ -37,6 +37,16 @@ function paraAsunto(texto: string, max = 80): string {
   return limpio.length > max ? `${limpio.slice(0, max - 1)}…` : limpio
 }
 
+/** 4271234567 → "427 123 4567"; otros largos se dejan como vienen. */
+function formatearTelefono(digitos: string): string {
+  return digitos.length === 10 ? `${digitos.slice(0, 3)} ${digitos.slice(3, 6)} ${digitos.slice(6)}` : `+${digitos}`
+}
+
+/** Chat de WhatsApp con el visitante (10 dígitos = número de México). */
+function enlaceWhatsApp(digitos: string): string {
+  return `https://wa.me/${digitos.length === 10 ? `52${digitos}` : digitos}`
+}
+
 function formatearFecha(fecha: Date): string {
   return new Intl.DateTimeFormat("es-MX", {
     dateStyle: "long",
@@ -62,7 +72,26 @@ export function plantillaCorreoContacto(mensaje: MensajeContacto, fecha: Date = 
   const mailto = `mailto:${encodeURIComponent(mensaje.email).replace(/%40/g, "@")}`
   const responder = `${mailto}?subject=${encodeURIComponent("Re: Tu mensaje a BR TECH Digital Systems")}`
 
-  const asunto = `🟣 Nuevo contacto · ${paraAsunto(mensaje.nombre, 60)}`
+  const interes = mensaje.interesEtiqueta
+  const telefono = mensaje.telefono ? formatearTelefono(mensaje.telefono) : null
+  const filaExtra = (etiqueta: string, valor: string) => `
+      <tr>
+        <td style="padding:14px 0;font-size:13px;color:${COLOR.textoTenue};border-top:1px solid ${COLOR.borde};">${etiqueta}</td>
+        <td style="padding:14px 0;font-size:15px;color:${COLOR.texto};font-weight:600;border-top:1px solid ${COLOR.borde};">${valor}</td>
+      </tr>`
+  const filasExtra = [
+    interes ? filaExtra("Le interesa", escaparHtml(interes)) : "",
+    telefono && mensaje.telefono
+      ? filaExtra(
+          "WhatsApp",
+          `<a href="${enlaceWhatsApp(mensaje.telefono)}" style="color:${COLOR.marca};text-decoration:none;font-weight:600;">${escaparHtml(telefono)}</a>`,
+        )
+      : "",
+  ].join("")
+
+  const asunto = paraAsunto(
+    `🟣 Nuevo contacto · ${paraAsunto(mensaje.nombre, 40)}${interes ? ` · ${interes}` : ""}`,
+  )
 
   const html = `<!doctype html>
 <html lang="es">
@@ -107,7 +136,7 @@ export function plantillaCorreoContacto(mensaje: MensajeContacto, fecha: Date = 
       <tr>
         <td style="padding:14px 0;font-size:13px;color:${COLOR.textoTenue};border-top:1px solid ${COLOR.borde};">Correo</td>
         <td style="padding:14px 0;font-size:15px;border-top:1px solid ${COLOR.borde};"><a href="${mailto}" style="color:${COLOR.marca};text-decoration:none;font-weight:600;">${email}</a></td>
-      </tr>
+      </tr>${filasExtra}
     </table>
 
     <div style="font-size:13px;color:${COLOR.textoTenue};margin-top:24px;">Mensaje</div>
@@ -137,6 +166,8 @@ export function plantillaCorreoContacto(mensaje: MensajeContacto, fecha: Date = 
     "",
     `Nombre: ${mensaje.nombre}`,
     `Correo: ${mensaje.email}`,
+    ...(interes ? [`Le interesa: ${interes}`] : []),
+    ...(telefono ? [`WhatsApp: ${telefono}`] : []),
     `Fecha: ${formatearFecha(fecha)}`,
     "",
     "Mensaje:",

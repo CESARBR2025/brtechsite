@@ -20,6 +20,8 @@ export async function enviarMensajeContacto(
       nombre: String(formData.get("name") ?? ""),
       email: String(formData.get("email") ?? ""),
       mensaje: String(formData.get("message") ?? ""),
+      interes: String(formData.get("interes") ?? ""),
+      telefono: String(formData.get("telefono") ?? ""),
     })
     return { success: true }
   } catch (err) {

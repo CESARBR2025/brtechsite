@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { evento } from "@/src/ui/analitica"
 import Link from "next/link"
 import {
   ArrowRight,
@@ -185,6 +186,7 @@ export function ProblemSection() {
                 href={enlaceWhatsApp}
                 target="_blank"
                 rel="noopener noreferrer"
+                {...evento("whatsapp", { origen: "autodiagnostico", marcadas: n })}
                 className={`group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold outline-none transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] ${
                   n > 0
                     ? "bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary-hover focus-visible:ring-offset-bg-dark"

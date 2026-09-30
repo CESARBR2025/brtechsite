@@ -1,6 +1,7 @@
 import { ArrowRight, Lock } from "lucide-react"
 import { BotonEspecular } from "@/src/ui/primitivos/boton-especular"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
+import { evento } from "@/src/ui/analitica"
 
 interface Props {
   etiqueta?: string
@@ -61,6 +62,7 @@ export function CTAFinal({
             ) : (
               <BotonEspecular
                 href={href}
+                atributos={evento(href.includes("wa.me") ? "whatsapp" : "agendar-consulta", { origen: "cta-final" })}
                 className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto sm:text-base"
               >
                 {boton}

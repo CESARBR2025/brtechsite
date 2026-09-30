@@ -4,7 +4,9 @@ import { plantillaCorreoContacto } from "./plantilla-correo-contacto"
 
 const fecha = new Date("2026-09-23T05:52:00Z") // 22 sep 2026, 23:52 en CDMX
 
-function mensaje(datos: Partial<{ nombre: string; email: string; mensaje: string }> = {}) {
+function mensaje(
+  datos: Partial<{ nombre: string; email: string; mensaje: string; interes: string; telefono: string }> = {},
+) {
   return MensajeContacto.crear({
     nombre: "Ana López",
     email: "ana@negocio.mx",
@@ -47,5 +49,22 @@ describe("plantillaCorreoContacto", () => {
     const { asunto } = plantillaCorreoContacto(mensaje({ nombre: `Ana\r\nBcc: otro@x.com ${"a".repeat(100)}` }), fecha)
     expect(asunto).not.toMatch(/[\r\n]/)
     expect(asunto.length).toBeLessThanOrEqual(80)
+  })
+
+  it("sin interés ni teléfono no agrega esas filas", () => {
+    const { html, texto } = plantillaCorreoContacto(mensaje(), fecha)
+    expect(html).not.toContain("Le interesa")
+    expect(html).not.toContain("wa.me")
+    expect(texto).not.toContain("WhatsApp:")
+  })
+
+  it("muestra el interés (también en el asunto) y el WhatsApp con enlace al chat", () => {
+    const correo = plantillaCorreoContacto(mensaje({ interes: "restaurantes", telefono: "427 123 4567" }), fecha)
+    expect(correo.asunto).toBe("🟣 Nuevo contacto · Ana López · Software para restaurantes")
+    expect(correo.html).toContain("Le interesa")
+    expect(correo.html).toContain('href="https://wa.me/524271234567"')
+    expect(correo.html).toContain("427 123 4567")
+    expect(correo.texto).toContain("Le interesa: Software para restaurantes")
+    expect(correo.texto).toContain("WhatsApp: 427 123 4567")
   })
 })

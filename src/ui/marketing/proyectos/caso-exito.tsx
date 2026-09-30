@@ -1,47 +1,63 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Check, ChevronRight } from "lucide-react"
+import { Check, ChevronRight, X } from "lucide-react"
 import { GaleriaAcordeon } from "@/src/ui/primitivos/galeria-acordeon"
-import { TarjetaFoco } from "@/src/ui/primitivos/tarjeta-foco"
 import { CTAFinal } from "@/src/ui/marketing/cta-final"
+import { iconoModulo } from "@/src/ui/marketing/proyectos/iconos"
 import type { Proyecto } from "@/src/ui/marketing/proyectos/datos"
+
+/*
+ * Página de un caso de éxito, con el mismo ritmo que el home: hero oscuro con
+ * la galería y, debajo, secciones claras alternadas (antes → después, módulos,
+ * etapas) hasta el CTA final de tarjeta oscura. Todo sale de `datos.ts`.
+ */
 
 const retraso = (ms: number) => ({ animationDelay: `${ms}ms` })
 const numero = (i: number) => String(i + 1).padStart(2, "0")
 
-function Etiqueta({ children }: { children: React.ReactNode }) {
+/** Etiqueta de sección centrada con filetes, como en el home. */
+function Encabezado({ etiqueta, titulo, texto }: { etiqueta: string; titulo: string; texto?: string }) {
   return (
-    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55">
-      <span className="h-px w-8 bg-primary" />
-      {children}
-    </p>
+    <div className="mx-auto max-w-2xl text-center">
+      <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+        <span className="h-px w-8 bg-primary" />
+        {etiqueta}
+        <span className="h-px w-8 bg-primary" />
+      </p>
+      <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
+        {titulo}
+      </h2>
+      {texto && (
+        <p className="mx-auto mt-5 max-w-xl text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">
+          {texto}
+        </p>
+      )}
+    </div>
   )
 }
 
-function Rejilla({ foco }: { foco: string }) {
-  return (
-    <div
-      style={{ maskImage: `radial-gradient(ellipse at ${foco}, black 5%, transparent 65%)` }}
-      className="absolute inset-0 bg-[linear-gradient(rgba(120,54,226,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(120,54,226,0.06)_1px,transparent_1px)] bg-[size:64px_64px]"
-    />
-  )
-}
-
-/** Página completa de un caso de éxito, armada con los datos de `proyectos`. */
 export function CasoExito({ proyecto: p }: { proyecto: Proyecto }) {
-  // El último término del nombre lleva el degradado de marca, como en los demás H1
+  // El último término del nombre lleva el degradado de marca
   const partes = p.titulo.split(" ")
   const final = partes.pop()
 
+  // Datos del proyecto en una línea (sin cliente ni estado, que ya están arriba)
+  const meta = p.ficha.filter((f) => !/cliente|estado/i.test(f.etiqueta))
+
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-bg-dark">
-        <Rejilla foco="30% 40%" />
-        <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-primary/15 blur-3xl" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      {/* Hero: identidad del proyecto + el sistema en operación */}
+      <section className="relative isolate overflow-hidden bg-bg-deep">
+        <div
+          aria-hidden="true"
+          className="absolute -left-40 top-0 -z-10 h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(circle,rgba(120,54,226,0.35),transparent_65%)] blur-2xl"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -right-40 bottom-0 -z-10 h-[30rem] w-[40rem] rounded-full bg-[radial-gradient(circle,rgba(120,54,226,0.25),transparent_65%)] blur-2xl"
+        />
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-36 sm:px-6 sm:pb-20 sm:pt-44 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-6 sm:pb-28 sm:pt-44 lg:px-8">
           <nav aria-label="Ruta" style={retraso(0)} className="motion-safe:animate-aparecer">
             <ol className="flex items-center gap-1.5 text-xs text-white/55">
               <li>
@@ -56,11 +72,16 @@ export function CasoExito({ proyecto: p }: { proyecto: Proyecto }) {
             </ol>
           </nav>
 
-          <div className="mt-8 grid items-center gap-12 lg:grid-cols-[1.3fr_0.7fr]">
+          <div className="mt-10 grid items-end gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:gap-16">
             <div>
               <div style={retraso(60)} className="flex flex-wrap items-center gap-3 motion-safe:animate-aparecer">
-                <Etiqueta>Caso de éxito</Etiqueta>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-line-dark bg-surface-dark px-2.5 py-0.5 text-[11px] font-medium text-white/75">
+                {/* Los logos de clientes van sobre tarjeta blanca (DESIGNS.md) */}
+                {p.logo && (
+                  <span className="flex h-11 items-center rounded-xl bg-white px-3">
+                    <Image src={p.logo} alt={`Logotipo de ${p.cliente}`} width={659} height={379} className="h-7 w-auto object-contain" priority />
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs font-medium text-success">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-75 motion-safe:animate-ping" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
@@ -70,186 +91,143 @@ export function CasoExito({ proyecto: p }: { proyecto: Proyecto }) {
               </div>
               <h1
                 style={retraso(120)}
-                className="mt-6 text-balance text-[38px] font-bold leading-[1.05] tracking-[-0.035em] text-white sm:text-6xl motion-safe:animate-aparecer"
+                className="mt-7 text-balance font-display text-[38px] font-bold leading-[1.05] tracking-[-0.035em] text-white sm:text-6xl motion-safe:animate-aparecer"
               >
                 {partes.join(" ")}{" "}
                 <span className="bg-gradient-to-br from-primary-light from-30% to-primary bg-clip-text text-transparent">
                   {final}
                 </span>
               </h1>
-              <p
-                style={retraso(200)}
-                className="mt-4 text-pretty text-lg font-medium text-white/85 sm:text-xl motion-safe:animate-aparecer"
-              >
+              <p style={retraso(200)} className="mt-4 text-pretty text-lg font-medium text-white/85 sm:text-xl motion-safe:animate-aparecer">
                 {p.subtitulo}
-              </p>
-              <p
-                style={retraso(260)}
-                className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-lg motion-safe:animate-aparecer"
-              >
-                {p.resumen}
               </p>
             </div>
 
-            {p.logo && (
-              <div style={retraso(320)} className="relative motion-safe:animate-aparecer">
-                <div className="absolute -inset-6 rounded-full bg-primary/15 blur-3xl" />
-                {/* Los logos de clientes van sobre tarjeta blanca (DESIGNS.md) */}
-                <div className="relative mx-auto flex max-w-sm items-center justify-center rounded-2xl bg-white p-10 shadow-glow">
-                  <Image
-                    src={p.logo}
-                    alt={`Logotipo de ${p.cliente}`}
-                    width={659}
-                    height={379}
-                    className="h-auto w-full max-w-[260px]"
-                    priority
-                  />
-                </div>
-              </div>
-            )}
+            <p style={retraso(260)} className="text-pretty text-base leading-relaxed text-white/65 motion-safe:animate-aparecer lg:pb-1">
+              {p.resumen}
+            </p>
           </div>
 
-          {/* Ficha del proyecto */}
-          <dl
-            style={retraso(380)}
-            className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-line-dark bg-line-dark sm:grid-cols-2 lg:grid-cols-5 motion-safe:animate-aparecer"
-          >
-            {p.ficha.map((f) => (
-              <div key={f.etiqueta} className="bg-bg-dark p-5">
-                <dt className="text-xs uppercase tracking-wider text-white/55">{f.etiqueta}</dt>
-                <dd className="mt-1.5 text-pretty text-sm font-medium text-white">{f.valor}</dd>
+          <div style={retraso(320)} className="relative mt-12 motion-safe:animate-aparecer">
+            <div className="absolute -inset-10 rounded-full bg-primary/15 blur-3xl" aria-hidden="true" />
+            <GaleriaAcordeon
+              elementos={p.galeria}
+              proporcion={0.6}
+              alturas="h-[520px] sm:h-[440px] lg:h-[560px]"
+              className="relative"
+            />
+          </div>
+
+          {/* gap-px sobre fondo translúcido = divisores finos entre celdas */}
+          <dl className="mt-6 grid gap-px overflow-hidden rounded-2xl border border-line-dark bg-line-dark sm:grid-cols-3">
+            {meta.map((f) => (
+              <div key={f.etiqueta} className="bg-bg-deep px-5 py-4">
+                <dt className="text-[11px] font-medium uppercase tracking-wider text-white/45">{f.etiqueta}</dt>
+                <dd className="mt-1 text-sm font-semibold text-white">{f.valor}</dd>
               </div>
             ))}
           </dl>
         </div>
       </section>
 
-      {/* Galería */}
-      <section className="relative bg-bg-dark pb-24 sm:pb-32">
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-x-8 -inset-y-8 rounded-full bg-primary/10 blur-3xl" />
-          <GaleriaAcordeon
-            elementos={p.galeria}
-            proporcion={0.6}
-            alturas="h-[560px] sm:h-[460px] lg:h-[560px]"
-            className="relative"
-          />
-        </div>
-      </section>
+      {/* Antes → Después */}
+      <section className="relative bg-surface py-24 sm:py-32">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <Encabezado etiqueta="La transformación" titulo="Lo que cambió en la operación" texto={p.reto.texto} />
 
-      {/* El reto */}
-      <section className="relative overflow-hidden border-t border-line-dark bg-bg-dark py-24 sm:py-32">
-        <Rejilla foco="75% 50%" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
-          <div>
-            <Etiqueta>El reto</Etiqueta>
-            <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">
-              Lo que había que resolver
-            </h2>
-            <p className="mt-5 max-w-lg text-pretty text-base leading-relaxed text-white/65 sm:text-lg">
-              {p.reto.texto}
-            </p>
-          </div>
-          <ol className="divide-y divide-line-dark border-y border-line-dark lg:self-center">
-            {p.reto.puntos.map((punto, i) => (
-              <li key={punto} className="grid grid-cols-[2.5rem_1fr] items-baseline gap-x-4 py-6">
-                <span className="font-mono text-xs tabular-nums text-primary-light">{numero(i)}</span>
-                <p className="text-pretty text-base font-medium text-white sm:text-lg">{punto}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+          <div className="mt-14 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-3xl border border-border bg-bg-section p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">Antes</p>
+              <ul className="mt-6 space-y-4">
+                {p.reto.puntos.map((x) => (
+                  <li key={x} className="flex gap-3 text-base leading-relaxed text-text-secondary">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-text-muted/10">
+                      <X className="h-3.5 w-3.5 text-text-muted" aria-hidden="true" />
+                    </span>
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-      {/* La solución */}
-      <section className="relative overflow-hidden border-t border-line-dark bg-bg-dark py-24 sm:py-32">
-        <div className="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <Etiqueta>La solución</Etiqueta>
-            <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">
-              Un sistema para toda la operación
-            </h2>
-          </div>
-          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {p.modulos.map((m, i) => (
-              <TarjetaFoco key={m.titulo} className="p-6 sm:p-7">
-                <span className="font-mono text-xs tabular-nums text-primary-light">{numero(i)}</span>
-                <h3 className="mt-4 text-lg font-semibold tracking-tight text-white">{m.titulo}</h3>
-                <p className="mt-2 text-pretty text-sm leading-relaxed text-white/65">{m.descripcion}</p>
-              </TarjetaFoco>
-            ))}
+            <div className="relative isolate overflow-hidden rounded-3xl border border-line-dark bg-bg-deep p-6 shadow-[0_40px_80px_-40px_rgba(71,31,163,0.55)] sm:p-8">
+              <div
+                aria-hidden="true"
+                className="absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(120,54,226,0.4),transparent_65%)] blur-2xl"
+              />
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light">Después</p>
+              <ul className="mt-6 space-y-4">
+                {p.puntos.map((x) => (
+                  <li key={x} className="flex gap-3 text-base leading-relaxed text-white">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success/20">
+                      <Check className="h-3.5 w-3.5 text-success" strokeWidth={3} aria-hidden="true" />
+                    </span>
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Cómo lo construimos */}
-      <section className="relative overflow-clip border-t border-line-dark bg-bg-dark py-24 sm:py-32">
-        <Rejilla foco="75% 50%" />
-        <div className="relative mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-8">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <Etiqueta>Cómo lo construimos</Etiqueta>
-            <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">
-              Por etapas, validando cada paso
-            </h2>
-            <p className="mt-5 max-w-md text-pretty text-base leading-relaxed text-white/65 sm:text-lg">
-              Cada etapa se entregó funcionando y se validó con el equipo del
-              restaurante antes de pasar a la siguiente.
-            </p>
+      {/* La solución: módulos */}
+      {p.modulos.length > 0 && (
+        <section className="relative bg-bg-section py-24 sm:py-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Encabezado etiqueta="La solución" titulo="Un sistema para toda la operación" />
+
+            <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {p.modulos.map((m) => {
+                const Icono = iconoModulo(m.titulo)
+                return (
+                  <li
+                    key={m.titulo}
+                    className="rounded-2xl border border-border bg-surface p-6 shadow-card transition-shadow hover:shadow-hover sm:p-7"
+                  >
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-light">
+                      <Icono className="h-5 w-5 text-primary" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-5 font-display text-lg font-semibold tracking-tight text-text-primary">{m.titulo}</h3>
+                    <p className="mt-2 text-pretty text-sm leading-relaxed text-text-secondary">{m.descripcion}</p>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
-          <ol className="relative">
-            <span
-              aria-hidden="true"
-              className="absolute bottom-6 left-5 top-6 w-px bg-gradient-to-b from-primary via-primary/40 to-transparent"
+        </section>
+      )}
+
+      {/* Cómo lo construimos: línea de tiempo (horizontal en escritorio) */}
+      {p.fases.length > 0 && (
+        <section className="relative bg-surface py-24 sm:py-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Encabezado
+              etiqueta="Cómo lo construimos"
+              titulo="Por etapas, validando cada paso"
+              texto="Cada etapa se entregó funcionando y se validó con el equipo antes de pasar a la siguiente."
             />
-            {p.fases.map((f, i) => (
-              <li key={f.titulo} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-5 pb-8 last:pb-0">
-                <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-line-dark-strong bg-bg-dark font-mono text-xs tabular-nums text-primary-light transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-white">
-                  {numero(i)}
-                </span>
-                <div className="pt-1.5">
-                  <h3 className="text-lg font-semibold tracking-tight text-white">{f.titulo}</h3>
-                  <p className="mt-1.5 text-pretty text-sm leading-relaxed text-white/65 sm:text-base">
-                    {f.descripcion}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
 
-      {/* Resultados */}
-      <section className="relative overflow-hidden border-t border-line-dark bg-bg-dark py-24 sm:py-32">
-        <div className="absolute -right-40 top-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-20 lg:px-8">
-          <div>
-            <Etiqueta>Resultados</Etiqueta>
-            <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">
-              Un sistema que se opera a diario
-            </h2>
-            <dl className="mt-10 grid grid-cols-2 gap-4">
-              {p.datos.map((d) => (
-                <div
-                  key={d.etiqueta}
-                  className="flex flex-col-reverse rounded-2xl border border-line-dark bg-surface-dark p-5"
-                >
-                  <dt className="mt-1 text-xs text-white/55">{d.etiqueta}</dt>
-                  <dd className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{d.valor}</dd>
-                </div>
+            <ol className="relative mt-16 grid gap-8 lg:grid-cols-6 lg:gap-6">
+              <span
+                aria-hidden="true"
+                className="absolute bottom-5 left-5 top-5 w-px bg-gradient-to-b from-primary via-primary/40 to-primary/10 lg:bottom-auto lg:left-5 lg:right-5 lg:top-5 lg:h-px lg:w-auto lg:bg-gradient-to-r"
+              />
+              {p.fases.map((f, i) => (
+                <li key={f.titulo} className="relative grid grid-cols-[2.5rem_1fr] gap-x-5 lg:block">
+                  <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-primary/30 bg-surface font-mono text-xs tabular-nums text-primary">
+                    {numero(i)}
+                  </span>
+                  <div className="pt-1.5 lg:pt-5">
+                    <h3 className="font-display text-base font-semibold tracking-tight text-text-primary">{f.titulo}</h3>
+                    <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">{f.descripcion}</p>
+                  </div>
+                </li>
               ))}
-            </dl>
+            </ol>
           </div>
-          <ul className="divide-y divide-line-dark border-y border-line-dark lg:self-end">
-            {p.puntos.map((punto) => (
-              <li key={punto} className="flex items-start gap-3 py-5 text-base text-white/80">
-                <Check className="mt-1 h-4 w-4 flex-shrink-0 text-primary-light" />
-                {punto}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+        </section>
+      )}
 
       <CTAFinal
         etiqueta="Tu negocio es el siguiente"

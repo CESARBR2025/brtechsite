@@ -97,6 +97,8 @@ export interface BotonEspecularProps extends Partial<PropsShader> {
   onClick?: MouseEventHandler<HTMLElement>
   type?: "button" | "submit" | "reset"
   disabled?: boolean
+  /** Atributos extra (p. ej. `data-umami-event` de analítica). */
+  atributos?: Record<string, string>
 }
 
 export function BotonEspecular({
@@ -106,6 +108,7 @@ export function BotonEspecular({
   onClick,
   type = "button",
   disabled,
+  atributos,
   radius = 9999,
   lineColor = "#ffffff",
   baseColor = "#471FA3",
@@ -305,6 +308,7 @@ export function BotonEspecular({
         href={href}
         onClick={onClick}
         className={clases}
+        {...atributos}
       >
         {contenido}
       </Link>
@@ -318,6 +322,7 @@ export function BotonEspecular({
       disabled={disabled}
       onClick={onClick}
       className={clases}
+      {...atributos}
     >
       {contenido}
     </button>

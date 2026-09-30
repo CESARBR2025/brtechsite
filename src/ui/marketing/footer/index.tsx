@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { EMPRESA, REDES, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
+import { evento } from "@/src/ui/analitica"
 
 const columnas = [
   {
@@ -68,6 +69,7 @@ export function Footer() {
             </p>
             <Link
               href="/contacto"
+              {...evento("agendar-consulta", { origen: "footer" })}
               className="group mt-6 inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-white outline-none transition-colors hover:text-primary-light focus-visible:ring-2 focus-visible:ring-primary"
             >
               Agendar consulta
@@ -103,7 +105,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href={WHATSAPP.url} target="_blank" rel="noopener noreferrer" className={enlace}>
+                <a
+                  href={WHATSAPP.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={enlace}
+                  {...evento("whatsapp", { origen: "footer" })}
+                >
                   WhatsApp {WHATSAPP.visible}
                 </a>
               </li>
@@ -116,8 +124,11 @@ export function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col-reverse items-center justify-between gap-4 border-t border-line-dark py-6 sm:flex-row">
-          <p className="text-xs text-white/55">
-            &copy; {new Date().getFullYear()} BR TECH Digital Systems
+          <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-white/55">
+            <span>&copy; {new Date().getFullYear()} BR TECH Digital Systems</span>
+            <Link href="/privacidad" className="rounded-sm outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-primary">
+              Aviso de privacidad
+            </Link>
           </p>
           <div className="flex items-center gap-2">
             {socialLinks.map((s) => (
@@ -127,6 +138,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
+                {...(s.href === WHATSAPP.url ? evento("whatsapp", { origen: "footer-redes" }) : {})}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-line-dark text-white/65 outline-none transition-colors hover:border-line-dark-strong hover:bg-surface-dark-hover hover:text-white focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
