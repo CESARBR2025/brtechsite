@@ -493,7 +493,7 @@ export function CuerpoSeccion({
         <ListaEditable
           items={c.calendario}
           onChange={(v) => fijar("calendario", v)}
-          crear={() => ({ id: nuevoId(), semanas: "", entregable: "", pagoId: null })}
+          crear={() => ({ id: nuevoId(), semanas: "", titulo: "", entregable: "", modulos: [], pagoId: null })}
           agregar="Agregar hito"
           titulo={(h) => (h.semanas ? `Semanas ${h.semanas}` : "Hito")}
         >
@@ -509,7 +509,22 @@ export function CuerpoSeccion({
                   vacio={opcionesPago.length ? "Sin pago" : "Primero captura los pagos"}
                 />
               </div>
+              <Campo
+                etiqueta="Nombre de la etapa"
+                placeholder="App del repartidor"
+                valor={h.titulo}
+                onChange={(v) => set({ titulo: v })}
+              />
               <Campo etiqueta="Entregable" filas={2} valor={h.entregable} onChange={(v) => set({ entregable: v })} />
+              <div>
+                <p className={SUBTITULO}>Módulos de esas semanas (si hay, se muestran en lugar del entregable)</p>
+                <Renglones
+                  items={h.modulos}
+                  onChange={(v) => set({ modulos: v })}
+                  agregar="Agregar módulo"
+                  etiqueta="Módulo"
+                />
+              </div>
             </>
           )}
         </ListaEditable>

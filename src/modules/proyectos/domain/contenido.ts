@@ -192,7 +192,11 @@ export const esquemaContenido = z.object({
       id,
       /** "0", "1-2", "Desde la entrega"… */
       semanas: texto(40),
+      /** Nombre corto de la etapa ("App del repartidor"). */
+      titulo: texto(),
       entregable: texto(LARGO),
+      /** Módulos que se construyen en esas semanas; si hay, se muestran en lugar del entregable. */
+      modulos: lista(renglon, 12),
       /** Pago ligado a este hito (id de `inversion.pagos`). */
       pagoId: ref,
     }),
@@ -359,7 +363,11 @@ export function normalizarContenido(crudo: unknown): Contenido {
       notas: sinVacios(c.arquitectura.notas),
     },
     fases,
-    calendario: sinVacios(c.calendario).map((h) => ({ ...h, pagoId: soloSi(idsPagos)(h.pagoId) })),
+    calendario: sinVacios(c.calendario).map((h) => ({
+      ...h,
+      modulos: sinVacios(h.modulos),
+      pagoId: soloSi(idsPagos)(h.pagoId),
+    })),
     inversion: {
       ...c.inversion,
       pagos,

@@ -26,6 +26,8 @@ import {
   Fuel,
   Navigation,
   ScrollText,
+  ShieldCheck,
+  UserCog,
   ShoppingCart,
   Sparkles,
   Store,
@@ -36,6 +38,7 @@ import {
   Wallet,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { createElement } from "react"
 import Image from "next/image"
 import type { PropuestaPublicaDTO } from "@/src/modules/proyectos/application/dtos"
 import {
@@ -51,6 +54,7 @@ import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 import { AceptarPropuesta } from "./aceptar-propuesta"
+import { PestanasSistema } from "./pestanas-sistema"
 import { ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
 
@@ -342,6 +346,38 @@ function partesProblema(texto: string): { titulo: string; detalle: string } {
   return { titulo: texto.replace(/\*\*/g, "").replace(/\.$/, ""), detalle: "" }
 }
 
+/** Ícono de un rol según su nombre. */
+function IconoRol({ nombre, className }: { nombre: string; className?: string }) {
+  const props = { className, "aria-hidden": true } as const
+  if (/super/i.test(nombre)) return <ShieldCheck {...props} />
+  if (/admin|gerent/i.test(nombre)) return <UserCog {...props} />
+  if (/almac/i.test(nombre)) return <Warehouse {...props} />
+  if (/repart|chofer|operador|vended/i.test(nombre)) return <Truck {...props} />
+  if (/comerci|cliente/i.test(nombre)) return <Store {...props} />
+  return <User {...props} />
+}
+
+/** Ícono del dispositivo desde el que entra un rol ("App Android nativa", "Panel web (PWA)"). */
+function IconoDispositivo({ texto, className }: { texto: string; className?: string }) {
+  const props = { className, "aria-hidden": true } as const
+  return /^\W*app\b/i.test(texto) ? <Smartphone {...props} /> : <MonitorSmartphone {...props} />
+}
+
+/**
+ * Las responsabilidades de un rol como lista: la primera oración se parte por
+ * comas (fuera de paréntesis) y el resto queda como nota al pie.
+ */
+function actividadesRol(texto: string): { actividades: string[]; nota: string } {
+  const [primera = "", ...resto] = texto.trim().split(/(?<=\.)\s+/)
+  const actividades = primera
+    .replace(/\.$/, "")
+    .split(/,\s+(?![^()]*\))/)
+    .map((x) => x.trim())
+    .filter(Boolean)
+    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+  return { actividades, nota: resto.join(" ") }
+}
+
 /** Ícono de un problema según su texto. */
 function iconoProblema(texto: string): LucideIcon {
   if (/merma|pierde/i.test(texto)) return PackageX
@@ -354,9 +390,10 @@ function iconoProblema(texto: string): LucideIcon {
 }
 
 /**
- * El valor central, legible para el cliente: texto de entrada, fórmulas del
- * bloque de código como ecuaciones visuales ("A = B + C") y la conclusión
- * destacada. Si no trae fórmulas, se muestra como texto.
+ * El valor central, la pieza protagonista del reto: tarjeta oscura con el
+ * texto de entrada como titular, las fórmulas del bloque de código como
+ * renglones "resultado = expresión" y la conclusión al pie. Si no trae
+ * fórmulas, se muestra como texto.
  */
 function ValorCentral({ texto }: { texto: string }) {
   const lineas = texto.split("\n")
@@ -368,15 +405,7 @@ function ValorCentral({ texto }: { texto: string }) {
           .slice(ini + 1, fin)
           .map((l) => /^\s*(.+?)\s*=\s*(.+)$/.exec(l))
           .filter((m): m is RegExpExecArray => m !== null)
-          .map((m) => {
-            // "Vendido + Devuelto − Faltante" → ["Vendido", "+", "Devuelto", "−", "Faltante"]
-            const partes = m[2].split(/\s+([+−-])\s+/)
-            const piezas: { op: string | null; texto: string }[] = []
-            for (let k = 0; k < partes.length; k += 2) {
-              piezas.push({ op: k === 0 ? null : partes[k - 1], texto: partes[k].trim() })
-            }
-            return { resultado: m[1].trim(), piezas }
-          })
+          .map((m) => ({ resultado: m[1].trim(), expresion: m[2].trim() }))
       : []
   const entrada = (ini >= 0 ? lineas.slice(0, ini) : lineas).join("\n").trim().replace(/:$/, ".")
   const cierre = fin > ini ? lineas.slice(fin + 1).join("\n").trim() : ""
@@ -389,63 +418,51 @@ function ValorCentral({ texto }: { texto: string }) {
     )
   }
 
-  // "Σ tickets (ya con descuentos aplicados)" → texto principal + nota
-  const pieza = (t: string) => {
-    const m = /^(.*?)\s*\(([^)]+)\)$/.exec(t)
-    return m ? { principal: m[1], nota: m[2] } : { principal: t, nota: "" }
-  }
-
   return (
-    <div className={`${TARJETA} overflow-hidden`}>
-      <div className="h-1 bg-gradient-to-r from-primary-hover via-primary to-primary-light" />
-      <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[0.9fr_1.4fr] lg:gap-10">
+    <div className="relative isolate overflow-hidden rounded-3xl bg-bg-dark shadow-glow ring-1 ring-inset ring-white/10">
+      <div aria-hidden="true" className={`${REJILLA} -z-10 [mask-image:linear-gradient(to_right,black,transparent_70%)]`} />
+      <div aria-hidden="true" className="absolute -left-24 -top-24 -z-10 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
+      <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[0.85fr_1.3fr] lg:items-center lg:gap-12">
         <div>
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <span className="h-px w-8 bg-primary" />
+          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+            <span className="h-px w-8 bg-primary-light/60" />
             El valor central
           </p>
           {entrada && (
-            <p className="mt-4 text-pretty font-display text-xl font-semibold leading-snug tracking-tight text-text-primary sm:text-2xl">
+            <p className="mt-5 text-pretty font-display text-2xl font-bold leading-[1.15] tracking-tight text-white sm:text-[32px] [&_strong]:text-primary-light">
               <EnLinea texto={entrada} />
             </p>
           )}
         </div>
-        <ol className="space-y-3">
+        <dl className="divide-y divide-line-dark rounded-2xl border border-line-dark-strong bg-white/[0.04] backdrop-blur-md">
           {formulas.map((f, k) => (
-            <li
-              key={k}
-              className="flex flex-wrap items-center gap-x-2.5 gap-y-2 rounded-2xl border border-border bg-bg-section/60 p-4"
-            >
-              <span className="rounded-xl bg-primary px-3 py-1.5 text-sm font-semibold text-white shadow-sm shadow-primary/20">
-                {f.resultado}
-              </span>
-              <span className="font-display text-lg font-semibold text-text-muted" aria-label="es igual a">
-                =
-              </span>
-              {f.piezas.map((x, n) => {
-                const { principal, nota } = pieza(x.texto)
-                return (
-                  <span key={n} className="flex items-center gap-2.5">
-                    {x.op && (
-                      <span className="font-display text-lg font-semibold text-primary/60" aria-hidden="true">
-                        {x.op === "-" ? "−" : x.op}
+            <div key={k} className="grid gap-x-5 gap-y-1 px-5 py-4 sm:grid-cols-[11rem_1fr] sm:items-baseline">
+              <dt className="text-sm font-semibold text-primary-light">{f.resultado}</dt>
+              <dd className="flex gap-2.5 text-sm leading-relaxed text-white/85">
+                <span className="font-semibold text-white/40" aria-label="es igual a">
+                  =
+                </span>
+                <span className="text-pretty">
+                  {/* Los operadores sueltos (entre espacios) se resaltan; el resto va tal cual */}
+                  {f.expresion.split(/(\s[+−×-]\s)/).map((x, n) =>
+                    n % 2 ? (
+                      <span key={n} className="font-semibold text-primary-light">
+                        {x.replace("-", "−")}
                       </span>
-                    )}
-                    <span className="rounded-xl border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-primary">
-                      {principal}
-                      {nota && <span className="ml-1.5 text-xs font-normal text-text-muted">{nota}</span>}
-                    </span>
-                  </span>
-                )
-              })}
-            </li>
+                    ) : (
+                      x
+                    ),
+                  )}
+                </span>
+              </dd>
+            </div>
           ))}
-        </ol>
+        </dl>
       </div>
       {cierre && (
-        <div className="flex gap-3 border-t border-border bg-primary-light/40 px-6 py-5 sm:px-8">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-          <p className="text-pretty text-sm leading-relaxed text-text-secondary sm:text-base [&_strong]:text-text-primary">
+        <div className="flex gap-3 border-t border-line-dark bg-white/[0.03] px-6 py-5 sm:px-10">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary-light" aria-hidden="true" />
+          <p className="text-pretty text-sm leading-relaxed text-white/70 sm:text-base [&_strong]:font-semibold [&_strong]:text-white">
             <EnLinea texto={cierre} />
           </p>
         </div>
@@ -470,15 +487,17 @@ const ICONOS_FUNCION: [RegExp, LucideIcon][] = [
   [/contrato/i, FileSignature],
 ]
 
-/** Ícono de un entregable de la ficha según su nombre. */
-function iconoEntregable(nombre: string): LucideIcon {
-  if (/app|android|ios|celular|móvil/i.test(nombre)) return Smartphone
-  if (/panel|web|pwa|portal|sitio/i.test(nombre)) return MonitorSmartphone
-  return Package
+/** Ícono de un entregable o de una parte del sistema según su nombre. */
+function IconoEntregable({ nombre, className }: { nombre: string; className?: string }) {
+  const props = { className, "aria-hidden": true } as const
+  if (/^app\b|android|ios|celular|móvil/i.test(nombre)) return <Smartphone {...props} />
+  if (/panel|web|pwa|portal|sitio/i.test(nombre)) return <MonitorSmartphone {...props} />
+  return <Package {...props} />
 }
 
-function iconoFuncion(nombre: string): LucideIcon {
-  return ICONOS_FUNCION.find(([r]) => r.test(nombre))?.[1] ?? Sparkles
+function IconoFuncion({ nombre, className }: { nombre: string; className?: string }) {
+  const Icono = ICONOS_FUNCION.find(([r]) => r.test(nombre))?.[1] ?? Sparkles
+  return createElement(Icono, { className, "aria-hidden": true })
 }
 
 /**
@@ -510,6 +529,15 @@ function partesIncluye(texto: string): string[] {
   return limpias.map((x) => x.charAt(0).toUpperCase() + x.slice(1))
 }
 
+/** Cuántas semanas abarca un hito: "3-5" → 3, "7" → 1; "0" o texto libre → 0. */
+function duracionSemanas(semanas: string): number {
+  const m = /^\s*(\d+)(?:\s*[-–]\s*(\d+))?\s*$/.exec(semanas)
+  if (!m) return 0
+  const ini = Number(m[1])
+  const fin = m[2] ? Number(m[2]) : ini
+  return ini === 0 && fin === 0 ? 0 : Math.max(0, fin - Math.max(ini, 1) + 1)
+}
+
 function Nodo({ i }: { i: number }) {
   return (
     <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface font-mono text-xs font-semibold tabular-nums text-primary shadow-sm transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-white">
@@ -528,6 +556,157 @@ function LineaTiempo() {
 }
 
 /** Página completa de la propuesta del proyecto. */
+/**
+ * Los módulos de una parte del sistema (el sistema web, la app…): dónde se
+ * usa y, por módulo, qué verá el cliente y qué podrá hacer.
+ */
+function ModulosGrupo({ grupo, vistas }: { grupo: string; vistas: C["vistas"] }) {
+  const [titulo, donde] = grupo.split(/\s+·\s+/)
+  return (
+    <div>
+      {titulo && (
+        <div className="flex items-center gap-4 rounded-2xl bg-bg-dark p-5 shadow-glow sm:p-6">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
+            <IconoEntregable nombre={titulo} className="h-6 w-6 text-primary-light" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-display text-xl font-bold tracking-tight text-white sm:text-2xl">{titulo}</h3>
+            {donde && <p className="mt-0.5 text-pretty text-sm text-white/60 first-letter:uppercase">{donde}</p>}
+          </div>
+          <p className="ml-auto hidden shrink-0 text-right sm:block">
+            <span className="block font-display text-3xl font-bold leading-none text-white tabular-nums">
+              {vistas.length}
+            </span>
+            <span className="text-xs text-white/55">{vistas.length === 1 ? "módulo" : "módulos"}</span>
+          </p>
+        </div>
+      )}
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {vistas.map((v, i) => {
+          const IconoVista = ICONO_VISTA[v.icono ?? "celular"]
+          return (
+            <div
+              key={v.id}
+              className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
+                  <IconoVista className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span className="font-mono text-xs font-semibold tabular-nums text-text-muted">
+                  Módulo {numero(i)}
+                </span>
+              </div>
+              <h4 className="mt-4 text-lg font-semibold leading-snug text-text-primary">{v.nombre}</h4>
+              {v.descripcion && (
+                <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
+                  <EnLinea texto={v.descripcion} />
+                </p>
+              )}
+              {v.puntos.length > 0 && (
+                <div className="mt-4 border-t border-border pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                    Qué podrás hacer
+                  </p>
+                  <ul className="mt-3 space-y-2.5">
+                    {v.puntos.map((x) => (
+                      <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                        <span>
+                          <EnLinea texto={x.texto} />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/** "F2" → "Fase 2"; cualquier otra clave se deja como está. */
+function nombreFase(clave: string): string {
+  const m = /^F\s*(\d+)$/i.exec(clave.trim())
+  return m ? `Fase ${m[1]}` : clave
+}
+
+/**
+ * Una fase futura: de qué trata y, por función, qué le resuelve al negocio y
+ * qué incluye.
+ */
+function FuncionesFase({ fase }: { fase: C["fases"][number] }) {
+  return (
+    <div>
+      <div className="flex items-center gap-4 rounded-2xl bg-bg-dark p-5 shadow-glow sm:p-6">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
+          <Sparkles className="h-6 w-6 text-primary-light" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+            {nombreFase(fase.clave)}
+          </p>
+          <h3 className="font-display text-xl font-bold tracking-tight text-white sm:text-2xl">{fase.nombre}</h3>
+          {fase.lema && <p className="mt-0.5 text-pretty text-sm text-white/60">{fase.lema}</p>}
+        </div>
+        <p className="ml-auto hidden shrink-0 text-right sm:block">
+          <span className="block font-display text-3xl font-bold leading-none text-white tabular-nums">
+            {fase.entregables.length}
+          </span>
+          <span className="text-xs text-white/55">{fase.entregables.length === 1 ? "función" : "funciones"}</span>
+        </p>
+      </div>
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {fase.entregables.map((e) => {
+          const nombre = nombreFuncion(e.nombre)
+          const opcional = /opcional/i.test(e.nombre)
+          return (
+            <div
+              key={e.id}
+              className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
+                  <IconoFuncion nombre={nombre} className="h-5 w-5" />
+                </span>
+                {opcional && (
+                  <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-inset ring-border">
+                    Opcional
+                  </span>
+                )}
+              </div>
+              <h4 className="mt-4 text-lg font-semibold leading-snug text-text-primary">{nombre}</h4>
+              {e.resuelve && (
+                <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
+                  <EnLinea texto={e.resuelve} />
+                </p>
+              )}
+              {e.incluye && (
+                <div className="mt-4 border-t border-border pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Qué incluye</p>
+                  <ul className="mt-3 space-y-2.5">
+                    {partesIncluye(e.incluye).map((x) => (
+                      <li key={x} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary/50" aria-hidden="true" />
+                        <span>
+                          <EnLinea texto={x} />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; puedeFirmar?: boolean }) {
   const c: C = p.contenido
   const moneda = c.inversion.moneda || "MXN"
@@ -535,7 +714,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
   const saludo = c.ficha.contactoNombre ? nombreDePila(c.ficha.contactoNombre) : p.cliente.nombre
 
   const contratadas = c.fases.filter((f) => f.contratada)
-  const futuras = c.fases.filter((f) => !f.contratada)
+  const fasesFuturas = c.fases.filter((f) => !f.contratada && f.entregables.length > 0)
   // Pantallas agrupadas por dónde se usan, en el orden en que se capturaron
   const gruposVistas = [...c.vistas.reduce((m, v) => m.set(v.grupo, [...(m.get(v.grupo) ?? []), v]), new Map<string, C["vistas"]>())]
   const etapasIncluidas = contratadas.flatMap((f) =>
@@ -543,6 +722,17 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
   )
   const pago = new Map(c.inversion.pagos.map((x) => [x.id, x]))
   const total = p.totalCentavos
+  // Tramos de la barra del calendario: solo las etapas con semanas numéricas ("3-5")
+  const tramos = c.calendario
+    .map((h) => ({
+      id: h.id,
+      semanas: h.semanas.replace(/\s+/g, ""),
+      titulo: h.titulo,
+      dura: duracionSemanas(h.semanas),
+      conPago: Boolean(h.pagoId && pago.get(h.pagoId)?.montoCentavos),
+    }))
+    .filter((t) => t.dura > 0)
+  const semanasTotales = tramos.reduce((n, t) => n + t.dura, 0)
   const mensual = c.inversion.mensualidad
 
 
@@ -560,7 +750,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
     { id: "reto", titulo: "El reto", mostrar: hayAlcance },
     { id: "personas", titulo: "Personas", mostrar: roles.length > 0 },
     { id: "tu-sistema", titulo: "Tu sistema", mostrar: c.vistas.length > 0 || etapasIncluidas.length > 0 },
-    { id: "futuras", titulo: "Features futuras", mostrar: futuras.some((f) => f.entregables.length > 0) },
+    { id: "futuras", titulo: "Lo que sigue", mostrar: fasesFuturas.length > 0 },
     { id: "calendario", titulo: "Calendario", mostrar: c.calendario.length > 0 },
     { id: "inversion", titulo: "Inversión", mostrar: hayInversion },
     { id: "tu-lado", titulo: "Lo que necesitamos", mostrar: hayRequisitos },
@@ -772,14 +962,13 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
             {c.ficha.entregables.length > 0 && (
               <ul className="mt-8 grid gap-3 sm:grid-cols-2">
                 {c.ficha.entregables.map((e) => {
-                  const Icono = iconoEntregable(e.nombre)
                   return (
                     <li
                       key={e.id}
                       className="flex gap-3 rounded-2xl border border-line-dark-strong bg-white/[0.06] p-4 backdrop-blur-md"
                     >
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
-                        <Icono className="h-5 w-5 text-primary-light" aria-hidden="true" />
+                        <IconoEntregable nombre={e.nombre} className="h-5 w-5 text-primary-light" />
                       </span>
                       <span className="text-sm leading-snug">
                         <span className="block font-semibold text-white">{e.nombre}</span>
@@ -826,7 +1015,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
         {/* El reto */}
         {hayAlcance && (
           <Seccion id="reto" indice={num("reto")} etiqueta="El reto" titulo="Qué resolvemos y hasta dónde llega">
-            <div className="space-y-4">
+            <div className="space-y-8">
               {c.alcance.problemas.length > 0 && (
                 <div>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -841,22 +1030,26 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
                     </p>
                   </div>
                   <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {c.alcance.problemas.map((x) => {
+                    {c.alcance.problemas.map((x, i) => {
                       const { titulo, detalle } = partesProblema(x.texto)
                       const Icono = iconoProblema(x.texto)
                       return (
-                        <li key={x.id} className={`${TARJETA} flex gap-4 p-5`}>
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-bg-section text-text-secondary">
-                            <Icono className="h-5 w-5" aria-hidden="true" />
-                          </span>
-                          <div className="min-w-0">
-                            <p className="font-display text-base font-semibold leading-snug text-text-primary">{titulo}</p>
-                            {detalle && (
-                              <p className="mt-1 text-pretty text-sm leading-relaxed text-text-secondary">
-                                <EnLinea texto={detalle} />
-                              </p>
-                            )}
+                        <li
+                          key={x.id}
+                          className={`${TARJETA} p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark text-primary-light">
+                              <Icono className="h-5 w-5" aria-hidden="true" />
+                            </span>
+                            <span className="font-mono text-xs font-semibold tabular-nums text-text-muted">{numero(i)}</span>
                           </div>
+                          <p className="mt-4 font-display text-lg font-semibold leading-snug text-text-primary">{titulo}</p>
+                          {detalle && (
+                            <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
+                              <EnLinea texto={detalle} />
+                            </p>
+                          )}
                         </li>
                       )
                     })}
@@ -868,37 +1061,71 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
           </Seccion>
         )}
 
-        {/* Personas */}
+        {/* Personas: cada rol con su dispositivo y sus actividades */}
         {roles.length > 0 && (
           <Seccion
             id="personas"
             indice={num("personas")}
             etiqueta="Las personas"
             titulo="Quién usa el sistema"
+            texto={`${roles.length === 1 ? "Un rol" : `${roles.length} roles`}, cada uno con su acceso y sus actividades.`}
           >
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {roles.map((r) => (
-                <div key={r.id} className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover`}>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
-                    <User className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-text-primary">{r.nombre}</h3>
-                  {r.quien && <p className="text-sm text-text-muted">{r.quien}</p>}
-                  {r.responsabilidades && (
-                    <p className="mt-2 text-pretty text-sm leading-relaxed text-text-secondary">
-                      <EnLinea texto={r.responsabilidades} />
-                    </p>
-                  )}
-                  {r.dispositivo && (
-                    <div className="mt-auto pt-4">
-                      <p className="border-t border-border pt-3 text-xs font-medium text-text-primary">
-                        <span className="text-text-muted">Desde · </span>
-                        <EnLinea texto={r.dispositivo} />
-                      </p>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+              {roles.map((r, i) => {
+                const { actividades, nota } = actividadesRol(r.responsabilidades)
+                // Las tarjetas de la última fila se reparten el ancho: nunca queda un hueco
+                const sobran = roles.length % 3
+                const ultimaFila = i >= roles.length - sobran
+                const ancho = !ultimaFila ? "lg:col-span-2" : sobran === 1 ? "lg:col-span-6" : "lg:col-span-3"
+                return (
+                  <div
+                    key={r.id}
+                    className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover ${ancho}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-dark text-primary-light">
+                        <IconoRol nombre={r.nombre} className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg font-semibold leading-snug text-text-primary">{r.nombre}</h3>
+                        {r.quien && <p className="text-sm text-text-muted">{r.quien}</p>}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {r.dispositivo && (
+                      <p className="mt-4 inline-flex items-start gap-2 self-start rounded-xl bg-primary-light/60 px-3 py-1.5 text-xs font-medium leading-snug text-primary-hover ring-1 ring-inset ring-primary/15">
+                        <IconoDispositivo texto={r.dispositivo} className="mt-px h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          <EnLinea texto={r.dispositivo.replace(/\*\*/g, "")} />
+                        </span>
+                      </p>
+                    )}
+                    {actividades.length > 0 && (
+                      <div className="mt-5 border-t border-border pt-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                          Sus actividades
+                        </p>
+                        <ul
+                          className={`mt-3 grid gap-x-6 gap-y-2.5 ${ultimaFila && sobran > 0 ? "sm:grid-cols-2" : ""}`}
+                        >
+                          {actividades.map((x) => (
+                            <li key={x} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                              <span className="text-pretty">
+                                <EnLinea texto={x} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {nota && (
+                      <p className="mt-4 text-pretty text-xs leading-relaxed text-text-muted [&_strong]:font-semibold [&_strong]:text-text-secondary">
+                        <EnLinea texto={nota} />
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </Seccion>
         )}
@@ -909,7 +1136,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
             id="tu-sistema"
             indice={num("tu-sistema")}
             etiqueta="Tu sistema"
-            titulo="Lo que vas a ver en tu sistema"
+            titulo="Lo que contendrá tu sistema"
             texto={
               contratadas[0]
                 ? `Esto es lo que tendrás funcionando al terminar ${contratadas[0].clave === "MVP" ? "la primera etapa" : contratadas[0].nombre.toLowerCase()}${contratadas[0].duracion ? `, en ${contratadas[0].duracion}` : ""}.`
@@ -917,57 +1144,24 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
             }
           >
             {c.vistas.length > 0 ? (
-              <div className="space-y-12">
-                {gruposVistas.map(([grupo, vistas]) => {
-                  const [tituloGrupo, subtitulo] = grupo.split(/\s+·\s+/)
-                  return (
-                    <div key={grupo || "sin-grupo"}>
-                      {tituloGrupo && (
-                        <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                          <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
-                            <span className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-primary-hover" aria-hidden="true" />
-                            {tituloGrupo}
-                          </h3>
-                          {subtitulo && <p className="text-sm text-text-muted">{subtitulo}</p>}
-                        </div>
-                      )}
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {vistas.map((v) => {
-                          const Icono = ICONO_VISTA[v.icono ?? "celular"]
-                          return (
-                            <div
-                              key={v.id}
-                              className={`${TARJETA} group relative flex flex-col overflow-hidden p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
-                            >
-                                                            <span className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
-                                <Icono className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                              <h4 className="relative mt-4 text-lg font-semibold leading-snug text-text-primary">{v.nombre}</h4>
-                              {v.descripcion && (
-                                <p className="relative mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
-                                  <EnLinea texto={v.descripcion} />
-                                </p>
-                              )}
-                              {v.puntos.length > 0 && (
-                                <ul className="relative mt-4 space-y-2.5 border-t border-border pt-4">
-                                  {v.puntos.map((x) => (
-                                    <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
-                                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
-                                      <span>
-                                        <EnLinea texto={x.texto} />
-                                      </span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              gruposVistas.length > 1 ? (
+                <PestanasSistema
+                  nombre="Partes del sistema"
+                  prefijo="sistema"
+                  pestanas={gruposVistas.map(([grupo, vistas], i) => {
+                    const titulo = grupo.split(/\s+·\s+/)[0] || "Sistema"
+                    return {
+                      id: String(i),
+                      titulo,
+                      cuenta: vistas.length,
+                      icono: <IconoEntregable nombre={titulo} className="h-4 w-4" />,
+                      panel: <ModulosGrupo grupo={grupo} vistas={vistas} />,
+                    }
+                  })}
+                />
+              ) : (
+                <ModulosGrupo grupo={gruposVistas[0][0]} vistas={gruposVistas[0][1]} />
+              )
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {etapasIncluidas.map((e, i) => (
@@ -985,77 +1179,34 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
           </Seccion>
         )}
 
-        {/* Features futuras: las funciones ya mapeadas de cada fase siguiente */}
-        {futuras.some((f) => f.entregables.length > 0) && (
+        {/* Lo que viene después: las funciones ya mapeadas de cada fase siguiente, una fase por pestaña */}
+        {fasesFuturas.length > 0 && (
           <Seccion
             id="futuras"
             indice={num("futuras")}
-            etiqueta="Features futuras"
-            titulo="Lo que puede venir después"
-            texto="Ya diseñadas y listas para cuando el negocio las necesite. Se cotizan por separado, por función o por fase."
+            etiqueta="Lo que sigue"
+            titulo="Lo que viene después"
+            texto="Tu sistema va a seguir creciendo. Estas funciones ya están diseñadas y listas para cuando el negocio las necesite; se cotizan por separado, por función o por fase."
           >
-            <div className="space-y-12">
-              {futuras
-                .filter((f) => f.entregables.length > 0)
-                .map((f) => (
-                  <div key={f.id}>
-                    <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
-                        <span className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-primary-hover" aria-hidden="true" />
-                        <ChipFase clave={f.clave} contratada={false} />
-                        {f.nombre}
-                      </h3>
-                      {f.lema && <p className="text-sm text-text-muted">{f.lema}</p>}
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                      {f.entregables.map((e) => {
-                        const nombre = nombreFuncion(e.nombre)
-                        const Icono = iconoFuncion(nombre)
-                        const opcional = /opcional/i.test(e.nombre)
-                        return (
-                          <div
-                            key={e.id}
-                            className={`${TARJETA} group relative flex flex-col overflow-hidden p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
-                          >
-                                                        <div className="relative flex items-start justify-between gap-3">
-                              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
-                                <Icono className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                              {opcional && (
-                                <span className="rounded-full bg-surface px-2.5 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-inset ring-border">
-                                  Opcional
-                                </span>
-                              )}
-                            </div>
-                            <h4 className="relative mt-4 text-lg font-semibold leading-snug text-text-primary">{nombre}</h4>
-                            {e.resuelve && (
-                              <p className="relative mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
-                                <EnLinea texto={e.resuelve} />
-                              </p>
-                            )}
-                            {e.incluye && (
-                              <ul className="relative mt-4 space-y-2.5 border-t border-border pt-4">
-                                {partesIncluye(e.incluye).map((x) => (
-                                  <li key={x} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
-                                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                                    <span>
-                                      <EnLinea texto={x} />
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                ))}
-            </div>
+            {fasesFuturas.length > 1 ? (
+              <PestanasSistema
+                nombre="Fases futuras"
+                prefijo="fase"
+                pestanas={fasesFuturas.map((f) => ({
+                  id: f.id,
+                  titulo: nombreFase(f.clave),
+                  cuenta: f.entregables.length,
+                  icono: <Sparkles className="h-4 w-4" aria-hidden="true" />,
+                  panel: <FuncionesFase fase={f} />,
+                }))}
+              />
+            ) : (
+              <FuncionesFase fase={fasesFuturas[0]} />
+            )}
           </Seccion>
         )}
 
-        {/* Calendario */}
+        {/* Calendario: el reparto de las semanas, los módulos de cada etapa y el pago que le toca */}
         {c.calendario.length > 0 && (
           <Seccion
             id="calendario"
@@ -1063,40 +1214,112 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
             etiqueta="El calendario"
             titulo="Semana a semana, con pagos amarrados a entregas"
           >
-            <div className={`${TARJETA} p-6 sm:p-8`}>
-              <ol className="relative">
-                <LineaTiempo />
-                {c.calendario.map((h, i) => {
-                  const x = h.pagoId ? pago.get(h.pagoId) : null
-                  return (
-                    <li key={h.id} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-4 pb-7 last:pb-0">
-                      <Nodo i={i} />
-                      <div className="flex flex-col gap-2 pt-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                            {/^\d/.test(h.semanas) ? `Semana${/[-–,]/.test(h.semanas) ? "s" : ""} ${h.semanas}` : h.semanas}
-                          </p>
-                          <p className="mt-1 text-pretty text-base font-medium text-text-primary">
-                            <EnLinea texto={h.entregable} />
-                          </p>
-                        </div>
-                        {x && x.montoCentavos != null && (
-                          <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full bg-primary-light px-3 py-1 text-sm font-semibold tabular-nums text-primary">
-                            <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
-                            {dinero(x.montoCentavos, moneda)}
-                            <span className="font-normal text-primary/70">· {x.nombre}</span>
+            {/* Barra del proyecto: cada tramo mide lo que dura su etapa */}
+            {tramos.length > 1 && (
+              <div className="mb-6 rounded-2xl bg-bg-dark p-5 shadow-glow sm:p-6">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+                    {semanasTotales} semanas de desarrollo
+                  </p>
+                  <p className="flex items-center gap-1.5 text-xs text-white/55">
+                    <Wallet className="h-3.5 w-3.5 text-primary-light" aria-hidden="true" /> Pago al cierre de la etapa
+                  </p>
+                </div>
+                <div className="mt-4 flex gap-1">
+                  {tramos.map((t, k) => (
+                    <div key={t.id} style={{ flexGrow: t.dura }} className="min-w-0 basis-0">
+                      <div
+                        className={`relative h-2.5 rounded-full ${
+                          ["bg-primary-light", "bg-primary", "bg-primary-hover"][k % 3]
+                        }`}
+                      >
+                        {t.conPago && (
+                          <span className="absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-white text-primary shadow-sm ring-2 ring-bg-dark">
+                            <Wallet className="h-3 w-3" aria-hidden="true" />
                           </span>
                         )}
                       </div>
-                    </li>
-                  )
-                })}
-              </ol>
-            </div>
+                      <p className="mt-2.5 truncate font-mono text-[11px] font-semibold tabular-nums text-white/80">
+                        S{t.semanas}
+                      </p>
+                      {t.titulo && <p className="hidden truncate text-xs text-white/55 sm:block">{t.titulo}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <ol className="relative space-y-4">
+              <LineaTiempo />
+              {c.calendario.map((h, i) => {
+                const x = h.pagoId ? pago.get(h.pagoId) : null
+                const dura = duracionSemanas(h.semanas)
+                return (
+                  <li key={h.id} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-4">
+                    <div className="pt-5">
+                      <Nodo i={i} />
+                    </div>
+                    <div className={`${TARJETA} overflow-hidden`}>
+                      <div className="p-5 sm:p-6">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                            {/^\d/.test(h.semanas) ? `Semana${/[-–,]/.test(h.semanas) ? "s" : ""} ${h.semanas}` : h.semanas}
+                          </p>
+                          {dura > 1 && (
+                            <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-xs text-text-muted ring-1 ring-inset ring-border">
+                              {dura} semanas
+                            </span>
+                          )}
+                        </div>
+                        {h.titulo && (
+                          <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-text-primary sm:text-xl">
+                            {h.titulo}
+                          </h3>
+                        )}
+                        {h.modulos.length > 0 ? (
+                          <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                            {h.modulos.map((m) => (
+                              <li key={m.id} className="flex gap-2.5 text-sm leading-relaxed text-text-secondary">
+                                <Boxes className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                                <span className="text-pretty [&_strong]:font-semibold [&_strong]:text-text-primary">
+                                  <EnLinea texto={m.texto} />
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          h.entregable && (
+                            <p
+                              className={`text-pretty text-text-primary ${
+                                h.titulo ? "mt-2 text-sm leading-relaxed text-text-secondary" : "mt-1 text-base font-medium"
+                              }`}
+                            >
+                              <EnLinea texto={h.entregable} />
+                            </p>
+                          )
+                        )}
+                      </div>
+                      {x && x.montoCentavos != null && (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border bg-primary-light/50 px-5 py-3 sm:px-6">
+                          <Wallet className="h-4 w-4 text-primary" aria-hidden="true" />
+                          <p className="text-sm font-semibold text-primary-hover">
+                            Pago de esta etapa: {x.nombre}
+                            {x.cuando && <span className="font-normal text-primary/80"> · {x.cuando.toLowerCase()}</span>}
+                          </p>
+                          <p className="ml-auto font-display text-lg font-bold tabular-nums text-text-primary">
+                            {dinero(x.montoCentavos, moneda)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
           </Seccion>
         )}
 
-        {/* Inversión */}
+        {/* Inversión: el total, los pagos, las condiciones, la mensualidad y lo que paga el cliente a terceros */}
         {hayInversion && (
           <Seccion
             id="inversion"
@@ -1107,89 +1330,82 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
           >
             <div className="space-y-5">
               {total > 0 && (
-                <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-                  <div className="relative flex flex-col overflow-hidden rounded-3xl bg-bg-dark p-6 shadow-glow sm:p-8">
-                    <div className={REJILLA} />
-                    <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/30 blur-3xl" />
-                    <p className="relative text-xs font-semibold uppercase tracking-wider text-primary-light">
-                      Desarrollo {contratadas.map((f) => f.clave).join(" + ")}
-                    </p>
-                    <p className="relative mt-3 font-display text-5xl font-bold tracking-tight text-white tabular-nums sm:text-6xl">
-                      {dinero(total, moneda)}
-                    </p>
-                    <p className="relative mt-3 text-sm text-white/60">
-                      En {c.inversion.pagos.length} {c.inversion.pagos.length === 1 ? "pago" : "pagos"} ligados a entregas concretas.
-                    </p>
-                    <div className="relative mt-10 lg:mt-auto lg:pt-10">
-                      <div className="flex h-2 gap-1 overflow-hidden rounded-full">
-                        {c.inversion.pagos
-                          .filter((x) => x.montoCentavos)
-                          .map((x, i) => (
-                            <span
-                              key={x.id}
-                              className={`h-full rounded-full ${["bg-primary-light", "bg-primary", "bg-primary-hover"][i % 3]}`}
-                              style={{ flexGrow: x.montoCentavos! }}
-                            />
-                          ))}
+                <>
+                  {/* El total y cómo se reparte entre los pagos */}
+                  <div className="relative isolate overflow-hidden rounded-3xl bg-bg-dark p-6 shadow-glow ring-1 ring-inset ring-white/10 sm:p-10">
+                    <div aria-hidden="true" className={`${REJILLA} -z-10 [mask-image:linear-gradient(to_left,black,transparent_75%)]`} />
+                    <div aria-hidden="true" className="absolute -right-16 -top-16 -z-10 h-64 w-64 rounded-full bg-primary/30 blur-3xl" />
+                    <div className="grid gap-8 lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+                          Desarrollo {contratadas.map((f) => f.clave).join(" + ")}
+                        </p>
+                        <p className="mt-3 font-display text-5xl font-bold tracking-tight text-white tabular-nums sm:text-7xl">
+                          {dinero(total, moneda)}
+                        </p>
+                        <p className="mt-3 text-sm text-white/60">
+                          En {pagos.length} {pagos.length === 1 ? "pago ligado a una entrega concreta" : "pagos ligados a entregas concretas"}.
+                        </p>
                       </div>
-                      <div className="mt-3 flex gap-1 text-[11px] text-white/55">
-                        {c.inversion.pagos
-                          .filter((x) => x.montoCentavos)
-                          .map((x) => (
-                            <span key={x.id} className="truncate" style={{ flexGrow: x.montoCentavos! }}>
-                              {x.nombre}
-                            </span>
-                          ))}
+                      <div className="flex gap-1.5">
+                        {pagos.map((x, i) => (
+                          <div key={x.id} style={{ flexGrow: x.montoCentavos! }} className="min-w-0 basis-0">
+                            <div className={`h-2.5 rounded-full ${["bg-primary-light", "bg-primary", "bg-primary-hover"][i % 3]}`} />
+                            <p className="mt-3 truncate text-xs text-white/55">{x.nombre}</p>
+                            <p className="truncate font-display text-base font-semibold text-white tabular-nums sm:text-xl">
+                              {dinero(x.montoCentavos!, moneda)}
+                            </p>
+                            <p className="truncate text-xs text-white/55">{Math.round((x.montoCentavos! / total) * 100)} %</p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
-                  <div className="grid gap-3">
-                    {c.inversion.pagos.map((x, i) => {
-                      const pct = total > 0 && x.montoCentavos ? Math.round((x.montoCentavos / total) * 100) : null
-                      return (
-                        <div key={x.id} className={`${TARJETA} flex gap-4 p-5`}>
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-light font-mono text-xs font-bold text-primary">
+
+                  {/* Cada pago: cuándo, cuánto y contra qué entrega */}
+                  <div className={`grid gap-4 ${c.inversion.pagos.length >= 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+                    {c.inversion.pagos.map((x, i) => (
+                      <div key={x.id} className={`${TARJETA} flex flex-col p-6`}>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-dark font-mono text-xs font-bold text-primary-light">
                             {numero(i)}
                           </span>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                              <p className="font-semibold text-text-primary">
-                                {x.nombre}
-                                {x.cuando && <span className="font-normal text-text-muted"> · {x.cuando}</span>}
-                              </p>
-                              {x.montoCentavos != null && (
-                                <p className="font-semibold tabular-nums text-text-primary">
-                                  {dinero(x.montoCentavos, moneda)}
-                                  {pct != null && <span className="ml-1.5 text-xs font-normal text-text-muted">{pct} %</span>}
-                                </p>
-                              )}
-                            </div>
-                            {x.contra && (
-                              <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                                <EnLinea texto={x.contra} />
-                              </p>
-                            )}
-                            {pct != null && (
-                              <div className="mt-3 h-1 overflow-hidden rounded-full bg-bg-section">
-                                <div className="h-full rounded-full bg-gradient-to-r from-primary-hover to-primary" style={{ width: `${pct}%` }} />
-                              </div>
-                            )}
-                          </div>
+                          {x.cuando && (
+                            <span className="rounded-full bg-primary-light/60 px-3 py-1 text-xs font-medium text-primary-hover ring-1 ring-inset ring-primary/15">
+                              {x.cuando}
+                            </span>
+                          )}
                         </div>
-                      )
-                    })}
+                        <p className="mt-4 text-sm font-semibold text-text-secondary">{x.nombre}</p>
+                        {x.montoCentavos != null && (
+                          <p className="font-display text-3xl font-bold tracking-tight text-text-primary tabular-nums">
+                            {dinero(x.montoCentavos, moneda)}
+                          </p>
+                        )}
+                        {x.contra && (
+                          <div className="mt-4 border-t border-border pt-4">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                              Se paga contra
+                            </p>
+                            <p className="mt-2 text-pretty text-sm leading-relaxed text-text-secondary [&_strong]:font-semibold [&_strong]:text-text-primary">
+                              <EnLinea texto={x.contra} />
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </div>
+                </>
               )}
 
               {c.inversion.condiciones.length > 0 && (
                 <div className={`${TARJETA} p-6 sm:p-8`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Condiciones</h3>
-                  <ul className="mt-4 space-y-3">
+                  <h3 className="font-display text-lg font-semibold text-text-primary">Condiciones</h3>
+                  <ul className="mt-4 grid gap-x-10 gap-y-4 md:grid-cols-2">
                     {c.inversion.condiciones.map((x) => (
                       <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-text-secondary">
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                        <span>
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                        <span className="text-pretty [&_strong]:font-semibold [&_strong]:text-text-primary">
                           <EnLinea texto={x.texto} />
                         </span>
                       </li>
@@ -1199,71 +1415,93 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
               )}
 
               {(mensual.montoCentavos != null || mensual.incluye.length > 0) && (
-                <div className={`${TARJETA} overflow-hidden`}>
-                  <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-6 sm:p-8">
-                    <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Hospedaje y mantenimiento</h3>
-                      {mensual.descripcion && (
-                        <p className="mt-2 max-w-lg text-sm leading-relaxed text-text-secondary">
-                          <EnLinea texto={mensual.descripcion} />
-                        </p>
-                      )}
-                    </div>
+                <div className={`${TARJETA} grid overflow-hidden lg:grid-cols-[0.8fr_1.6fr]`}>
+                  <div className="border-b border-border bg-primary-light/40 p-6 sm:p-8 lg:border-b-0 lg:border-r">
+                    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                      <span className="h-px w-8 bg-primary" />
+                      Cada mes
+                    </p>
+                    <h3 className="mt-4 font-display text-lg font-semibold text-text-primary">Hospedaje y mantenimiento</h3>
                     {mensual.montoCentavos != null && (
-                      <p className="text-3xl font-bold tracking-tight text-text-primary tabular-nums">
+                      <p className="mt-2 font-display text-4xl font-bold tracking-tight text-text-primary tabular-nums sm:text-5xl">
                         {dinero(mensual.montoCentavos, moneda)}
                         <span className="text-base font-medium text-text-muted"> /mes</span>
                       </p>
                     )}
+                    {mensual.descripcion && (
+                      <p className="mt-3 text-pretty text-sm leading-relaxed text-text-secondary">
+                        <EnLinea texto={mensual.descripcion} />
+                      </p>
+                    )}
                   </div>
-                  <div className="grid sm:grid-cols-2">
-                    {(
-                      [
-                        ["Incluye", mensual.incluye, true],
-                        ["No incluye", mensual.noIncluye, false],
-                      ] as const
-                    )
-                      .filter(([, items]) => items.length > 0)
-                      .map(([etiqueta, items, si]) => (
-                        <div key={etiqueta} className="p-6 sm:p-8 sm:[&+&]:border-l sm:[&+&]:border-border max-sm:[&+&]:border-t max-sm:[&+&]:border-border">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">{etiqueta}</p>
-                          <ul className="mt-3 space-y-2.5">
-                            {items.map((x) => (
-                              <li key={x.id} className="flex gap-2.5 text-sm text-text-secondary">
-                                {si ? (
-                                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                                ) : (
-                                  <span className="mt-2 h-px w-3 shrink-0 bg-text-muted" aria-hidden="true" />
-                                )}
+                  <div className="p-6 sm:p-8">
+                    {mensual.incluye.length > 0 && (
+                      <>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Incluye</p>
+                        <ul className="mt-3 grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                          {mensual.incluye.map((x) => (
+                            <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                              <span>
                                 <EnLinea texto={x.texto} />
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    {mensual.noIncluye.length > 0 && (
+                      <div className={mensual.incluye.length > 0 ? "mt-6 border-t border-border pt-5" : ""}>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">No incluye</p>
+                        <ul className="mt-3 grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                          {mensual.noIncluye.map((x) => (
+                            <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-muted">
+                              <span className="mt-2 h-px w-3 shrink-0 bg-text-muted" aria-hidden="true" />
+                              <span>
+                                <EnLinea texto={x.texto} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {c.inversion.terceros.length > 0 && (
                 <div className={`${TARJETA} p-6 sm:p-8`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">
-                    Pagos únicos y costos de terceros · a cargo del cliente
-                  </h3>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 className="font-display text-lg font-semibold text-text-primary">Pagos únicos y costos de terceros</h3>
+                    <p className="text-xs text-text-muted">A cargo del cliente</p>
+                  </div>
                   <ul className="mt-4 divide-y divide-border">
-                    {c.inversion.terceros.map((x) => (
-                      <li key={x.id} className="flex flex-col gap-1 py-3.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                        <div>
-                          <p className="text-sm font-semibold text-text-primary">
-                            <EnLinea texto={x.concepto} />
+                    {c.inversion.terceros.map((x) => {
+                      // "Navegación _(opcional, fase futura)_" → nombre + etiqueta
+                      const marca = /_\(([^)]*)\)_/.exec(x.concepto)
+                      return (
+                        <li key={x.id} className="flex flex-col gap-1 py-3.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                          <div>
+                            <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm font-semibold text-text-primary">
+                              <EnLinea texto={x.concepto.replace(/\s*_\([^)]*\)_/, "")} />
+                              {marca && (
+                                <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-inset ring-border first-letter:uppercase">
+                                  {marca[1]}
+                                </span>
+                              )}
+                            </p>
+                            {x.nota && (
+                              <p className="mt-0.5 text-xs text-text-muted">
+                                <EnLinea texto={x.nota} />
+                              </p>
+                            )}
+                          </div>
+                          <p className="shrink-0 text-sm font-medium text-text-primary sm:max-w-[45%] sm:text-right">
+                            <EnLinea texto={x.costo} />
                           </p>
-                          {x.nota && <p className="mt-0.5 text-xs text-text-muted"><EnLinea texto={x.nota} /></p>}
-                        </div>
-                        <p className="shrink-0 text-sm font-medium text-text-primary sm:text-right">
-                          <EnLinea texto={x.costo} />
-                        </p>
-                      </li>
-                    ))}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               )}
