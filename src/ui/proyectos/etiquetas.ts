@@ -1,4 +1,4 @@
-import type { ClaveSeccion, IconoVista, NivelImpacto } from "@/src/modules/proyectos/domain/contenido"
+import type { ClaveSeccion, IconoVista, NivelImpacto, TipoRequisito } from "@/src/modules/proyectos/domain/contenido"
 
 /** Textos visibles de los catálogos del proyecto (panel y propuesta). */
 
@@ -22,6 +22,12 @@ export const ETIQUETA_ICONO: Record<IconoVista, string> = {
   reparto: "Reparto",
 }
 
+export const ETIQUETA_TIPO_REQUISITO: Record<TipoRequisito, string> = {
+  hardware: "Hardware",
+  licencia: "Licencias",
+  operativa: "Operativas",
+}
+
 /** Qué capturar en cada sección (solo panel). */
 export const GUIA_SECCION: Record<ClaveSeccion, string> = {
   ficha: "Datos generales, promesa del hero, objetivo y entregables.",
@@ -34,7 +40,7 @@ export const GUIA_SECCION: Record<ClaveSeccion, string> = {
   flujo: "Cómo se opera un día con el sistema, por etapas.",
   calendario: "Hitos por semanas y el pago ligado a cada entrega.",
   inversion: "Pagos (montos en pesos), condiciones, mensualidad y costos de terceros.",
-  requisitos: "Lo que el cliente debe entregar, para cuándo y qué bloquea si falta.",
+  requisitos: "Lo que el cliente debe entregar, para cuándo y qué bloquea si falta. Al cliente solo se le muestra lo marcado como hardware, licencia u operativa.",
   arquitectura: "Visión general, diagrama, stack y notas técnicas.",
   decisiones: "Decisiones tomadas: motivo y alternativas descartadas.",
   riesgos: "Riesgos, su impacto y cómo se mitigan.",

@@ -30,6 +30,10 @@ export const ICONOS_VISTA = [
 ] as const
 export type IconoVista = (typeof ICONOS_VISTA)[number]
 
+/** Tipos de requisito que se muestran al cliente, cada uno en su tarjeta. */
+export const TIPOS_REQUISITO = ["hardware", "licencia", "operativa"] as const
+export type TipoRequisito = (typeof TIPOS_REQUISITO)[number]
+
 // --- Esquema ---
 
 const CORTO = 300
@@ -105,6 +109,12 @@ export const esquemaContenido = z.object({
     version: texto(20),
     giro: texto(),
     tipoSistema: texto(),
+    /** Titular de "La propuesta": el beneficio, en una línea. Vacío = se usa `tipoSistema`. */
+    titular: texto(),
+    /** Foto de "La propuesta": ruta dentro de `public/` (p. ej. "/propuestas/tio-beto.webp"). */
+    imagen: texto(),
+    /** Foto de la portada (hero), también dentro de `public/`. Vacío = portada centrada sin foto. */
+    imagenHero: texto(),
     /** Frase del hero de la propuesta. */
     promesa: texto(),
     objetivo: texto(LARGO),
@@ -216,6 +226,12 @@ export const esquemaContenido = z.object({
             paraQue: texto(LARGO),
             formato: texto(),
             bloquea: texto(),
+            /** Tarjeta en la que sale en la propuesta; null = solo en el panel. */
+            // "software" fue un tipo que ya no existe: lo guardado así queda sin tarjeta
+            tipo: z.preprocess(
+              (v) => (v === "software" ? null : v),
+              z.enum(TIPOS_REQUISITO).nullable().default(null),
+            ),
           }),
           40,
         ),

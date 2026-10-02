@@ -1,8 +1,11 @@
 import {
   ArrowDown,
+  ClipboardList,
+  KeyRound,
   BarChart3,
   Bell,
   MapPinned,
+  MonitorSmartphone,
   Package,
   QrCode,
   Receipt,
@@ -28,16 +31,17 @@ import {
   Store,
   Wrench,
   CheckCircle2,
-  ChevronDown,
   ExternalLink,
   User,
   Wallet,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import Image from "next/image"
 import type { PropuestaPublicaDTO } from "@/src/modules/proyectos/application/dtos"
 import {
+  TIPOS_REQUISITO,
+  type TipoRequisito,
   type IconoVista,
-  type NivelImpacto,
   type Tabla,
 } from "@/src/modules/proyectos/domain/contenido"
 import { formatearFecha, nombreDePila } from "@/src/ui/formato"
@@ -47,8 +51,8 @@ import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 import { AceptarPropuesta } from "./aceptar-propuesta"
+import { ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
-import { ETIQUETA_IMPACTO } from "./etiquetas"
 
 /*
  * Mismo lenguaje que el diagnóstico: hero oscuro de marca a pantalla
@@ -79,10 +83,10 @@ const ICONO_VISTA: Record<IconoVista, LucideIcon> = {
   reparto: Truck,
 }
 
-const COLOR_IMPACTO: Record<NivelImpacto, string> = {
-  alto: "bg-primary text-white ring-primary",
-  medio: "bg-primary-light text-primary ring-primary/20",
-  bajo: "bg-bg-section text-text-muted ring-border",
+const TIPO_REQUISITO: Record<TipoRequisito, { Icono: LucideIcon; nota: string }> = {
+  hardware: { Icono: Smartphone, nota: "Equipo y materiales" },
+  licencia: { Icono: KeyRound, nota: "Pagos a terceros, a tu nombre" },
+  operativa: { Icono: ClipboardList, nota: "Tareas de tu operación" },
 }
 
 function dinero(centavos: number, moneda: string): string {
@@ -306,33 +310,6 @@ function TablaSimple({ tabla }: { tabla: Tabla }) {
   )
 }
 
-/** Tarjeta plegable (fases futuras, requisitos, anexos). */
-function Plegable({
-  titulo,
-  subtitulo,
-  extra,
-  children,
-}: {
-  titulo: React.ReactNode
-  subtitulo?: React.ReactNode
-  extra?: React.ReactNode
-  children: React.ReactNode
-}) {
-  return (
-    <details className={`${TARJETA} group overflow-hidden transition-colors open:border-primary/30`}>
-      <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4 sm:px-6 [&::-webkit-details-marker]:hidden">
-        <div className="min-w-0 flex-1">
-          <div className="text-base font-semibold text-text-primary">{titulo}</div>
-          {subtitulo && <div className="mt-0.5 text-xs text-text-muted">{subtitulo}</div>}
-        </div>
-        {extra}
-        <ChevronDown className="h-5 w-5 shrink-0 text-text-muted transition-transform group-open:rotate-180" aria-hidden="true" />
-      </summary>
-      <div className="border-t border-border px-5 py-5 sm:px-6">{children}</div>
-    </details>
-  )
-}
-
 function ChipFase({ clave, contratada }: { clave: string; contratada: boolean }) {
   return (
     <span
@@ -374,14 +351,6 @@ function iconoProblema(texto: string): LucideIcon {
   if (/ruta|parada|ubicaci/i.test(texto)) return MapPinOff
   if (/factura|papel|manual/i.test(texto)) return FileWarning
   return CircleAlert
-}
-
-/** Ícono de un área del sistema según su nombre. */
-function iconoArea(nombre: string): LucideIcon {
-  if (/inventario|almac/i.test(nombre)) return Warehouse
-  if (/tráfico|ruta|unidad|reparto/i.test(nombre)) return Truck
-  if (/venta|finanza|cobr/i.test(nombre)) return BarChart3
-  return Sparkles
 }
 
 /**
@@ -501,6 +470,13 @@ const ICONOS_FUNCION: [RegExp, LucideIcon][] = [
   [/contrato/i, FileSignature],
 ]
 
+/** Ícono de un entregable de la ficha según su nombre. */
+function iconoEntregable(nombre: string): LucideIcon {
+  if (/app|android|ios|celular|móvil/i.test(nombre)) return Smartphone
+  if (/panel|web|pwa|portal|sitio/i.test(nombre)) return MonitorSmartphone
+  return Package
+}
+
 function iconoFuncion(nombre: string): LucideIcon {
   return ICONOS_FUNCION.find(([r]) => r.test(nombre))?.[1] ?? Sparkles
 }
@@ -571,26 +547,24 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
 
 
   const roles = c.roles.filter((r) => r.nombre)
-  const hayAlcance = Boolean(
-    c.alcance.problemas.length || c.alcance.areas.length || c.alcance.valorCentral,
-  )
+  const hayAlcance = Boolean(c.alcance.problemas.length || c.alcance.valorCentral)
   const hayInversion = total > 0 || mensual.montoCentavos != null || c.inversion.terceros.length > 0
-  const hayValidacion = Boolean(c.validacion.objetivo || c.validacion.alcance.length || c.validacion.criterios.length)
-  const hayRequisitos = c.requisitos.grupos.length > 0
+  // Al cliente solo se le muestra lo que tiene tipo, una tarjeta por tipo
+  const requisitosPorTipo = TIPOS_REQUISITO.map((tipo) => ({
+    tipo,
+    items: c.requisitos.grupos.flatMap((g) => g.items.filter((r) => r.tipo === tipo)),
+  })).filter((x) => x.items.length > 0)
+  const hayRequisitos = requisitosPorTipo.length > 0
 
   const indice = [
     { id: "reto", titulo: "El reto", mostrar: hayAlcance },
     { id: "personas", titulo: "Personas", mostrar: roles.length > 0 },
     { id: "tu-sistema", titulo: "Tu sistema", mostrar: c.vistas.length > 0 || etapasIncluidas.length > 0 },
     { id: "futuras", titulo: "Features futuras", mostrar: futuras.some((f) => f.entregables.length > 0) },
-    { id: "operacion", titulo: "Un día con el sistema", mostrar: c.flujo.length > 0 },
     { id: "calendario", titulo: "Calendario", mostrar: c.calendario.length > 0 },
     { id: "inversion", titulo: "Inversión", mostrar: hayInversion },
     { id: "tu-lado", titulo: "Lo que necesitamos", mostrar: hayRequisitos },
-    { id: "riesgos", titulo: "Riesgos", mostrar: c.riesgos.length > 0 },
-    { id: "validacion", titulo: "Validación técnica", mostrar: hayValidacion },
     { id: "glosario", titulo: "Glosario", mostrar: c.glosario.length > 0 },
-    { id: "anexos", titulo: "Anexos", mostrar: c.anexos.length > 0 },
     { id: "aceptar", titulo: "Aceptar", mostrar: true },
   ].filter((x) => x.mostrar)
   const num = (id: string) => indice.findIndex((x) => x.id === id)
@@ -603,13 +577,28 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
   }
   const atajos = indice.filter((x) => x.id in ATAJOS).map((x) => ({ id: x.id, titulo: ATAJOS[x.id] }))
 
+  // Para quién es, a qué se dedica y cuánto dura el desarrollo
   const ficha = [
-    ["Cliente", p.cliente.nombre],
-    ["Contacto", c.ficha.contactoNombre],
+    ["Empresa cliente", p.cliente.nombre],
     ["Giro", c.ficha.giro],
-    ["Fecha", formatearFecha(p.fechaPropuesta)],
-    ...c.ficha.datos.map((d) => [d.etiqueta, d.valor]),
+    ["Duración del desarrollo", contratadas.map((f) => f.duracion).filter(Boolean).join(" + ")],
   ].filter(([, v]) => v)
+
+  const local = (ruta: string) => (/^\/[^/]/.test(ruta) ? ruta : null)
+  const imagen = local(c.ficha.imagen)
+  const imagenHero = local(c.ficha.imagenHero)
+  // Cifras del proyecto: se calculan de lo ya capturado, no se escriben a mano
+  const semanas = /(\d+)\s*semanas?/i.exec(contratadas.map((f) => f.duracion).join(" "))
+  const pagos = c.inversion.pagos.filter((x) => x.montoCentavos)
+  const plural = (n: number, uno: string, varios: string) => (n === 1 ? uno : varios)
+  const cifras = [
+    { n: semanas ? Number(semanas[1]) : 0, etiqueta: plural(semanas ? Number(semanas[1]) : 0, "semana de desarrollo", "semanas de desarrollo") },
+    { n: c.ficha.entregables.length, etiqueta: plural(c.ficha.entregables.length, "aplicación a la medida", "aplicaciones a la medida") },
+    { n: c.vistas.length, etiqueta: plural(c.vistas.length, "pantalla para tu operación", "pantallas para tu operación") },
+    { n: pagos.length, etiqueta: plural(pagos.length, "pago, ligado a una entrega", "pagos, ligados a entregas") },
+  ]
+    .filter((x) => x.n > 0)
+    .map((x) => ({ valor: String(x.n), etiqueta: x.etiqueta }))
 
   const mensajeWhatsApp = `Hola, revisé la propuesta ${p.folio} de ${titulo}. `
   const enlaceWhatsApp = `https://wa.me/${WHATSAPP.telefono.replace("+", "")}?text=${encodeURIComponent(mensajeWhatsApp)}`
@@ -625,27 +614,56 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
       />
 
       {/*
-        Hero tipo portada: reflector de luz, rótulo del documento, nombre del
-        sistema y una línea de apoyo. Los datos del documento van al pie.
+        Hero tipo portada: rótulo del documento, nombre del sistema y una línea
+        de apoyo; los datos del documento van al pie. Con foto, sigue al hero
+        del inicio: texto a la izquierda y la foto fundida a la derecha (arriba
+        en celular). Sin foto, todo va centrado sobre las ondas.
       */}
       <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
         {/* Resplandor base (también es el respaldo sin WebGL) */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-20 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,rgba(120,54,226,0.32),transparent_70%)]"
+          className="absolute inset-0 -z-30 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,rgba(120,54,226,0.32),transparent_70%)]"
         />
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 -z-20">
           <OndasGradiente />
         </div>
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/5 bg-gradient-to-b from-transparent to-bg-deep/80" />
+        {imagenHero && (
+          <>
+            <div className="absolute inset-x-0 top-0 -z-10 h-[58%] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[74%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)]">
+              <Image
+                src={imagenHero}
+                alt=""
+                fill
+                priority
+                sizes="(min-width: 1024px) 74vw, 100vw"
+                className="object-cover object-[78%_center] lg:object-center"
+              />
+            </div>
+            {/* Contraste para el texto: velo lateral en escritorio */}
+            <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-bg-deep/70 via-bg-deep/20 to-transparent lg:block" />
+          </>
+        )}
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/4 bg-gradient-to-b from-transparent to-bg-deep/80" />
 
         {/* pt deja libre el espacio del encabezado de vidrio (fijo) */}
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-28 text-center sm:px-6 sm:pt-32">
-          <div style={retraso(0)} className="flex flex-col items-center gap-3 motion-safe:animate-aparecer">
+        <div
+          className={
+            imagenHero
+              ? "flex w-full flex-1 flex-col justify-end px-5 pb-10 pt-28 sm:px-8 sm:pt-32 lg:justify-center lg:pl-16 xl:pl-24"
+              : "mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-28 text-center sm:px-6 sm:pt-32"
+          }
+        >
+          <div
+            style={retraso(0)}
+            className={`flex gap-3 motion-safe:animate-aparecer ${imagenHero ? "flex-wrap items-center" : "flex-col items-center"}`}
+          >
             <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70 sm:gap-4 sm:text-xs">
               <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
               Propuesta de desarrollo
-              <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
+              {!imagenHero && (
+                <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
+              )}
             </p>
             {p.aceptacion && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
@@ -654,13 +672,29 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
             )}
           </div>
 
-          <h1 className="mt-7 text-balance pb-1 font-hero text-[48px] font-semibold leading-[1.02] tracking-[-0.02em] text-white [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-7xl lg:text-8xl">
+          <h1
+            className={`mt-7 text-balance pb-1 font-hero font-semibold leading-[1.02] tracking-[-0.02em] text-white ${
+              imagenHero
+                ? "max-w-3xl text-[44px] [text-shadow:0_2px_40px_rgba(0,0,0,0.45)] sm:text-7xl lg:text-[84px]"
+                : "text-[48px] [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-7xl lg:text-8xl"
+            }`}
+          >
             <TextoDesenfocado texto={titulo} retrasoMs={200} />
           </h1>
 
+          {imagenHero && (
+            <span
+              style={retraso(600)}
+              aria-hidden="true"
+              className="mt-7 block h-px w-16 bg-gradient-to-r from-primary-light/80 to-transparent motion-safe:animate-aparecer"
+            />
+          )}
+
           <p
             style={retraso(650)}
-            className="mt-6 max-w-2xl text-balance text-base leading-relaxed text-white/65 sm:text-xl motion-safe:animate-aparecer"
+            className={`mt-6 text-base leading-relaxed motion-safe:animate-aparecer ${
+              imagenHero ? "max-w-md text-pretty text-white/75 sm:text-lg" : "max-w-2xl text-balance text-white/65 sm:text-xl"
+            }`}
           >
             Hola, <span className="font-medium text-white">{saludo}</span>.{" "}
             {c.ficha.promesa || "Esto es lo que vamos a construir juntos."}
@@ -668,7 +702,12 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
         </div>
 
         {/* Pie de portada: los datos del documento, fuera del centro */}
-        <div style={retraso(850)} className="relative mx-auto w-full max-w-5xl px-5 pb-6 motion-safe:animate-aparecer sm:px-6 sm:pb-8 lg:px-8">
+        <div
+          style={retraso(850)}
+          className={`relative w-full px-5 pb-6 motion-safe:animate-aparecer sm:px-8 sm:pb-8 ${
+            imagenHero ? "lg:px-16 xl:px-24" : "mx-auto max-w-5xl sm:px-6 lg:px-8"
+          }`}
+        >
           <div className="grid items-center gap-4 border-t border-white/10 pt-5 text-xs text-white/50 sm:grid-cols-3 sm:text-sm">
             <p className="text-center sm:text-left">
               Empresa cliente: <span className="font-medium text-white/85">{p.cliente.nombre}</span>
@@ -686,55 +725,103 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
       </section>
 
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Resumen */}
+        {/*
+          La propuesta: tarjeta oscura con la foto del sistema fundida a la
+          derecha, el beneficio como titular y las cifras del proyecto al pie.
+        */}
         <div
           id="resumen"
-          className="relative mt-12 scroll-mt-28 overflow-hidden rounded-3xl border border-border bg-surface shadow-modal sm:mt-16"
+          className="relative isolate mt-12 scroll-mt-28 overflow-hidden rounded-3xl bg-bg-dark shadow-glow ring-1 ring-inset ring-white/10 sm:mt-16"
         >
-          <div className="h-1 bg-gradient-to-r from-primary-hover via-primary to-primary-light" />
-          <div className="grid lg:grid-cols-[1.35fr_1fr]">
-            <div className="relative overflow-hidden p-6 sm:p-10">
-              <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-primary-light blur-3xl" aria-hidden="true" />
-              <p className="relative flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                <span className="h-px w-8 bg-primary" />
-                La propuesta
+          {imagen ? (
+            <div className="absolute inset-x-0 top-0 -z-10 h-64 [mask-image:linear-gradient(to_bottom,black_45%,transparent)] sm:h-80 lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[64%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_48%)]">
+              <Image
+                src={imagen}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 640px, 100vw"
+                className="object-cover object-[70%_center]"
+              />
+            </div>
+          ) : (
+            <>
+              <div aria-hidden="true" className={`${REJILLA} -z-10 [mask-image:linear-gradient(to_right,transparent_30%,black)]`} />
+              <div
+                aria-hidden="true"
+                className="absolute -right-32 -top-32 -z-10 h-96 w-96 rounded-full bg-primary/30 blur-3xl"
+              />
+            </>
+          )}
+
+          <div className={`p-6 sm:p-10 lg:max-w-[58%] lg:py-14 ${imagen ? "pt-52 sm:pt-64 lg:pt-14" : ""}`}>
+            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+              <span className="h-px w-8 bg-primary-light/60" />
+              La propuesta
+            </p>
+            <h2 className="mt-5 text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-[40px]">
+              {c.ficha.titular || c.ficha.tipoSistema || titulo}
+            </h2>
+            {c.ficha.titular && c.ficha.tipoSistema && (
+              <p className="mt-3 text-sm font-medium text-primary-light/80">{c.ficha.tipoSistema}</p>
+            )}
+            {c.ficha.objetivo && (
+              <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/65 [&_strong]:font-semibold [&_strong]:text-white">
+                <EnLinea texto={c.ficha.objetivo} />
               </p>
-              {c.ficha.tipoSistema && (
-                <p className="relative mt-5 font-display text-pretty text-xl font-semibold leading-snug tracking-tight text-text-primary sm:text-2xl">
-                  {c.ficha.tipoSistema}
-                </p>
-              )}
-              {c.ficha.objetivo && (
-                <TextoRico texto={c.ficha.objetivo} className="relative mt-4" />
-              )}
-              {c.ficha.entregables.length > 0 && (
-                <ul className="relative mt-6 space-y-3">
-                  {c.ficha.entregables.map((e) => (
-                    <li key={e.id} className="flex gap-3">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-light">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+            )}
+            {c.ficha.entregables.length > 0 && (
+              <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+                {c.ficha.entregables.map((e) => {
+                  const Icono = iconoEntregable(e.nombre)
+                  return (
+                    <li
+                      key={e.id}
+                      className="flex gap-3 rounded-2xl border border-line-dark-strong bg-white/[0.06] p-4 backdrop-blur-md"
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
+                        <Icono className="h-5 w-5 text-primary-light" aria-hidden="true" />
                       </span>
-                      <span className="text-sm leading-relaxed text-text-secondary sm:text-base">
-                        <span className="font-semibold text-text-primary">{e.nombre}</span>
-                        {e.descripcion && <> · {e.descripcion}</>}
+                      <span className="text-sm leading-snug">
+                        <span className="block font-semibold text-white">{e.nombre}</span>
+                        {e.descripcion && <span className="mt-0.5 block text-white/60">{e.descripcion}</span>}
                       </span>
                     </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <dl className="grid grid-cols-2 content-start border-t border-border bg-bg-section/70 lg:border-l lg:border-t-0">
-              {ficha.map(([etiqueta, valor]) => (
-                <div key={etiqueta} className="border-b border-border p-5 odd:border-r">
-                  <dt className="text-[11px] font-medium uppercase tracking-wider text-text-muted">{etiqueta}</dt>
-                  <dd className="mt-1 text-pretty text-sm font-semibold text-text-primary">
-                    <EnLinea texto={valor} />
+                  )
+                })}
+              </ul>
+            )}
+          </div>
+
+          {cifras.length > 0 && (
+            <dl className="grid grid-cols-2 border-t border-line-dark bg-bg-dark/60 backdrop-blur-md lg:grid-cols-4">
+              {cifras.map((x) => (
+                <div
+                  key={x.etiqueta}
+                  className="flex flex-col-reverse justify-end gap-1 border-line-dark p-5 odd:border-r sm:p-6 lg:border-r lg:last:border-r-0 max-lg:[&:nth-child(n+3)]:border-t"
+                >
+                  <dt className="text-xs leading-snug text-white/55 sm:text-sm">{x.etiqueta}</dt>
+                  <dd className="font-display text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl">
+                    {x.valor}
                   </dd>
                 </div>
               ))}
             </dl>
-          </div>
+          )}
         </div>
+
+        {/* La ficha, en discreto: el contexto del proyecto sin competir con la tarjeta */}
+        {ficha.length > 0 && (
+          <dl className="mt-8 grid gap-x-10 gap-y-5 px-2 sm:grid-cols-3 sm:px-4">
+            {ficha.map(([etiqueta, valor]) => (
+              <div key={etiqueta} className="border-t border-border pt-4">
+                <dt className="text-[11px] font-medium uppercase tracking-wider text-text-muted">{etiqueta}</dt>
+                <dd className="mt-1 text-pretty text-sm leading-relaxed text-text-secondary [&_strong]:font-semibold [&_strong]:text-text-primary">
+                  <EnLinea texto={valor} />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
 
         {/* El reto */}
         {hayAlcance && (
@@ -774,43 +861,6 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
                       )
                     })}
                   </ul>
-                </div>
-              )}
-              {c.alcance.areas.length > 0 && (
-                <div className="pt-6">
-                  <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
-                    <span className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-primary-hover" aria-hidden="true" />
-                    Tu control empieza aquí
-                  </h3>
-                  <div className="relative mt-5 grid gap-4 sm:grid-cols-3">
-                    {/* Hilo que une los pilares (solo en escritorio) */}
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-[16%] right-[16%] top-[3.25rem] hidden h-px bg-gradient-to-r from-primary/0 via-primary/35 to-primary/0 sm:block"
-                    />
-                    {c.alcance.areas.map((a, i) => {
-                      const Icono = iconoArea(a.nombre)
-                      return (
-                        <div
-                          key={a.id}
-                          className={`${TARJETA} relative flex flex-col items-center p-6 text-center transition-all hover:border-primary/30 hover:shadow-hover sm:p-7`}
-                        >
-                          <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface text-primary shadow-sm">
-                            <Icono className="h-6 w-6" aria-hidden="true" />
-                            <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-1.5 font-mono text-[10px] font-bold tabular-nums text-white">
-                              {numero(i)}
-                            </span>
-                          </span>
-                          <h4 className="mt-5 font-display text-lg font-semibold text-text-primary">{a.nombre}</h4>
-                          {a.descripcion && (
-                            <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
-                              <EnLinea texto={a.descripcion} />
-                            </p>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
                 </div>
               )}
               {c.alcance.valorCentral && <ValorCentral texto={c.alcance.valorCentral} />}
@@ -1001,44 +1051,6 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
                     </div>
                   </div>
                 ))}
-            </div>
-          </Seccion>
-        )}
-
-        {/* Flujo operativo */}
-        {c.flujo.length > 0 && (
-          <Seccion
-            id="operacion"
-            indice={num("operacion")}
-            etiqueta="La operación"
-            titulo="Un día con el sistema"
-          >
-            <div className="grid gap-5 lg:grid-cols-3">
-              {c.flujo.map((etapa, ei) => (
-                <div key={etapa.id} className={`${TARJETA} overflow-hidden`}>
-                  <div className="relative overflow-hidden bg-bg-dark px-6 py-5">
-                    <div className={REJILLA} />
-                    <span className="relative font-mono text-xs tabular-nums text-primary-light">Etapa {numero(ei)}</span>
-                    <h3 className="relative mt-1 text-lg font-bold text-white">{etapa.nombre}</h3>
-                  </div>
-                  <ol className="relative p-6">
-                    <LineaTiempo />
-                    {etapa.pasos.map((paso, i) => (
-                      <li key={paso.id} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-4 pb-5 last:pb-0">
-                        <Nodo i={i} />
-                        <div className="pt-2">
-                          <p className="text-pretty text-sm font-medium text-text-primary">
-                            <EnLinea texto={paso.texto} />
-                          </p>
-                          {paso.detalle && (
-                            <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-text-muted">{paso.detalle}</p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
             </div>
           </Seccion>
         )}
@@ -1259,160 +1271,64 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
           </Seccion>
         )}
 
-        {/* Lo que necesitamos de su lado */}
+        {/* Lo que necesitamos de su lado: una tarjeta por tipo */}
         {hayRequisitos && (
           <Seccion
             id="tu-lado"
             indice={num("tu-lado")}
             etiqueta="Tu parte"
             titulo="¡Listo, empecemos!"
-            texto={c.requisitos.intro || undefined}
+            texto="Esto es lo que necesitamos de tu lado para arrancar."
           >
-            <div className="space-y-4">
-              {c.requisitos.grupos.map((g) => (
-                <Plegable
-                  key={g.id}
-                  titulo={g.nombre}
-                  subtitulo={g.cuando}
-                  extra={
-                    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-light px-2 font-mono text-xs font-semibold text-primary">
-                      {g.items.length}
-                    </span>
-                  }
-                >
-                  {g.nota && <TextoRico texto={g.nota} className="mb-4 sm:text-sm" />}
-                  <ul className="divide-y divide-border">
-                    {g.items.map((r) => (
-                      <li key={r.id} className="grid gap-1 py-4 first:pt-0 last:pb-0 sm:grid-cols-[4rem_1fr]">
-                        <span className="font-mono text-xs font-semibold text-primary">{r.clave}</span>
-                        <div>
-                          <p className="text-sm font-semibold text-text-primary">
-                            <EnLinea texto={r.que} />
-                          </p>
-                          {r.paraQue && (
-                            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                              <EnLinea texto={r.paraQue} />
-                            </p>
-                          )}
-                          {(r.formato || r.bloquea) && (
-                            <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                              {r.formato && (
-                                <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-text-secondary ring-1 ring-inset ring-border">
-                                  {r.formato}
-                                </span>
+            <div className={`grid items-start gap-4 ${requisitosPorTipo.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+              {requisitosPorTipo.map(({ tipo, items }) => {
+                const { Icono, nota } = TIPO_REQUISITO[tipo]
+                return (
+                  <div key={tipo} className={`${TARJETA} p-6`}>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
+                        <Icono className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg font-semibold leading-tight text-text-primary">
+                          {ETIQUETA_TIPO_REQUISITO[tipo]}
+                        </h3>
+                        <p className="text-xs text-text-muted">{nota}</p>
+                      </div>
+                      <span className="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-light px-2 font-mono text-xs font-semibold text-primary">
+                        {items.length}
+                      </span>
+                    </div>
+                    <ul className="mt-5 space-y-4 border-t border-border pt-5">
+                      {items.map((r) => {
+                        // Un "✔" al inicio marca lo que el cliente ya entregó
+                        const listo = /^\s*✔/.test(r.que)
+                        return (
+                          <li key={r.id} className="flex gap-3">
+                            {listo ? (
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                            ) : (
+                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                            )}
+                            <div className={listo ? "min-w-0" : "min-w-0 pl-[5px]"}>
+                              <p className="text-pretty text-sm leading-snug text-text-primary [&_strong]:font-semibold">
+                                <EnLinea texto={r.que.replace(/^\s*✔\s*/, "")} />
+                              </p>
+                              {r.paraQue && (
+                                <p className="mt-1 text-pretty text-xs leading-relaxed text-text-muted">
+                                  <EnLinea texto={r.paraQue} />
+                                </p>
                               )}
-                              {r.bloquea && (
-                                <span className="rounded-full bg-primary-light px-2.5 py-0.5 text-primary-hover ring-1 ring-inset ring-primary/15">
-                                  Si falta, se detiene: {r.bloquea}
-                                </span>
-                              )}
+                              {listo && <p className="mt-1 text-xs font-medium text-success">Ya lo tenemos</p>}
                             </div>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </Plegable>
-              ))}
-              {c.requisitos.nuestroLado.length > 0 && (
-                <div className="relative overflow-hidden rounded-2xl bg-bg-dark p-6 shadow-glow sm:p-8">
-                  <div className={REJILLA} />
-                  <p className="relative text-xs font-semibold uppercase tracking-wider text-primary-light">
-                    Mientras tanto, de nuestro lado
-                  </p>
-                  <ol className="relative mt-4 space-y-3">
-                    {c.requisitos.nuestroLado.map((x, i) => (
-                      <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-white/80">
-                        <span className="font-mono text-xs text-primary-light">{numero(i)}</span>
-                        <span className="[&_strong]:text-white">
-                          <EnLinea texto={x.texto} />
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-          </Seccion>
-        )}
-
-        {/* Riesgos */}
-        {c.riesgos.length > 0 && (
-          <Seccion id="riesgos" indice={num("riesgos")} etiqueta="Los riesgos" titulo="Lo que puede salir mal y cómo lo evitamos">
-            <div className="grid gap-3 md:grid-cols-2">
-              {c.riesgos.map((r) => (
-                <div key={r.id} className={`${TARJETA} p-5`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-semibold leading-snug text-text-primary">
-                      <EnLinea texto={r.riesgo} />
-                    </p>
-                    {r.impacto && (
-                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset ${COLOR_IMPACTO[r.impacto]}`}>
-                        {ETIQUETA_IMPACTO[r.impacto]}
-                      </span>
-                    )}
+                          </li>
+                        )
+                      })}
+                    </ul>
                   </div>
-                  {r.mitigacion && (
-                    <p className="mt-2 flex gap-2 text-sm leading-relaxed text-text-secondary">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                      <span>
-                        <EnLinea texto={r.mitigacion} />
-                      </span>
-                    </p>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
-          </Seccion>
-        )}
-
-        {/* Validación técnica */}
-        {hayValidacion && (
-          <Seccion
-            id="validacion"
-            indice={num("validacion")}
-            etiqueta="Validación técnica"
-            titulo="Lo probamos en campo antes de construir"
-            texto={c.validacion.objetivo || undefined}
-          >
-            <div className="grid gap-4 md:grid-cols-2">
-              {c.validacion.alcance.length > 0 && (
-                <div className={`${TARJETA} p-6`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Qué se prueba</h3>
-                  <ol className="mt-4 space-y-3">
-                    {c.validacion.alcance.map((x, i) => (
-                      <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-text-secondary">
-                        <span className="font-mono text-xs font-semibold text-primary">{numero(i)}</span>
-                        <span>
-                          <EnLinea texto={x.texto} />
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-              {c.validacion.criterios.length > 0 && (
-                <div className={`${TARJETA} p-6`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Se da por buena si…</h3>
-                  <ul className="mt-4 space-y-3">
-                    {c.validacion.criterios.map((x) => (
-                      <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-text-secondary">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                        <span>
-                          <EnLinea texto={x.texto} />
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            {c.validacion.necesita && (
-              <p className="mt-4 rounded-2xl border border-primary/20 bg-primary-light/60 px-5 py-4 text-sm leading-relaxed text-text-secondary">
-                <span className="font-semibold text-primary">Necesitamos de ti: </span>
-                <EnLinea texto={c.validacion.necesita} />
-              </p>
-            )}
           </Seccion>
         )}
 
@@ -1429,24 +1345,6 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
                 </div>
               ))}
             </dl>
-          </Seccion>
-        )}
-
-        {/* Anexos */}
-        {c.anexos.length > 0 && (
-          <Seccion id="anexos" indice={num("anexos")} etiqueta="Anexos" titulo="Los detalles, por si quieres profundizar">
-            <div className="space-y-3">
-              {c.anexos.map((a) => (
-                <Plegable key={a.id} titulo={a.titulo}>
-                  {a.texto && <TextoRico texto={a.texto} className="sm:text-sm" />}
-                  {a.tabla && (
-                    <div className={a.texto ? "mt-5" : ""}>
-                      <TablaSimple tabla={a.tabla} />
-                    </div>
-                  )}
-                </Plegable>
-              ))}
-            </div>
           </Seccion>
         )}
 

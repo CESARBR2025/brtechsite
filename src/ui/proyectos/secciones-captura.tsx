@@ -5,7 +5,7 @@ import { NIVELES_IMPACTO } from "@/src/modules/proyectos/domain/contenido"
 import { Campo, ChipUnico, ListaEditable, nuevoId } from "@/src/ui/levantamientos/campos"
 import { formatearDinero } from "@/src/ui/formato"
 import { CampoDinero, CampoTabla, Casilla, Selector } from "./campos"
-import { ETIQUETA_ICONO, ETIQUETA_IMPACTO } from "./etiquetas"
+import { ETIQUETA_ICONO, ETIQUETA_IMPACTO, ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 
 export interface Generales {
   clienteNombre: string
@@ -144,6 +144,26 @@ export function CuerpoSeccion({
             valor={c.ficha.promesa}
             onChange={(v) => mezclar("ficha", { promesa: v })}
           />
+          <Campo
+            etiqueta="Titular de «La propuesta»"
+            placeholder="Control total de tu operación diaria"
+            valor={c.ficha.titular}
+            onChange={(v) => mezclar("ficha", { titular: v })}
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Campo
+              etiqueta="Foto de la portada (ruta en public/)"
+              placeholder="/propuestas/cliente-portada.webp"
+              valor={c.ficha.imagenHero}
+              onChange={(v) => mezclar("ficha", { imagenHero: v })}
+            />
+            <Campo
+              etiqueta="Foto de «La propuesta» (ruta en public/)"
+              placeholder="/propuestas/cliente.webp"
+              valor={c.ficha.imagen}
+              onChange={(v) => mezclar("ficha", { imagen: v })}
+            />
+          </div>
           <Campo
             etiqueta="Objetivo"
             filas={3}
@@ -623,6 +643,7 @@ export function CuerpoSeccion({
                     paraQue: "",
                     formato: "",
                     bloquea: "",
+                    tipo: null,
                   })}
                   agregar="Agregar requisito"
                   titulo={(r) => [r.clave, r.que.slice(0, 50)].filter(Boolean).join(" · ") || "Requisito"}
@@ -633,6 +654,12 @@ export function CuerpoSeccion({
                         <Campo etiqueta="Clave" placeholder="R-01" valor={r.clave} onChange={(v) => setR({ clave: v })} />
                         <Campo etiqueta="Qué se necesita" valor={r.que} onChange={(v) => setR({ que: v })} />
                       </div>
+                      <ChipUnico
+                        etiqueta="Tarjeta en la propuesta (sin marcar = solo en el panel)"
+                        opciones={ETIQUETA_TIPO_REQUISITO}
+                        valor={r.tipo}
+                        onChange={(v) => setR({ tipo: v })}
+                      />
                       <Campo etiqueta="Para qué" filas={2} valor={r.paraQue} onChange={(v) => setR({ paraQue: v })} />
                       <div className={REJILLA}>
                         <Campo etiqueta="Formato" valor={r.formato} onChange={(v) => setR({ formato: v })} />

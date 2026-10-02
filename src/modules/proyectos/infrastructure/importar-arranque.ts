@@ -457,6 +457,7 @@ export function importarArranque(md: string, nuevoId: () => string): ArranqueImp
           paraQue: celda(f, iPara),
           formato: celda(f, iFmt),
           bloquea: celda(f, iBlq),
+          tipo: null,
         })),
       }
     })
