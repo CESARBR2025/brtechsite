@@ -30,6 +30,10 @@ export const ICONOS_VISTA = [
 ] as const
 export type IconoVista = (typeof ICONOS_VISTA)[number]
 
+/** Dispositivo en el que se ve una maqueta: define en qué pestaña de la propuesta sale. */
+export const DISPOSITIVOS_MAQUETA = ["movil", "web"] as const
+export type DispositivoMaqueta = (typeof DISPOSITIVOS_MAQUETA)[number]
+
 /** Tipos de requisito que se muestran al cliente, cada uno en su tarjeta. */
 export const TIPOS_REQUISITO = ["hardware", "licencia", "operativa"] as const
 export type TipoRequisito = (typeof TIPOS_REQUISITO)[number]
@@ -141,6 +145,22 @@ export const esquemaContenido = z.object({
       puntos: lista(renglon, 20),
     }),
     30,
+  ),
+  /**
+   * Maquetas ilustrativas de las pantallas (imágenes en `public/`). Son una
+   * vista conceptual: el diseño final se define con el cliente.
+   */
+  maquetas: lista(
+    z.object({
+      id,
+      dispositivo: z.enum(DISPOSITIVOS_MAQUETA).default("movil"),
+      titulo: texto(),
+      /** Una línea: qué se ve en la pantalla. */
+      descripcion: texto(),
+      /** Ruta dentro de `public/` (p. ej. "/propuestas/tio-beto-app-ruta.webp"). */
+      imagen: texto(),
+    }),
+    16,
   ),
   glosario: lista(z.object({ id, termino: texto(), definicion: texto(LARGO) }), 200),
   roles: lista(
@@ -347,6 +367,8 @@ export function normalizarContenido(crudo: unknown): Contenido {
       areas: sinVacios(c.alcance.areas),
     },
     vistas: sinVacios(c.vistas).map((v) => ({ ...v, puntos: sinVacios(v.puntos) })),
+    // Sin imagen no hay maqueta que mostrar; el dispositivo por sí solo no cuenta como contenido
+    maquetas: c.maquetas.filter((m) => m.imagen),
     glosario: sinVacios(c.glosario),
     roles,
     permisos: sinVacios(
@@ -450,6 +472,7 @@ export const SECCIONES = [
   { clave: "ficha", titulo: "Ficha del proyecto", publica: true },
   { clave: "alcance", titulo: "Problema y alcance", publica: true },
   { clave: "vistas", titulo: "Lo que verás en tu sistema", publica: true },
+  { clave: "maquetas", titulo: "Cómo se vería", publica: true },
   { clave: "roles", titulo: "Roles", publica: true },
   { clave: "permisos", titulo: "Matriz de permisos", publica: false },
   { clave: "fases", titulo: "Fases", publica: true },

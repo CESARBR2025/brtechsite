@@ -1,4 +1,10 @@
-import type { ClaveSeccion, IconoVista, NivelImpacto, TipoRequisito } from "@/src/modules/proyectos/domain/contenido"
+import type {
+  ClaveSeccion,
+  DispositivoMaqueta,
+  IconoVista,
+  NivelImpacto,
+  TipoRequisito,
+} from "@/src/modules/proyectos/domain/contenido"
 
 /** Textos visibles de los catálogos del proyecto (panel y propuesta). */
 
@@ -22,6 +28,11 @@ export const ETIQUETA_ICONO: Record<IconoVista, string> = {
   reparto: "Reparto",
 }
 
+export const ETIQUETA_DISPOSITIVO: Record<DispositivoMaqueta, string> = {
+  movil: "Celular",
+  web: "Computadora",
+}
+
 export const ETIQUETA_TIPO_REQUISITO: Record<TipoRequisito, string> = {
   hardware: "Hardware",
   licencia: "Licencias",
@@ -32,6 +43,7 @@ export const ETIQUETA_TIPO_REQUISITO: Record<TipoRequisito, string> = {
 export const GUIA_SECCION: Record<ClaveSeccion, string> = {
   ficha: "Datos generales, titular y foto de la portada, objetivo y entregables.",
   vistas: "Las pantallas que tendrá el cliente, en su idioma: qué verá y qué podrá hacer en cada una. Solo lo contratado.",
+  maquetas: "Imágenes ilustrativas de las pantallas (vista conceptual): una por pantalla, con la ruta del archivo en public/. Sin imagen no se muestra.",
   alcance: "Los problemas que resuelve, las grandes áreas del sistema y dónde está el valor central.",
   roles: "Quién usa el sistema, desde qué dispositivo y de qué es responsable.",
   permisos: "Por módulo, qué puede hacer cada rol (CRUD, Lectura, ✔, –).",
