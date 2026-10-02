@@ -346,6 +346,16 @@ function partesProblema(texto: string): { titulo: string; detalle: string } {
   return { titulo: texto.replace(/\*\*/g, "").replace(/\.$/, ""), detalle: "" }
 }
 
+/**
+ * Ancho de la tarjeta `i` de `total` en una rejilla de 6 columnas que acomoda
+ * tres por fila: las de la última fila se reparten el ancho, así nunca queda un hueco.
+ */
+function anchoEnFila(i: number, total: number): string {
+  const sobran = total % 3
+  if (i < total - sobran) return "lg:col-span-2"
+  return sobran === 1 ? "lg:col-span-6" : "lg:col-span-3"
+}
+
 /** Ícono de un rol según su nombre. */
 function IconoRol({ nombre, className }: { nombre: string; className?: string }) {
   const props = { className, "aria-hidden": true } as const
@@ -767,15 +777,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
   }
   const atajos = indice.filter((x) => x.id in ATAJOS).map((x) => ({ id: x.id, titulo: ATAJOS[x.id] }))
 
-  // Para quién es, a qué se dedica y cuánto dura el desarrollo
-  const ficha = [
-    ["Empresa cliente", p.cliente.nombre],
-    ["Giro", c.ficha.giro],
-    ["Duración del desarrollo", contratadas.map((f) => f.duracion).filter(Boolean).join(" + ")],
-  ].filter(([, v]) => v)
-
   const local = (ruta: string) => (/^\/[^/]/.test(ruta) ? ruta : null)
-  const imagen = local(c.ficha.imagen)
   const imagenHero = local(c.ficha.imagenHero)
   // Cifras del proyecto: se calculan de lo ya capturado, no se escriben a mano
   const semanas = /(\d+)\s*semanas?/i.exec(contratadas.map((f) => f.duracion).join(" "))
@@ -784,7 +786,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
   const cifras = [
     { n: semanas ? Number(semanas[1]) : 0, etiqueta: plural(semanas ? Number(semanas[1]) : 0, "semana de desarrollo", "semanas de desarrollo") },
     { n: c.ficha.entregables.length, etiqueta: plural(c.ficha.entregables.length, "aplicación a la medida", "aplicaciones a la medida") },
-    { n: c.vistas.length, etiqueta: plural(c.vistas.length, "pantalla para tu operación", "pantallas para tu operación") },
+    { n: c.vistas.length, etiqueta: plural(c.vistas.length, "módulo para tu operación", "módulos para tu operación") },
     { n: pagos.length, etiqueta: plural(pagos.length, "pago, ligado a una entrega", "pagos, ligados a entregas") },
   ]
     .filter((x) => x.n > 0)
@@ -804,12 +806,12 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
       />
 
       {/*
-        Hero tipo portada: rótulo del documento, nombre del sistema y una línea
-        de apoyo; los datos del documento van al pie. Con foto, sigue al hero
-        del inicio: texto a la izquierda y la foto fundida a la derecha (arriba
-        en celular). Sin foto, todo va centrado sobre las ondas.
+        Portada: la única presentación de la propuesta. Qué es el sistema, su
+        objetivo, los entregables y las cifras del proyecto; al pie, para quién
+        es. Como el hero del inicio: texto a la izquierda y, si hay foto,
+        fundida a la derecha (arriba en celular) sobre las ondas de marca.
       */}
-      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
+      <section id="portada" className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
         {/* Resplandor base (también es el respaldo sin WebGL) */}
         <div
           aria-hidden="true"
@@ -820,41 +822,39 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
         </div>
         {imagenHero && (
           <>
-            <div className="absolute inset-x-0 top-0 -z-10 h-[58%] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[74%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)]">
+            <div className="absolute inset-x-0 top-0 -z-10 h-80 [mask-image:linear-gradient(to_bottom,black_35%,transparent)] sm:h-96 lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[70%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_45%)]">
               <Image
                 src={imagenHero}
                 alt=""
                 fill
                 priority
-                sizes="(min-width: 1024px) 74vw, 100vw"
+                sizes="(min-width: 1024px) 70vw, 100vw"
                 className="object-cover object-[78%_center] lg:object-center"
               />
             </div>
             {/* Contraste para el texto: velo lateral en escritorio */}
-            <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-bg-deep/70 via-bg-deep/20 to-transparent lg:block" />
+            <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-bg-deep/75 via-bg-deep/25 to-transparent lg:block" />
           </>
         )}
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/4 bg-gradient-to-b from-transparent to-bg-deep/80" />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-b from-transparent to-bg-deep/85" />
 
         {/* pt deja libre el espacio del encabezado de vidrio (fijo) */}
         <div
-          className={
-            imagenHero
-              ? "flex w-full flex-1 flex-col justify-end px-5 pb-10 pt-28 sm:px-8 sm:pt-32 lg:justify-center lg:pl-16 xl:pl-24"
-              : "mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-28 text-center sm:px-6 sm:pt-32"
-          }
+          className={`flex w-full flex-1 flex-col justify-end px-5 pb-10 sm:px-8 lg:justify-center lg:px-16 xl:px-24 ${
+            imagenHero ? "pt-64 sm:pt-80 lg:pt-32" : "pt-28 sm:pt-32"
+          }`}
         >
-          <div
-            style={retraso(0)}
-            className={`flex gap-3 motion-safe:animate-aparecer ${imagenHero ? "flex-wrap items-center" : "flex-col items-center"}`}
-          >
+          <div style={retraso(0)} className="flex flex-wrap items-center gap-x-4 gap-y-3 motion-safe:animate-aparecer">
             <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70 sm:gap-4 sm:text-xs">
               <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
               Propuesta de desarrollo
-              {!imagenHero && (
-                <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
-              )}
             </p>
+            {/* Con titular, el nombre del producto pasa a etiqueta */}
+            {c.ficha.titular && p.proyectoNombre && (
+              <span className="rounded-full border border-white/15 bg-white/[0.08] px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                {p.proyectoNombre}
+              </span>
+            )}
             {p.aceptacion && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Aceptada
@@ -862,48 +862,80 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
             )}
           </div>
 
-          <h1
-            className={`mt-7 text-balance pb-1 font-hero font-semibold leading-[1.02] tracking-[-0.02em] text-white ${
-              imagenHero
-                ? "max-w-3xl text-[44px] [text-shadow:0_2px_40px_rgba(0,0,0,0.45)] sm:text-7xl lg:text-[84px]"
-                : "text-[48px] [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-7xl lg:text-8xl"
-            }`}
-          >
-            <TextoDesenfocado texto={titulo} retrasoMs={200} />
+          <h1 className="mt-6 max-w-3xl text-balance pb-1 font-hero text-[40px] font-semibold leading-[1.04] tracking-[-0.02em] text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.45)] sm:text-6xl lg:text-7xl">
+            <TextoDesenfocado texto={c.ficha.titular || titulo} retrasoMs={200} />
           </h1>
 
-          {imagenHero && (
-            <span
-              style={retraso(600)}
-              aria-hidden="true"
-              className="mt-7 block h-px w-16 bg-gradient-to-r from-primary-light/80 to-transparent motion-safe:animate-aparecer"
-            />
+          {c.ficha.tipoSistema && (
+            <p
+              style={retraso(550)}
+              className="mt-4 max-w-2xl text-pretty text-sm font-medium text-primary-light/85 motion-safe:animate-aparecer sm:text-base"
+            >
+              {c.ficha.tipoSistema}
+            </p>
           )}
+
+          <span
+            style={retraso(600)}
+            aria-hidden="true"
+            className="mt-6 block h-px w-16 bg-gradient-to-r from-primary-light/80 to-transparent motion-safe:animate-aparecer"
+          />
 
           <p
             style={retraso(650)}
-            className={`mt-6 text-base leading-relaxed motion-safe:animate-aparecer ${
-              imagenHero ? "max-w-md text-pretty text-white/75 sm:text-lg" : "max-w-2xl text-balance text-white/65 sm:text-xl"
-            }`}
+            className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/70 motion-safe:animate-aparecer sm:text-lg [&_strong]:font-semibold [&_strong]:text-white"
           >
-            Hola, <span className="font-medium text-white">{saludo}</span>.{" "}
-            {c.ficha.promesa || "Esto es lo que vamos a construir juntos."}
+            {c.ficha.objetivo ? (
+              <EnLinea texto={c.ficha.objetivo} />
+            ) : (
+              <>
+                Hola, <span className="font-medium text-white">{saludo}</span>.{" "}
+                {c.ficha.promesa || "Esto es lo que vamos a construir juntos."}
+              </>
+            )}
           </p>
+
+          {c.ficha.entregables.length > 0 && (
+            <ul style={retraso(750)} className="mt-7 grid max-w-2xl gap-3 motion-safe:animate-aparecer sm:grid-cols-2">
+              {c.ficha.entregables.map((e) => (
+                <li
+                  key={e.id}
+                  className="flex gap-3 rounded-2xl border border-line-dark-strong bg-white/[0.06] p-4 backdrop-blur-md"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
+                    <IconoEntregable nombre={e.nombre} className="h-5 w-5 text-primary-light" />
+                  </span>
+                  <span className="text-sm leading-snug">
+                    <span className="block font-semibold text-white">{e.nombre}</span>
+                    {e.descripcion && <span className="mt-0.5 block text-white/60">{e.descripcion}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        {/* Pie de portada: los datos del documento, fuera del centro */}
-        <div
-          style={retraso(850)}
-          className={`relative w-full px-5 pb-6 motion-safe:animate-aparecer sm:px-8 sm:pb-8 ${
-            imagenHero ? "lg:px-16 xl:px-24" : "mx-auto max-w-5xl sm:px-6 lg:px-8"
-          }`}
-        >
-          <div className="grid items-center gap-4 border-t border-white/10 pt-5 text-xs text-white/50 sm:grid-cols-3 sm:text-sm">
-            <p className="text-center sm:text-left">
+        {/* Pie de portada: las cifras del proyecto y para quién es */}
+        <div style={retraso(850)} className="relative w-full px-5 pb-6 motion-safe:animate-aparecer sm:px-8 sm:pb-8 lg:px-16 xl:px-24">
+          {cifras.length > 0 && (
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/10 pt-6 lg:grid-cols-4">
+              {cifras.map((x) => (
+                <div key={x.etiqueta} className="flex flex-col-reverse justify-end gap-1">
+                  <dt className="text-xs leading-snug text-white/55 sm:text-sm">{x.etiqueta}</dt>
+                  <dd className="font-display text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl">
+                    {x.valor}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          <div className="mt-6 grid items-center gap-4 border-t border-white/10 pt-5 text-xs text-white/50 sm:grid-cols-[1fr_auto_1fr] sm:text-sm">
+            <p className="text-pretty text-center sm:text-left">
               Empresa cliente: <span className="font-medium text-white/85">{p.cliente.nombre}</span>
+              {c.ficha.giro && <span className="mt-0.5 block text-xs text-white/45">{c.ficha.giro}</span>}
             </p>
             <a
-              href="#resumen"
+              href={`#${indice[0].id}`}
               className="group mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/20 active:scale-[0.98]"
             >
               Ver la propuesta
@@ -915,103 +947,6 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
       </section>
 
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/*
-          La propuesta: tarjeta oscura con la foto del sistema fundida a la
-          derecha, el beneficio como titular y las cifras del proyecto al pie.
-        */}
-        <div
-          id="resumen"
-          className="relative isolate mt-12 scroll-mt-28 overflow-hidden rounded-3xl bg-bg-dark shadow-glow ring-1 ring-inset ring-white/10 sm:mt-16"
-        >
-          {imagen ? (
-            <div className="absolute inset-x-0 top-0 -z-10 h-64 [mask-image:linear-gradient(to_bottom,black_45%,transparent)] sm:h-80 lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[64%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_48%)]">
-              <Image
-                src={imagen}
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 640px, 100vw"
-                className="object-cover object-[70%_center]"
-              />
-            </div>
-          ) : (
-            <>
-              <div aria-hidden="true" className={`${REJILLA} -z-10 [mask-image:linear-gradient(to_right,transparent_30%,black)]`} />
-              <div
-                aria-hidden="true"
-                className="absolute -right-32 -top-32 -z-10 h-96 w-96 rounded-full bg-primary/30 blur-3xl"
-              />
-            </>
-          )}
-
-          <div className={`p-6 sm:p-10 lg:max-w-[58%] lg:py-14 ${imagen ? "pt-52 sm:pt-64 lg:pt-14" : ""}`}>
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
-              <span className="h-px w-8 bg-primary-light/60" />
-              La propuesta
-            </p>
-            <h2 className="mt-5 text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-[40px]">
-              {c.ficha.titular || c.ficha.tipoSistema || titulo}
-            </h2>
-            {c.ficha.titular && c.ficha.tipoSistema && (
-              <p className="mt-3 text-sm font-medium text-primary-light/80">{c.ficha.tipoSistema}</p>
-            )}
-            {c.ficha.objetivo && (
-              <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/65 [&_strong]:font-semibold [&_strong]:text-white">
-                <EnLinea texto={c.ficha.objetivo} />
-              </p>
-            )}
-            {c.ficha.entregables.length > 0 && (
-              <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-                {c.ficha.entregables.map((e) => {
-                  return (
-                    <li
-                      key={e.id}
-                      className="flex gap-3 rounded-2xl border border-line-dark-strong bg-white/[0.06] p-4 backdrop-blur-md"
-                    >
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
-                        <IconoEntregable nombre={e.nombre} className="h-5 w-5 text-primary-light" />
-                      </span>
-                      <span className="text-sm leading-snug">
-                        <span className="block font-semibold text-white">{e.nombre}</span>
-                        {e.descripcion && <span className="mt-0.5 block text-white/60">{e.descripcion}</span>}
-                      </span>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
-
-          {cifras.length > 0 && (
-            <dl className="grid grid-cols-2 border-t border-line-dark bg-bg-dark/60 backdrop-blur-md lg:grid-cols-4">
-              {cifras.map((x) => (
-                <div
-                  key={x.etiqueta}
-                  className="flex flex-col-reverse justify-end gap-1 border-line-dark p-5 odd:border-r sm:p-6 lg:border-r lg:last:border-r-0 max-lg:[&:nth-child(n+3)]:border-t"
-                >
-                  <dt className="text-xs leading-snug text-white/55 sm:text-sm">{x.etiqueta}</dt>
-                  <dd className="font-display text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl">
-                    {x.valor}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </div>
-
-        {/* La ficha, en discreto: el contexto del proyecto sin competir con la tarjeta */}
-        {ficha.length > 0 && (
-          <dl className="mt-8 grid gap-x-10 gap-y-5 px-2 sm:grid-cols-3 sm:px-4">
-            {ficha.map(([etiqueta, valor]) => (
-              <div key={etiqueta} className="border-t border-border pt-4">
-                <dt className="text-[11px] font-medium uppercase tracking-wider text-text-muted">{etiqueta}</dt>
-                <dd className="mt-1 text-pretty text-sm leading-relaxed text-text-secondary [&_strong]:font-semibold [&_strong]:text-text-primary">
-                  <EnLinea texto={valor} />
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-
         {/* El reto */}
         {hayAlcance && (
           <Seccion id="reto" indice={num("reto")} etiqueta="El reto" titulo="Qué resolvemos y hasta dónde llega">
@@ -1029,14 +964,14 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
                         : `${c.alcance.problemas.length} problemas que el sistema resuelve`}
                     </p>
                   </div>
-                  <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
                     {c.alcance.problemas.map((x, i) => {
                       const { titulo, detalle } = partesProblema(x.texto)
                       const Icono = iconoProblema(x.texto)
                       return (
                         <li
                           key={x.id}
-                          className={`${TARJETA} p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
+                          className={`${TARJETA} p-6 transition-all hover:border-primary/30 hover:shadow-hover ${anchoEnFila(i, c.alcance.problemas.length)}`}
                         >
                           <div className="flex items-center justify-between gap-3">
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark text-primary-light">
@@ -1073,10 +1008,9 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
               {roles.map((r, i) => {
                 const { actividades, nota } = actividadesRol(r.responsabilidades)
-                // Las tarjetas de la última fila se reparten el ancho: nunca queda un hueco
                 const sobran = roles.length % 3
                 const ultimaFila = i >= roles.length - sobran
-                const ancho = !ultimaFila ? "lg:col-span-2" : sobran === 1 ? "lg:col-span-6" : "lg:col-span-3"
+                const ancho = anchoEnFila(i, roles.length)
                 return (
                   <div
                     key={r.id}

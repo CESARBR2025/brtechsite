@@ -109,11 +109,9 @@ export const esquemaContenido = z.object({
     version: texto(20),
     giro: texto(),
     tipoSistema: texto(),
-    /** Titular de "La propuesta": el beneficio, en una línea. Vacío = se usa `tipoSistema`. */
+    /** Titular de la portada: el beneficio, en una línea. Vacío = se usa el nombre del producto. */
     titular: texto(),
-    /** Foto de "La propuesta": ruta dentro de `public/` (p. ej. "/propuestas/tio-beto.webp"). */
-    imagen: texto(),
-    /** Foto de la portada (hero), también dentro de `public/`. Vacío = portada centrada sin foto. */
+    /** Foto de la portada: ruta dentro de `public/` (p. ej. "/propuestas/tio-beto.webp"). */
     imagenHero: texto(),
     /** Frase del hero de la propuesta. */
     promesa: texto(),

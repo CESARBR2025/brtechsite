@@ -138,30 +138,24 @@ export function CuerpoSeccion({
             />
           </div>
           <Campo
-            etiqueta="Promesa (hero de la propuesta)"
+            etiqueta="Promesa (portada, solo si no hay objetivo)"
             filas={2}
             placeholder="Cada caja, cada parada y cada peso: bajo control."
             valor={c.ficha.promesa}
             onChange={(v) => mezclar("ficha", { promesa: v })}
           />
-          <Campo
-            etiqueta="Titular de «La propuesta»"
-            placeholder="Control total de tu operación diaria"
-            valor={c.ficha.titular}
-            onChange={(v) => mezclar("ficha", { titular: v })}
-          />
           <div className="grid gap-4 sm:grid-cols-2">
             <Campo
-              etiqueta="Foto de la portada (ruta en public/)"
-              placeholder="/propuestas/cliente-portada.webp"
-              valor={c.ficha.imagenHero}
-              onChange={(v) => mezclar("ficha", { imagenHero: v })}
+              etiqueta="Titular de la portada"
+              placeholder="Control total de tu operación diaria"
+              valor={c.ficha.titular}
+              onChange={(v) => mezclar("ficha", { titular: v })}
             />
             <Campo
-              etiqueta="Foto de «La propuesta» (ruta en public/)"
+              etiqueta="Foto de la portada (ruta en public/)"
               placeholder="/propuestas/cliente.webp"
-              valor={c.ficha.imagen}
-              onChange={(v) => mezclar("ficha", { imagen: v })}
+              valor={c.ficha.imagenHero}
+              onChange={(v) => mezclar("ficha", { imagenHero: v })}
             />
           </div>
           <Campo

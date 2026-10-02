@@ -30,7 +30,7 @@ export const ETIQUETA_TIPO_REQUISITO: Record<TipoRequisito, string> = {
 
 /** Qué capturar en cada sección (solo panel). */
 export const GUIA_SECCION: Record<ClaveSeccion, string> = {
-  ficha: "Datos generales, promesa del hero, objetivo y entregables.",
+  ficha: "Datos generales, titular y foto de la portada, objetivo y entregables.",
   vistas: "Las pantallas que tendrá el cliente, en su idioma: qué verá y qué podrá hacer en cada una. Solo lo contratado.",
   alcance: "Los problemas que resuelve, las grandes áreas del sistema y dónde está el valor central.",
   roles: "Quién usa el sistema, desde qué dispositivo y de qué es responsable.",
