@@ -1,8 +1,11 @@
 import {
   ArrowDown,
+  ClipboardList,
+  KeyRound,
   BarChart3,
   Bell,
   MapPinned,
+  MonitorSmartphone,
   Package,
   QrCode,
   Receipt,
@@ -23,6 +26,8 @@ import {
   Fuel,
   Navigation,
   ScrollText,
+  ShieldCheck,
+  UserCog,
   ShoppingCart,
   Sparkles,
   Store,
@@ -34,21 +39,24 @@ import {
   Wallet,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { createElement } from "react"
+import Image from "next/image"
 import type { PropuestaPublicaDTO } from "@/src/modules/proyectos/application/dtos"
 import {
+  TIPOS_REQUISITO,
+  totalConBonificacion,
+  type TipoRequisito,
   type IconoVista,
-  type NivelImpacto,
-  type Tabla,
 } from "@/src/modules/proyectos/domain/contenido"
-import { formatearFecha, nombreDePila } from "@/src/ui/formato"
+import { formatearFecha } from "@/src/ui/formato"
 import { BarraLectura, Revelar } from "@/src/ui/levantamientos/efectos-diagnostico"
-import { CTAFinal } from "@/src/ui/marketing/cta-final"
-import { EMPRESA, WHATSAPP } from "@/src/ui/marketing/datos-contacto"
+import { EMPRESA } from "@/src/ui/marketing/datos-contacto"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 import { AceptarPropuesta } from "./aceptar-propuesta"
+import { PestanasSistema } from "./pestanas-sistema"
+import { ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
-import { ETIQUETA_IMPACTO } from "./etiquetas"
 
 /*
  * Mismo lenguaje que el diagnóstico: hero oscuro de marca a pantalla
@@ -79,10 +87,10 @@ const ICONO_VISTA: Record<IconoVista, LucideIcon> = {
   reparto: Truck,
 }
 
-const COLOR_IMPACTO: Record<NivelImpacto, string> = {
-  alto: "bg-primary text-white ring-primary",
-  medio: "bg-primary-light text-primary ring-primary/20",
-  bajo: "bg-bg-section text-text-muted ring-border",
+const TIPO_REQUISITO: Record<TipoRequisito, { Icono: LucideIcon; nota: string }> = {
+  hardware: { Icono: Smartphone, nota: "Equipo y materiales" },
+  licencia: { Icono: KeyRound, nota: "Pagos a terceros, a tu nombre" },
+  operativa: { Icono: ClipboardList, nota: "Tareas de tu operación" },
 }
 
 function dinero(centavos: number, moneda: string): string {
@@ -111,22 +119,17 @@ function Seccion({
   return (
     <section id={id} className="scroll-mt-28 py-12 sm:py-20">
       <Revelar>
-        <div className="relative pr-20 sm:pr-40">
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-3 right-0 select-none font-bold leading-none tracking-tighter text-transparent [-webkit-text-stroke:1.5px_rgba(120,54,226,0.22)] text-[72px] sm:-top-6 sm:text-[140px]"
-          >
-            {numero(indice)}
-          </span>
-          <p className="relative flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <span className="h-px w-8 bg-primary" />
+        <div>
+          <p className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            <span className="tabular-nums">{numero(indice)}</span>
+            <span className="h-0.5 w-3 rounded-full bg-current" aria-hidden="true" />
             {etiqueta}
           </p>
-          <h2 className="relative mt-4 max-w-2xl font-display text-balance text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-[44px]">
+          <h2 className="mt-4 max-w-2xl font-display text-balance text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-[44px]">
             {titulo}
           </h2>
           {texto && (
-            <p className="relative mt-4 max-w-2xl text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">
+            <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">
               {texto}
             </p>
           )}
@@ -176,163 +179,6 @@ function EnLinea({ texto }: { texto: string }) {
   )
 }
 
-/** Celdas de una fila de tabla Markdown ("| a | b |"). */
-function celdas(linea: string): string[] {
-  return linea.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((x) => x.trim())
-}
-
-/**
- * Texto con un subconjunto de Markdown: párrafos, subtítulos ("### "),
- * viñetas ("- "), listas numeradas, casillas ("- [ ]"), citas ("> "),
- * tablas, bloques de código, **negritas** y `código`.
- */
-function TextoRico({ texto, className = "" }: { texto: string; className?: string }) {
-  const bloques: React.ReactNode[] = []
-  const lineas = texto.split("\n")
-  let lista: { tipo: "ul" | "ol"; items: string[] } | null = null
-  const cerrar = () => {
-    if (!lista) return
-    const { tipo, items } = lista
-    const Tag = tipo
-    bloques.push(
-      <Tag
-        key={bloques.length}
-        className={`space-y-1.5 pl-5 ${tipo === "ul" ? "list-disc marker:text-primary" : "list-decimal marker:font-mono marker:text-xs marker:text-primary"}`}
-      >
-        {items.map((it, i) => (
-          <li key={i} className="pl-1">
-            <EnLinea texto={it} />
-          </li>
-        ))}
-      </Tag>,
-    )
-    lista = null
-  }
-  for (let i = 0; i < lineas.length; i++) {
-    const t = lineas[i].trim()
-
-    if (t.startsWith("```")) {
-      cerrar()
-      const codigo: string[] = []
-      while (++i < lineas.length && !lineas[i].trim().startsWith("```")) codigo.push(lineas[i])
-      bloques.push(
-        <pre key={bloques.length} className="overflow-x-auto rounded-xl bg-bg-dark p-4 ring-1 ring-inset ring-white/10 font-mono text-[11px] leading-snug text-white/80 sm:text-xs">
-          {codigo.join("\n")}
-        </pre>,
-      )
-      continue
-    }
-    if (t.startsWith("|")) {
-      cerrar()
-      const filas: string[][] = []
-      for (; i < lineas.length && lineas[i].trim().startsWith("|"); i++) {
-        const f = celdas(lineas[i])
-        if (!f.every((x) => /^:?-+:?$/.test(x))) filas.push(f)
-      }
-      i--
-      const [columnas = [], ...resto] = filas
-      bloques.push(<TablaSimple key={bloques.length} tabla={{ columnas, filas: resto }} />)
-      continue
-    }
-
-    const casilla = /^[-*]\s+\[[ xX]\]\s+(.*)$/.exec(t)
-    const vineta = casilla ?? /^[-*·]\s+(.*)$/.exec(t)
-    const num = /^\d+[.)]\s+(.*)$/.exec(t)
-    if (vineta || num) {
-      const tipo = vineta ? "ul" : "ol"
-      if (lista && lista.tipo !== tipo) cerrar()
-      lista ??= { tipo, items: [] }
-      lista.items.push((vineta ?? num)![1])
-      continue
-    }
-    cerrar()
-    if (!t) continue
-    const titulo = /^#{2,6}\s+(.*)$/.exec(t)
-    if (titulo) {
-      bloques.push(
-        <h4 key={bloques.length} className="pt-2 text-sm font-bold text-text-primary">
-          <EnLinea texto={titulo[1]} />
-        </h4>,
-      )
-    } else if (t.startsWith(">")) {
-      bloques.push(
-        <blockquote key={bloques.length} className="border-l-2 border-primary pl-4 italic text-text-secondary">
-          <EnLinea texto={t.replace(/^>\s*/, "")} />
-        </blockquote>,
-      )
-    } else {
-      bloques.push(
-        <p key={bloques.length}>
-          <EnLinea texto={t} />
-        </p>,
-      )
-    }
-  }
-  cerrar()
-  return <div className={`space-y-3 text-pretty text-sm leading-relaxed text-text-secondary sm:text-base ${className}`}>{bloques}</div>
-}
-
-function TablaSimple({ tabla }: { tabla: Tabla }) {
-  return (
-    <div className="-mx-5 overflow-x-auto sm:mx-0">
-      <table className="w-full min-w-[32rem] border-collapse text-left text-sm">
-        {tabla.columnas.length > 0 && (
-          <thead>
-            <tr className="border-b border-border">
-              {tabla.columnas.map((c, i) => (
-                <th key={i} className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-text-muted sm:px-4 sm:first:pl-0">
-                  {c}
-                </th>
-              ))}
-            </tr>
-          </thead>
-        )}
-        <tbody className="divide-y divide-border">
-          {tabla.filas.map((f, i) => (
-            <tr key={i}>
-              {f.map((celda, j) => (
-                <td
-                  key={j}
-                  className={`px-5 py-3 align-top sm:px-4 sm:first:pl-0 ${j === 0 ? "font-medium text-text-primary" : "text-text-secondary"}`}
-                >
-                  <EnLinea texto={celda} />
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-/** Tarjeta plegable (fases futuras, requisitos, anexos). */
-function Plegable({
-  titulo,
-  subtitulo,
-  extra,
-  children,
-}: {
-  titulo: React.ReactNode
-  subtitulo?: React.ReactNode
-  extra?: React.ReactNode
-  children: React.ReactNode
-}) {
-  return (
-    <details className={`${TARJETA} group overflow-hidden transition-colors open:border-primary/30`}>
-      <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4 sm:px-6 [&::-webkit-details-marker]:hidden">
-        <div className="min-w-0 flex-1">
-          <div className="text-base font-semibold text-text-primary">{titulo}</div>
-          {subtitulo && <div className="mt-0.5 text-xs text-text-muted">{subtitulo}</div>}
-        </div>
-        {extra}
-        <ChevronDown className="h-5 w-5 shrink-0 text-text-muted transition-transform group-open:rotate-180" aria-hidden="true" />
-      </summary>
-      <div className="border-t border-border px-5 py-5 sm:px-6">{children}</div>
-    </details>
-  )
-}
-
 function ChipFase({ clave, contratada }: { clave: string; contratada: boolean }) {
   return (
     <span
@@ -365,6 +211,48 @@ function partesProblema(texto: string): { titulo: string; detalle: string } {
   return { titulo: texto.replace(/\*\*/g, "").replace(/\.$/, ""), detalle: "" }
 }
 
+/**
+ * Ancho de la tarjeta `i` de `total` en una rejilla de 6 columnas que acomoda
+ * tres por fila: las de la última fila se reparten el ancho, así nunca queda un hueco.
+ */
+function anchoEnFila(i: number, total: number): string {
+  const sobran = total % 3
+  if (i < total - sobran) return "lg:col-span-2"
+  return sobran === 1 ? "lg:col-span-6" : "lg:col-span-3"
+}
+
+/** Ícono de un rol según su nombre. */
+function IconoRol({ nombre, className }: { nombre: string; className?: string }) {
+  const props = { className, "aria-hidden": true } as const
+  if (/super/i.test(nombre)) return <ShieldCheck {...props} />
+  if (/admin|gerent/i.test(nombre)) return <UserCog {...props} />
+  if (/almac/i.test(nombre)) return <Warehouse {...props} />
+  if (/repart|chofer|operador|vended/i.test(nombre)) return <Truck {...props} />
+  if (/comerci|cliente/i.test(nombre)) return <Store {...props} />
+  return <User {...props} />
+}
+
+/** Ícono del dispositivo desde el que entra un rol ("App Android nativa", "Panel web (PWA)"). */
+function IconoDispositivo({ texto, className }: { texto: string; className?: string }) {
+  const props = { className, "aria-hidden": true } as const
+  return /^\W*app\b/i.test(texto) ? <Smartphone {...props} /> : <MonitorSmartphone {...props} />
+}
+
+/**
+ * Las responsabilidades de un rol como lista: la primera oración se parte por
+ * comas (fuera de paréntesis) y el resto queda como nota al pie.
+ */
+function actividadesRol(texto: string): { actividades: string[]; nota: string } {
+  const [primera = "", ...resto] = texto.trim().split(/(?<=\.)\s+/)
+  const actividades = primera
+    .replace(/\.$/, "")
+    .split(/,\s+(?![^()]*\))/)
+    .map((x) => x.trim())
+    .filter(Boolean)
+    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+  return { actividades, nota: resto.join(" ") }
+}
+
 /** Ícono de un problema según su texto. */
 function iconoProblema(texto: string): LucideIcon {
   if (/merma|pierde/i.test(texto)) return PackageX
@@ -374,115 +262,6 @@ function iconoProblema(texto: string): LucideIcon {
   if (/ruta|parada|ubicaci/i.test(texto)) return MapPinOff
   if (/factura|papel|manual/i.test(texto)) return FileWarning
   return CircleAlert
-}
-
-/** Ícono de un área del sistema según su nombre. */
-function iconoArea(nombre: string): LucideIcon {
-  if (/inventario|almac/i.test(nombre)) return Warehouse
-  if (/tráfico|ruta|unidad|reparto/i.test(nombre)) return Truck
-  if (/venta|finanza|cobr/i.test(nombre)) return BarChart3
-  return Sparkles
-}
-
-/**
- * El valor central, legible para el cliente: texto de entrada, fórmulas del
- * bloque de código como ecuaciones visuales ("A = B + C") y la conclusión
- * destacada. Si no trae fórmulas, se muestra como texto.
- */
-function ValorCentral({ texto }: { texto: string }) {
-  const lineas = texto.split("\n")
-  const ini = lineas.findIndex((l) => l.trim().startsWith("```"))
-  const fin = ini >= 0 ? lineas.findIndex((l, k) => k > ini && l.trim().startsWith("```")) : -1
-  const formulas =
-    ini >= 0 && fin > ini
-      ? lineas
-          .slice(ini + 1, fin)
-          .map((l) => /^\s*(.+?)\s*=\s*(.+)$/.exec(l))
-          .filter((m): m is RegExpExecArray => m !== null)
-          .map((m) => {
-            // "Vendido + Devuelto − Faltante" → ["Vendido", "+", "Devuelto", "−", "Faltante"]
-            const partes = m[2].split(/\s+([+−-])\s+/)
-            const piezas: { op: string | null; texto: string }[] = []
-            for (let k = 0; k < partes.length; k += 2) {
-              piezas.push({ op: k === 0 ? null : partes[k - 1], texto: partes[k].trim() })
-            }
-            return { resultado: m[1].trim(), piezas }
-          })
-      : []
-  const entrada = (ini >= 0 ? lineas.slice(0, ini) : lineas).join("\n").trim().replace(/:$/, ".")
-  const cierre = fin > ini ? lineas.slice(fin + 1).join("\n").trim() : ""
-
-  if (formulas.length === 0) {
-    return (
-      <div className={`${TARJETA} p-6 sm:p-8`}>
-        <TextoRico texto={texto} />
-      </div>
-    )
-  }
-
-  // "Σ tickets (ya con descuentos aplicados)" → texto principal + nota
-  const pieza = (t: string) => {
-    const m = /^(.*?)\s*\(([^)]+)\)$/.exec(t)
-    return m ? { principal: m[1], nota: m[2] } : { principal: t, nota: "" }
-  }
-
-  return (
-    <div className={`${TARJETA} overflow-hidden`}>
-      <div className="h-1 bg-gradient-to-r from-primary-hover via-primary to-primary-light" />
-      <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[0.9fr_1.4fr] lg:gap-10">
-        <div>
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            <span className="h-px w-8 bg-primary" />
-            El valor central
-          </p>
-          {entrada && (
-            <p className="mt-4 text-pretty font-display text-xl font-semibold leading-snug tracking-tight text-text-primary sm:text-2xl">
-              <EnLinea texto={entrada} />
-            </p>
-          )}
-        </div>
-        <ol className="space-y-3">
-          {formulas.map((f, k) => (
-            <li
-              key={k}
-              className="flex flex-wrap items-center gap-x-2.5 gap-y-2 rounded-2xl border border-border bg-bg-section/60 p-4"
-            >
-              <span className="rounded-xl bg-primary px-3 py-1.5 text-sm font-semibold text-white shadow-sm shadow-primary/20">
-                {f.resultado}
-              </span>
-              <span className="font-display text-lg font-semibold text-text-muted" aria-label="es igual a">
-                =
-              </span>
-              {f.piezas.map((x, n) => {
-                const { principal, nota } = pieza(x.texto)
-                return (
-                  <span key={n} className="flex items-center gap-2.5">
-                    {x.op && (
-                      <span className="font-display text-lg font-semibold text-primary/60" aria-hidden="true">
-                        {x.op === "-" ? "−" : x.op}
-                      </span>
-                    )}
-                    <span className="rounded-xl border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-primary">
-                      {principal}
-                      {nota && <span className="ml-1.5 text-xs font-normal text-text-muted">{nota}</span>}
-                    </span>
-                  </span>
-                )
-              })}
-            </li>
-          ))}
-        </ol>
-      </div>
-      {cierre && (
-        <div className="flex gap-3 border-t border-border bg-primary-light/40 px-6 py-5 sm:px-8">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-          <p className="text-pretty text-sm leading-relaxed text-text-secondary sm:text-base [&_strong]:text-text-primary">
-            <EnLinea texto={cierre} />
-          </p>
-        </div>
-      )}
-    </div>
-  )
 }
 
 /** Ícono de una función futura según su nombre (no hay campo propio para eso). */
@@ -501,8 +280,17 @@ const ICONOS_FUNCION: [RegExp, LucideIcon][] = [
   [/contrato/i, FileSignature],
 ]
 
-function iconoFuncion(nombre: string): LucideIcon {
-  return ICONOS_FUNCION.find(([r]) => r.test(nombre))?.[1] ?? Sparkles
+/** Ícono de un entregable o de una parte del sistema según su nombre. */
+function IconoEntregable({ nombre, className }: { nombre: string; className?: string }) {
+  const props = { className, "aria-hidden": true } as const
+  if (/^app\b|android|ios|celular|móvil/i.test(nombre)) return <Smartphone {...props} />
+  if (/panel|web|pwa|portal|sitio/i.test(nombre)) return <MonitorSmartphone {...props} />
+  return <Package {...props} />
+}
+
+function IconoFuncion({ nombre, className }: { nombre: string; className?: string }) {
+  const Icono = ICONOS_FUNCION.find(([r]) => r.test(nombre))?.[1] ?? Sparkles
+  return createElement(Icono, { className, "aria-hidden": true })
 }
 
 /**
@@ -534,6 +322,15 @@ function partesIncluye(texto: string): string[] {
   return limpias.map((x) => x.charAt(0).toUpperCase() + x.slice(1))
 }
 
+/** Cuántas semanas abarca un hito: "3-5" → 3, "7" → 1; "0" o texto libre → 0. */
+function duracionSemanas(semanas: string): number {
+  const m = /^\s*(\d+)(?:\s*[-–]\s*(\d+))?\s*$/.exec(semanas)
+  if (!m) return 0
+  const ini = Number(m[1])
+  const fin = m[2] ? Number(m[2]) : ini
+  return ini === 0 && fin === 0 ? 0 : Math.max(0, fin - Math.max(ini, 1) + 1)
+}
+
 function Nodo({ i }: { i: number }) {
   return (
     <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface font-mono text-xs font-semibold tabular-nums text-primary shadow-sm transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-white">
@@ -552,14 +349,163 @@ function LineaTiempo() {
 }
 
 /** Página completa de la propuesta del proyecto. */
-export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
+/**
+ * Los módulos de una parte del sistema (el sistema web, la app…): dónde se
+ * usa y, por módulo, qué verá el cliente y qué podrá hacer.
+ */
+function ModulosGrupo({ grupo, vistas }: { grupo: string; vistas: C["vistas"] }) {
+  const [titulo, donde] = grupo.split(/\s+·\s+/)
+  return (
+    <div>
+      {titulo && (
+        <div className="flex items-center gap-4 rounded-2xl bg-bg-dark p-5 shadow-card sm:p-6">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
+            <IconoEntregable nombre={titulo} className="h-6 w-6 text-primary-light" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-display text-xl font-bold tracking-tight text-white sm:text-2xl">{titulo}</h3>
+            {donde && <p className="mt-0.5 text-pretty text-sm text-white/60 first-letter:uppercase">{donde}</p>}
+          </div>
+          <p className="ml-auto hidden shrink-0 text-right sm:block">
+            <span className="block font-display text-3xl font-bold leading-none text-white tabular-nums">
+              {vistas.length}
+            </span>
+            <span className="text-xs text-white/55">{vistas.length === 1 ? "módulo" : "módulos"}</span>
+          </p>
+        </div>
+      )}
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {vistas.map((v, i) => {
+          const IconoVista = ICONO_VISTA[v.icono ?? "celular"]
+          return (
+            <div
+              key={v.id}
+              className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
+                  <IconoVista className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span className="font-mono text-xs font-semibold tabular-nums text-text-muted">
+                  Módulo {numero(i)}
+                </span>
+              </div>
+              <h4 className="mt-4 text-lg font-semibold leading-snug text-text-primary">{v.nombre}</h4>
+              {v.descripcion && (
+                <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
+                  <EnLinea texto={v.descripcion} />
+                </p>
+              )}
+              {v.puntos.length > 0 && (
+                <div className="mt-4 border-t border-border pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                    Qué podrás hacer
+                  </p>
+                  <ul className="mt-3 space-y-2.5">
+                    {v.puntos.map((x) => (
+                      <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                        <span>
+                          <EnLinea texto={x.texto} />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/** "F2" → "Fase 2"; cualquier otra clave se deja como está. */
+function nombreFase(clave: string): string {
+  const m = /^F\s*(\d+)$/i.exec(clave.trim())
+  return m ? `Fase ${m[1]}` : clave
+}
+
+/**
+ * Una fase futura: de qué trata y, por función, qué le resuelve al negocio y
+ * qué incluye.
+ */
+function FuncionesFase({ fase }: { fase: C["fases"][number] }) {
+  return (
+    <div>
+      <div className="flex items-center gap-4 rounded-2xl bg-bg-dark p-5 shadow-card sm:p-6">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/25 ring-1 ring-inset ring-primary-light/20">
+          <Sparkles className="h-6 w-6 text-primary-light" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+            {nombreFase(fase.clave)}
+          </p>
+          <h3 className="font-display text-xl font-bold tracking-tight text-white sm:text-2xl">{fase.nombre}</h3>
+          {fase.lema && <p className="mt-0.5 text-pretty text-sm text-white/60">{fase.lema}</p>}
+        </div>
+        <p className="ml-auto hidden shrink-0 text-right sm:block">
+          <span className="block font-display text-3xl font-bold leading-none text-white tabular-nums">
+            {fase.entregables.length}
+          </span>
+          <span className="text-xs text-white/55">{fase.entregables.length === 1 ? "función" : "funciones"}</span>
+        </p>
+      </div>
+      <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {fase.entregables.map((e) => {
+          const nombre = nombreFuncion(e.nombre)
+          const opcional = /opcional/i.test(e.nombre)
+          return (
+            <div
+              key={e.id}
+              className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
+                  <IconoFuncion nombre={nombre} className="h-5 w-5" />
+                </span>
+                {opcional && (
+                  <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-inset ring-border">
+                    Opcional
+                  </span>
+                )}
+              </div>
+              <h4 className="mt-4 text-lg font-semibold leading-snug text-text-primary">{nombre}</h4>
+              {e.resuelve && (
+                <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
+                  <EnLinea texto={e.resuelve} />
+                </p>
+              )}
+              {e.incluye && (
+                <div className="mt-4 border-t border-border pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Qué incluye</p>
+                  <ul className="mt-3 space-y-2.5">
+                    {partesIncluye(e.incluye).map((x) => (
+                      <li key={x} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary/50" aria-hidden="true" />
+                        <span>
+                          <EnLinea texto={x} />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; puedeFirmar?: boolean }) {
   const c: C = p.contenido
   const moneda = c.inversion.moneda || "MXN"
-  const titulo = p.proyectoNombre ?? "Tu proyecto"
-  const saludo = c.ficha.contactoNombre ? nombreDePila(c.ficha.contactoNombre) : p.cliente.nombre
 
   const contratadas = c.fases.filter((f) => f.contratada)
-  const futuras = c.fases.filter((f) => !f.contratada)
+  const fasesFuturas = c.fases.filter((f) => !f.contratada && f.entregables.length > 0)
   // Pantallas agrupadas por dónde se usan, en el orden en que se capturaron
   const gruposVistas = [...c.vistas.reduce((m, v) => m.set(v.grupo, [...(m.get(v.grupo) ?? []), v]), new Map<string, C["vistas"]>())]
   const etapasIncluidas = contratadas.flatMap((f) =>
@@ -567,30 +513,42 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
   )
   const pago = new Map(c.inversion.pagos.map((x) => [x.id, x]))
   const total = p.totalCentavos
+  // Bonificación: lo que baja el último pago si el cliente da algo a cambio
+  const bonificacion = c.inversion.bonificacion
+  const totalBonificado = totalConBonificacion(c)
+  const conBonificacion = `con ${(bonificacion.nombre || "bonificación").toLowerCase()}`
+  // Tramos de la barra del calendario: solo las etapas con semanas numéricas ("3-5")
+  const tramos = c.calendario
+    .map((h) => ({
+      id: h.id,
+      semanas: h.semanas.replace(/\s+/g, ""),
+      titulo: h.titulo,
+      dura: duracionSemanas(h.semanas),
+      conPago: Boolean(h.pagoId && pago.get(h.pagoId)?.montoCentavos),
+    }))
+    .filter((t) => t.dura > 0)
+  const semanasTotales = tramos.reduce((n, t) => n + t.dura, 0)
   const mensual = c.inversion.mensualidad
 
 
   const roles = c.roles.filter((r) => r.nombre)
-  const hayAlcance = Boolean(
-    c.alcance.problemas.length || c.alcance.areas.length || c.alcance.valorCentral,
-  )
+  const hayAlcance = c.alcance.problemas.length > 0
   const hayInversion = total > 0 || mensual.montoCentavos != null || c.inversion.terceros.length > 0
-  const hayValidacion = Boolean(c.validacion.objetivo || c.validacion.alcance.length || c.validacion.criterios.length)
-  const hayRequisitos = c.requisitos.grupos.length > 0
+  // Al cliente solo se le muestra lo que tiene tipo, una tarjeta por tipo
+  const requisitosPorTipo = TIPOS_REQUISITO.map((tipo) => ({
+    tipo,
+    items: c.requisitos.grupos.flatMap((g) => g.items.filter((r) => r.tipo === tipo)),
+  })).filter((x) => x.items.length > 0)
+  const hayRequisitos = requisitosPorTipo.length > 0
 
   const indice = [
     { id: "reto", titulo: "El reto", mostrar: hayAlcance },
     { id: "personas", titulo: "Personas", mostrar: roles.length > 0 },
     { id: "tu-sistema", titulo: "Tu sistema", mostrar: c.vistas.length > 0 || etapasIncluidas.length > 0 },
-    { id: "futuras", titulo: "Features futuras", mostrar: futuras.some((f) => f.entregables.length > 0) },
-    { id: "operacion", titulo: "Un día con el sistema", mostrar: c.flujo.length > 0 },
     { id: "calendario", titulo: "Calendario", mostrar: c.calendario.length > 0 },
     { id: "inversion", titulo: "Inversión", mostrar: hayInversion },
     { id: "tu-lado", titulo: "Lo que necesitamos", mostrar: hayRequisitos },
-    { id: "riesgos", titulo: "Riesgos", mostrar: c.riesgos.length > 0 },
-    { id: "validacion", titulo: "Validación técnica", mostrar: hayValidacion },
-    { id: "glosario", titulo: "Glosario", mostrar: c.glosario.length > 0 },
-    { id: "anexos", titulo: "Anexos", mostrar: c.anexos.length > 0 },
+    { id: "futuras", titulo: "Lo que sigue", mostrar: fasesFuturas.length > 0 },
     { id: "aceptar", titulo: "Aceptar", mostrar: true },
   ].filter((x) => x.mostrar)
   const num = (id: string) => indice.findIndex((x) => x.id === id)
@@ -603,16 +561,9 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
   }
   const atajos = indice.filter((x) => x.id in ATAJOS).map((x) => ({ id: x.id, titulo: ATAJOS[x.id] }))
 
-  const ficha = [
-    ["Cliente", p.cliente.nombre],
-    ["Contacto", c.ficha.contactoNombre],
-    ["Giro", c.ficha.giro],
-    ["Fecha", formatearFecha(p.fechaPropuesta)],
-    ...c.ficha.datos.map((d) => [d.etiqueta, d.valor]),
-  ].filter(([, v]) => v)
-
-  const mensajeWhatsApp = `Hola, revisé la propuesta ${p.folio} de ${titulo}. `
-  const enlaceWhatsApp = `https://wa.me/${WHATSAPP.telefono.replace("+", "")}?text=${encodeURIComponent(mensajeWhatsApp)}`
+  const local = (ruta: string) => (/^\/[^/]/.test(ruta) ? ruta : null)
+  const imagenHero = local(c.ficha.imagenHero)
+  const pagos = c.inversion.pagos.filter((x) => x.montoCentavos)
 
   return (
     <main className="min-h-screen bg-bg-section">
@@ -625,127 +576,140 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
       />
 
       {/*
-        Hero tipo portada: reflector de luz, rótulo del documento, nombre del
-        sistema y una línea de apoyo. Los datos del documento van al pie.
+        Portada, como la de un documento: qué es (propuesta de desarrollo) y de
+        qué producto, su promesa en una línea y, al pie, la ficha: para quién,
+        de quién, folio y fecha. Texto a la izquierda y, si hay foto, fundida a
+        la derecha (arriba en celular) sobre las ondas de marca.
       */}
-      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
+      <section id="portada" className="relative isolate flex min-h-svh flex-col overflow-hidden bg-bg-deep">
         {/* Resplandor base (también es el respaldo sin WebGL) */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-20 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,rgba(120,54,226,0.32),transparent_70%)]"
+          className="absolute inset-0 -z-30 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,rgba(120,54,226,0.32),transparent_70%)]"
         />
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 -z-20">
           <OndasGradiente />
         </div>
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-1/5 bg-gradient-to-b from-transparent to-bg-deep/80" />
+        {imagenHero && (
+          <>
+            <div className="absolute inset-x-0 top-0 -z-10 h-80 [mask-image:linear-gradient(to_bottom,black_35%,transparent)] sm:h-96 lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[70%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_45%)]">
+              <Image
+                src={imagenHero}
+                alt=""
+                fill
+                priority
+                sizes="(min-width: 1024px) 70vw, 100vw"
+                className="object-cover object-[78%_center] lg:object-center"
+              />
+            </div>
+            {/* Contraste para el texto: velo lateral en escritorio */}
+            <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-bg-deep/75 via-bg-deep/25 to-transparent lg:block" />
+          </>
+        )}
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-2/5 bg-gradient-to-b from-transparent to-bg-deep/85" />
 
         {/* pt deja libre el espacio del encabezado de vidrio (fijo) */}
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-28 text-center sm:px-6 sm:pt-32">
-          <div style={retraso(0)} className="flex flex-col items-center gap-3 motion-safe:animate-aparecer">
-            <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70 sm:gap-4 sm:text-xs">
-              <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
-              Propuesta de desarrollo
-              <span className="h-px w-8 bg-gradient-to-l from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
+        <div
+          className={`flex w-full flex-1 flex-col justify-end px-5 pb-10 sm:px-8 lg:justify-center lg:px-16 xl:px-24 ${
+            imagenHero ? "pt-64 sm:pt-80 lg:pt-32" : "pt-28 sm:pt-32"
+          }`}
+        >
+          {p.aceptacion && (
+            <p
+              style={retraso(0)}
+              className="mb-6 inline-flex items-center gap-1.5 self-start rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success motion-safe:animate-aparecer"
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Aceptada
             </p>
-            {p.aceptacion && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
-                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> Aceptada
+          )}
+
+          {/* El título es el del documento: qué es y, en grande, el nombre del producto */}
+          <h1 className="max-w-4xl text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.45)]">
+            <span
+              style={retraso(0)}
+              className={
+                p.proyectoNombre
+                  ? "flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.32em] text-white/70 motion-safe:animate-aparecer sm:gap-4 sm:text-sm"
+                  : "block text-balance pb-1 font-hero text-[40px] font-semibold leading-[1.04] tracking-[-0.02em] sm:text-6xl lg:text-7xl"
+              }
+            >
+              {p.proyectoNombre && (
+                <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
+              )}
+              Propuesta de desarrollo
+            </span>
+            {p.proyectoNombre && (
+              <span className="mt-5 block text-balance pb-1 font-hero text-[44px] font-semibold leading-[1.04] tracking-[-0.02em] sm:text-7xl lg:text-[88px]">
+                <TextoDesenfocado texto={p.proyectoNombre} retrasoMs={200} />
               </span>
             )}
-          </div>
-
-          <h1 className="mt-7 text-balance pb-1 font-hero text-[48px] font-semibold leading-[1.02] tracking-[-0.02em] text-white [text-shadow:0_0_60px_rgba(120,54,226,0.35)] sm:text-7xl lg:text-8xl">
-            <TextoDesenfocado texto={titulo} retrasoMs={200} />
           </h1>
 
-          <p
-            style={retraso(650)}
-            className="mt-6 max-w-2xl text-balance text-base leading-relaxed text-white/65 sm:text-xl motion-safe:animate-aparecer"
+          {c.ficha.titular && (
+            <p
+              style={retraso(500)}
+              className="mt-5 max-w-2xl text-pretty font-display text-xl font-medium leading-snug text-white/90 motion-safe:animate-aparecer sm:text-2xl"
+            >
+              {c.ficha.titular}
+            </p>
+          )}
+
+          {c.ficha.tipoSistema && (
+            <p
+              style={retraso(580)}
+              className="mt-2 max-w-2xl text-pretty text-sm text-white/55 motion-safe:animate-aparecer sm:text-base"
+            >
+              {c.ficha.tipoSistema}
+            </p>
+          )}
+
+          <a
+            style={retraso(700)}
+            href={`#${indice[0].id}`}
+            className="group mt-9 inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/20 active:scale-[0.98] motion-safe:animate-aparecer sm:mt-10"
           >
-            Hola, <span className="font-medium text-white">{saludo}</span>.{" "}
-            {c.ficha.promesa || "Esto es lo que vamos a construir juntos."}
-          </p>
+            Ver la propuesta
+            <ArrowDown className="h-4 w-4 text-primary-light transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+          </a>
         </div>
 
-        {/* Pie de portada: los datos del documento, fuera del centro */}
-        <div style={retraso(850)} className="relative mx-auto w-full max-w-5xl px-5 pb-6 motion-safe:animate-aparecer sm:px-6 sm:pb-8 lg:px-8">
-          <div className="grid items-center gap-4 border-t border-white/10 pt-5 text-xs text-white/50 sm:grid-cols-3 sm:text-sm">
-            <p className="text-center sm:text-left">
-              Empresa cliente: <span className="font-medium text-white/85">{p.cliente.nombre}</span>
-            </p>
-            <a
-              href="#resumen"
-              className="group mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-primary/60 hover:bg-primary/20 active:scale-[0.98]"
-            >
-              Ver la propuesta
-              <ArrowDown className="h-4 w-4 text-primary-light transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
-            </a>
-            <p className="text-center tabular-nums sm:text-right">{formatearFecha(p.fechaPropuesta)}</p>
-          </div>
-        </div>
+        {/* Pie de portada: la ficha del documento */}
+        <dl
+          style={retraso(850)}
+          className="relative grid w-full grid-cols-2 gap-x-6 gap-y-6 border-t border-white/10 px-5 py-6 motion-safe:animate-aparecer sm:px-8 sm:py-8 lg:grid-cols-[1.4fr_1.4fr_1fr_1fr] lg:px-16 xl:px-24"
+        >
+          {[
+            {
+              rotulo: "Preparada para",
+              valor: c.ficha.contactoNombre || p.cliente.nombre,
+              nota: c.ficha.contactoNombre ? p.cliente.nombre : "",
+            },
+            { rotulo: "Preparada por", valor: EMPRESA.fundador, nota: EMPRESA.nombre },
+            { rotulo: "Folio", valor: p.folio, nota: "" },
+            { rotulo: "Fecha", valor: formatearFecha(p.fechaPropuesta), nota: "" },
+          ].map((x) => (
+            <div key={x.rotulo}>
+              <dt className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">{x.rotulo}</dt>
+              <dd className="mt-2 text-sm font-medium text-white tabular-nums sm:text-base">
+                {x.valor}
+                {x.nota && <span className="mt-0.5 block text-xs font-normal text-white/55 sm:text-sm">{x.nota}</span>}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Resumen */}
-        <div
-          id="resumen"
-          className="relative mt-12 scroll-mt-28 overflow-hidden rounded-3xl border border-border bg-surface shadow-modal sm:mt-16"
-        >
-          <div className="h-1 bg-gradient-to-r from-primary-hover via-primary to-primary-light" />
-          <div className="grid lg:grid-cols-[1.35fr_1fr]">
-            <div className="relative overflow-hidden p-6 sm:p-10">
-              <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-primary-light blur-3xl" aria-hidden="true" />
-              <p className="relative flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                <span className="h-px w-8 bg-primary" />
-                La propuesta
-              </p>
-              {c.ficha.tipoSistema && (
-                <p className="relative mt-5 font-display text-pretty text-xl font-semibold leading-snug tracking-tight text-text-primary sm:text-2xl">
-                  {c.ficha.tipoSistema}
-                </p>
-              )}
-              {c.ficha.objetivo && (
-                <TextoRico texto={c.ficha.objetivo} className="relative mt-4" />
-              )}
-              {c.ficha.entregables.length > 0 && (
-                <ul className="relative mt-6 space-y-3">
-                  {c.ficha.entregables.map((e) => (
-                    <li key={e.id} className="flex gap-3">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-light">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                      </span>
-                      <span className="text-sm leading-relaxed text-text-secondary sm:text-base">
-                        <span className="font-semibold text-text-primary">{e.nombre}</span>
-                        {e.descripcion && <> · {e.descripcion}</>}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <dl className="grid grid-cols-2 content-start border-t border-border bg-bg-section/70 lg:border-l lg:border-t-0">
-              {ficha.map(([etiqueta, valor]) => (
-                <div key={etiqueta} className="border-b border-border p-5 odd:border-r">
-                  <dt className="text-[11px] font-medium uppercase tracking-wider text-text-muted">{etiqueta}</dt>
-                  <dd className="mt-1 text-pretty text-sm font-semibold text-text-primary">
-                    <EnLinea texto={valor} />
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-
         {/* El reto */}
         {hayAlcance && (
           <Seccion id="reto" indice={num("reto")} etiqueta="El reto" titulo="Qué resolvemos y hasta dónde llega">
-            <div className="space-y-4">
+            <div className="space-y-8">
               {c.alcance.problemas.length > 0 && (
                 <div>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                     <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
                       <span className="h-6 w-1 rounded-full bg-text-primary/25" aria-hidden="true" />
-                      Lo que hoy duele
+                      La situación actual
                     </h3>
                     <p className="text-sm text-text-muted">
                       {c.alcance.problemas.length === 1
@@ -753,102 +717,101 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
                         : `${c.alcance.problemas.length} problemas que el sistema resuelve`}
                     </p>
                   </div>
-                  <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {c.alcance.problemas.map((x) => {
+                  <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+                    {c.alcance.problemas.map((x, i) => {
                       const { titulo, detalle } = partesProblema(x.texto)
                       const Icono = iconoProblema(x.texto)
                       return (
-                        <li key={x.id} className={`${TARJETA} flex gap-4 p-5`}>
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-bg-section text-text-secondary">
-                            <Icono className="h-5 w-5" aria-hidden="true" />
-                          </span>
-                          <div className="min-w-0">
-                            <p className="font-display text-base font-semibold leading-snug text-text-primary">{titulo}</p>
-                            {detalle && (
-                              <p className="mt-1 text-pretty text-sm leading-relaxed text-text-secondary">
-                                <EnLinea texto={detalle} />
-                              </p>
-                            )}
+                        <li
+                          key={x.id}
+                          className={`${TARJETA} p-6 transition-all hover:border-primary/30 hover:shadow-hover ${anchoEnFila(i, c.alcance.problemas.length)}`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark text-primary-light">
+                              <Icono className="h-5 w-5" aria-hidden="true" />
+                            </span>
+                            <span className="font-mono text-xs font-semibold tabular-nums text-text-muted">{numero(i)}</span>
                           </div>
+                          <p className="mt-4 font-display text-lg font-semibold leading-snug text-text-primary">{titulo}</p>
+                          {detalle && (
+                            <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
+                              <EnLinea texto={detalle} />
+                            </p>
+                          )}
                         </li>
                       )
                     })}
                   </ul>
                 </div>
               )}
-              {c.alcance.areas.length > 0 && (
-                <div className="pt-6">
-                  <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
-                    <span className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-primary-hover" aria-hidden="true" />
-                    Tu control empieza aquí
-                  </h3>
-                  <div className="relative mt-5 grid gap-4 sm:grid-cols-3">
-                    {/* Hilo que une los pilares (solo en escritorio) */}
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-[16%] right-[16%] top-[3.25rem] hidden h-px bg-gradient-to-r from-primary/0 via-primary/35 to-primary/0 sm:block"
-                    />
-                    {c.alcance.areas.map((a, i) => {
-                      const Icono = iconoArea(a.nombre)
-                      return (
-                        <div
-                          key={a.id}
-                          className={`${TARJETA} relative flex flex-col items-center p-6 text-center transition-all hover:border-primary/30 hover:shadow-hover sm:p-7`}
-                        >
-                          <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface text-primary shadow-sm">
-                            <Icono className="h-6 w-6" aria-hidden="true" />
-                            <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-1.5 font-mono text-[10px] font-bold tabular-nums text-white">
-                              {numero(i)}
-                            </span>
-                          </span>
-                          <h4 className="mt-5 font-display text-lg font-semibold text-text-primary">{a.nombre}</h4>
-                          {a.descripcion && (
-                            <p className="mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
-                              <EnLinea texto={a.descripcion} />
-                            </p>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-              {c.alcance.valorCentral && <ValorCentral texto={c.alcance.valorCentral} />}
             </div>
           </Seccion>
         )}
 
-        {/* Personas */}
+        {/* Personas: cada rol con su dispositivo y sus actividades */}
         {roles.length > 0 && (
           <Seccion
             id="personas"
             indice={num("personas")}
             etiqueta="Las personas"
             titulo="Quién usa el sistema"
+            texto={`${roles.length === 1 ? "Un rol" : `${roles.length} roles`}, cada uno con su acceso y sus actividades.`}
           >
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {roles.map((r) => (
-                <div key={r.id} className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover`}>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
-                    <User className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-text-primary">{r.nombre}</h3>
-                  {r.quien && <p className="text-sm text-text-muted">{r.quien}</p>}
-                  {r.responsabilidades && (
-                    <p className="mt-2 text-pretty text-sm leading-relaxed text-text-secondary">
-                      <EnLinea texto={r.responsabilidades} />
-                    </p>
-                  )}
-                  {r.dispositivo && (
-                    <div className="mt-auto pt-4">
-                      <p className="border-t border-border pt-3 text-xs font-medium text-text-primary">
-                        <span className="text-text-muted">Desde · </span>
-                        <EnLinea texto={r.dispositivo} />
-                      </p>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+              {roles.map((r, i) => {
+                const { actividades, nota } = actividadesRol(r.responsabilidades)
+                const sobran = roles.length % 3
+                const ultimaFila = i >= roles.length - sobran
+                const ancho = anchoEnFila(i, roles.length)
+                return (
+                  <div
+                    key={r.id}
+                    className={`${TARJETA} flex flex-col p-6 transition-all hover:border-primary/30 hover:shadow-hover ${ancho}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-dark text-primary-light">
+                        <IconoRol nombre={r.nombre} className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg font-semibold leading-snug text-text-primary">{r.nombre}</h3>
+                        {r.quien && <p className="text-sm text-text-muted">{r.quien}</p>}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {r.dispositivo && (
+                      <p className="mt-4 inline-flex items-start gap-2 self-start rounded-xl bg-primary-light/60 px-3 py-1.5 text-xs font-medium leading-snug text-primary-hover ring-1 ring-inset ring-primary/15">
+                        <IconoDispositivo texto={r.dispositivo} className="mt-px h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          <EnLinea texto={r.dispositivo.replace(/\*\*/g, "")} />
+                        </span>
+                      </p>
+                    )}
+                    {actividades.length > 0 && (
+                      <div className="mt-5 border-t border-border pt-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                          Sus actividades
+                        </p>
+                        <ul
+                          className={`mt-3 grid gap-x-6 gap-y-2.5 ${ultimaFila && sobran > 0 ? "sm:grid-cols-2" : ""}`}
+                        >
+                          {actividades.map((x) => (
+                            <li key={x} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                              <span className="text-pretty">
+                                <EnLinea texto={x} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {nota && (
+                      <p className="mt-4 text-pretty text-xs leading-relaxed text-text-muted [&_strong]:font-semibold [&_strong]:text-text-secondary">
+                        <EnLinea texto={nota} />
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </Seccion>
         )}
@@ -859,7 +822,7 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
             id="tu-sistema"
             indice={num("tu-sistema")}
             etiqueta="Tu sistema"
-            titulo="Lo que vas a ver en tu sistema"
+            titulo="Lo que contendrá tu sistema"
             texto={
               contratadas[0]
                 ? `Esto es lo que tendrás funcionando al terminar ${contratadas[0].clave === "MVP" ? "la primera etapa" : contratadas[0].nombre.toLowerCase()}${contratadas[0].duracion ? `, en ${contratadas[0].duracion}` : ""}.`
@@ -867,57 +830,24 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
             }
           >
             {c.vistas.length > 0 ? (
-              <div className="space-y-12">
-                {gruposVistas.map(([grupo, vistas]) => {
-                  const [tituloGrupo, subtitulo] = grupo.split(/\s+·\s+/)
-                  return (
-                    <div key={grupo || "sin-grupo"}>
-                      {tituloGrupo && (
-                        <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                          <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
-                            <span className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-primary-hover" aria-hidden="true" />
-                            {tituloGrupo}
-                          </h3>
-                          {subtitulo && <p className="text-sm text-text-muted">{subtitulo}</p>}
-                        </div>
-                      )}
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {vistas.map((v) => {
-                          const Icono = ICONO_VISTA[v.icono ?? "celular"]
-                          return (
-                            <div
-                              key={v.id}
-                              className={`${TARJETA} group relative flex flex-col overflow-hidden p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
-                            >
-                                                            <span className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
-                                <Icono className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                              <h4 className="relative mt-4 text-lg font-semibold leading-snug text-text-primary">{v.nombre}</h4>
-                              {v.descripcion && (
-                                <p className="relative mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
-                                  <EnLinea texto={v.descripcion} />
-                                </p>
-                              )}
-                              {v.puntos.length > 0 && (
-                                <ul className="relative mt-4 space-y-2.5 border-t border-border pt-4">
-                                  {v.puntos.map((x) => (
-                                    <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
-                                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
-                                      <span>
-                                        <EnLinea texto={x.texto} />
-                                      </span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              gruposVistas.length > 1 ? (
+                <PestanasSistema
+                  nombre="Partes del sistema"
+                  prefijo="sistema"
+                  pestanas={gruposVistas.map(([grupo, vistas], i) => {
+                    const titulo = grupo.split(/\s+·\s+/)[0] || "Sistema"
+                    return {
+                      id: String(i),
+                      titulo,
+                      cuenta: vistas.length,
+                      icono: <IconoEntregable nombre={titulo} className="h-4 w-4" />,
+                      panel: <ModulosGrupo grupo={grupo} vistas={vistas} />,
+                    }
+                  })}
+                />
+              ) : (
+                <ModulosGrupo grupo={gruposVistas[0][0]} vistas={gruposVistas[0][1]} />
+              )
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {etapasIncluidas.map((e, i) => (
@@ -935,156 +865,120 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
           </Seccion>
         )}
 
-        {/* Features futuras: las funciones ya mapeadas de cada fase siguiente */}
-        {futuras.some((f) => f.entregables.length > 0) && (
-          <Seccion
-            id="futuras"
-            indice={num("futuras")}
-            etiqueta="Features futuras"
-            titulo="Lo que puede venir después"
-            texto="Ya diseñadas y listas para cuando el negocio las necesite. Se cotizan por separado, por función o por fase."
-          >
-            <div className="space-y-12">
-              {futuras
-                .filter((f) => f.entregables.length > 0)
-                .map((f) => (
-                  <div key={f.id}>
-                    <div className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <h3 className="flex items-center gap-3 font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
-                        <span className="h-6 w-1 rounded-full bg-gradient-to-b from-primary to-primary-hover" aria-hidden="true" />
-                        <ChipFase clave={f.clave} contratada={false} />
-                        {f.nombre}
-                      </h3>
-                      {f.lema && <p className="text-sm text-text-muted">{f.lema}</p>}
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                      {f.entregables.map((e) => {
-                        const nombre = nombreFuncion(e.nombre)
-                        const Icono = iconoFuncion(nombre)
-                        const opcional = /opcional/i.test(e.nombre)
-                        return (
-                          <div
-                            key={e.id}
-                            className={`${TARJETA} group relative flex flex-col overflow-hidden p-6 transition-all hover:border-primary/30 hover:shadow-hover`}
-                          >
-                                                        <div className="relative flex items-start justify-between gap-3">
-                              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
-                                <Icono className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                              {opcional && (
-                                <span className="rounded-full bg-surface px-2.5 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-inset ring-border">
-                                  Opcional
-                                </span>
-                              )}
-                            </div>
-                            <h4 className="relative mt-4 text-lg font-semibold leading-snug text-text-primary">{nombre}</h4>
-                            {e.resuelve && (
-                              <p className="relative mt-1.5 text-pretty text-sm leading-relaxed text-text-secondary">
-                                <EnLinea texto={e.resuelve} />
-                              </p>
-                            )}
-                            {e.incluye && (
-                              <ul className="relative mt-4 space-y-2.5 border-t border-border pt-4">
-                                {partesIncluye(e.incluye).map((x) => (
-                                  <li key={x} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
-                                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                                    <span>
-                                      <EnLinea texto={x} />
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </Seccion>
-        )}
-
-        {/* Flujo operativo */}
-        {c.flujo.length > 0 && (
-          <Seccion
-            id="operacion"
-            indice={num("operacion")}
-            etiqueta="La operación"
-            titulo="Un día con el sistema"
-          >
-            <div className="grid gap-5 lg:grid-cols-3">
-              {c.flujo.map((etapa, ei) => (
-                <div key={etapa.id} className={`${TARJETA} overflow-hidden`}>
-                  <div className="relative overflow-hidden bg-bg-dark px-6 py-5">
-                    <div className={REJILLA} />
-                    <span className="relative font-mono text-xs tabular-nums text-primary-light">Etapa {numero(ei)}</span>
-                    <h3 className="relative mt-1 text-lg font-bold text-white">{etapa.nombre}</h3>
-                  </div>
-                  <ol className="relative p-6">
-                    <LineaTiempo />
-                    {etapa.pasos.map((paso, i) => (
-                      <li key={paso.id} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-4 pb-5 last:pb-0">
-                        <Nodo i={i} />
-                        <div className="pt-2">
-                          <p className="text-pretty text-sm font-medium text-text-primary">
-                            <EnLinea texto={paso.texto} />
-                          </p>
-                          {paso.detalle && (
-                            <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-text-muted">{paso.detalle}</p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ))}
-            </div>
-          </Seccion>
-        )}
-
-        {/* Calendario */}
+        {/* Calendario: el reparto de las semanas, los módulos de cada etapa y el pago que le toca */}
         {c.calendario.length > 0 && (
           <Seccion
             id="calendario"
             indice={num("calendario")}
             etiqueta="El calendario"
-            titulo="Semana a semana, con pagos amarrados a entregas"
+            titulo="El proceso, semana a semana"
           >
-            <div className={`${TARJETA} p-6 sm:p-8`}>
-              <ol className="relative">
-                <LineaTiempo />
-                {c.calendario.map((h, i) => {
-                  const x = h.pagoId ? pago.get(h.pagoId) : null
-                  return (
-                    <li key={h.id} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-4 pb-7 last:pb-0">
-                      <Nodo i={i} />
-                      <div className="flex flex-col gap-2 pt-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                            {/^\d/.test(h.semanas) ? `Semana${/[-–,]/.test(h.semanas) ? "s" : ""} ${h.semanas}` : h.semanas}
-                          </p>
-                          <p className="mt-1 text-pretty text-base font-medium text-text-primary">
-                            <EnLinea texto={h.entregable} />
-                          </p>
-                        </div>
-                        {x && x.montoCentavos != null && (
-                          <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full bg-primary-light px-3 py-1 text-sm font-semibold tabular-nums text-primary">
-                            <Wallet className="h-3.5 w-3.5" aria-hidden="true" />
-                            {dinero(x.montoCentavos, moneda)}
-                            <span className="font-normal text-primary/70">· {x.nombre}</span>
+            {/* Barra del proyecto: cada tramo mide lo que dura su etapa */}
+            {tramos.length > 1 && (
+              <div className="mb-6 rounded-2xl bg-bg-dark p-5 shadow-card sm:p-6">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+                    {semanasTotales} semanas de desarrollo
+                  </p>
+                  <p className="flex items-center gap-1.5 text-xs text-white/55">
+                    <Wallet className="h-3.5 w-3.5 text-primary-light" aria-hidden="true" /> Pago al cierre de la etapa
+                  </p>
+                </div>
+                <div className="mt-4 flex gap-1">
+                  {tramos.map((t, k) => (
+                    <div key={t.id} style={{ flexGrow: t.dura }} className="min-w-0 basis-0">
+                      <div
+                        className={`relative h-2.5 rounded-full ${
+                          ["bg-primary-light", "bg-primary", "bg-primary-hover"][k % 3]
+                        }`}
+                      >
+                        {t.conPago && (
+                          <span className="absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-white text-primary shadow-sm ring-2 ring-bg-dark">
+                            <Wallet className="h-3 w-3" aria-hidden="true" />
                           </span>
                         )}
                       </div>
-                    </li>
-                  )
-                })}
-              </ol>
-            </div>
+                      <p className="mt-2.5 truncate font-mono text-[11px] font-semibold tabular-nums text-white/80">
+                        S{t.semanas}
+                      </p>
+                      {t.titulo && <p className="hidden truncate text-xs text-white/55 sm:block">{t.titulo}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <ol className="relative space-y-4">
+              <LineaTiempo />
+              {c.calendario.map((h, i) => {
+                const x = h.pagoId ? pago.get(h.pagoId) : null
+                const dura = duracionSemanas(h.semanas)
+                return (
+                  <li key={h.id} className="group relative grid grid-cols-[2.5rem_1fr] gap-x-4">
+                    <div className="pt-5">
+                      <Nodo i={i} />
+                    </div>
+                    <div className={`${TARJETA} overflow-hidden`}>
+                      <div className="p-5 sm:p-6">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                            {/^\d/.test(h.semanas) ? `Semana${/[-–,]/.test(h.semanas) ? "s" : ""} ${h.semanas}` : h.semanas}
+                          </p>
+                          {dura > 1 && (
+                            <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-xs text-text-muted ring-1 ring-inset ring-border">
+                              {dura} semanas
+                            </span>
+                          )}
+                        </div>
+                        {h.titulo && (
+                          <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-text-primary sm:text-xl">
+                            {h.titulo}
+                          </h3>
+                        )}
+                        {h.modulos.length > 0 ? (
+                          <ul className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                            {h.modulos.map((m) => (
+                              <li key={m.id} className="flex gap-2.5 text-sm leading-relaxed text-text-secondary">
+                                <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                                <span className="text-pretty [&_strong]:font-semibold [&_strong]:text-text-primary">
+                                  <EnLinea texto={m.texto} />
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          h.entregable && (
+                            <p
+                              className={`text-pretty text-text-primary ${
+                                h.titulo ? "mt-2 text-sm leading-relaxed text-text-secondary" : "mt-1 text-base font-medium"
+                              }`}
+                            >
+                              <EnLinea texto={h.entregable} />
+                            </p>
+                          )
+                        )}
+                      </div>
+                      {x && x.montoCentavos != null && (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border bg-primary-light/50 px-5 py-3 sm:px-6">
+                          <Wallet className="h-4 w-4 text-primary" aria-hidden="true" />
+                          <p className="text-sm font-semibold text-primary-hover">
+                            Pago de esta etapa: {x.nombre}
+                            {x.cuando && <span className="font-normal text-primary/80"> · {x.cuando.toLowerCase()}</span>}
+                          </p>
+                          <p className="ml-auto font-display text-lg font-bold tabular-nums text-text-primary">
+                            {dinero(x.montoCentavos, moneda)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
           </Seccion>
         )}
 
-        {/* Inversión */}
+        {/* Inversión: el total, los pagos, las condiciones, la mensualidad y lo que paga el cliente a terceros */}
         {hayInversion && (
           <Seccion
             id="inversion"
@@ -1095,89 +989,114 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
           >
             <div className="space-y-5">
               {total > 0 && (
-                <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-                  <div className="relative flex flex-col overflow-hidden rounded-3xl bg-bg-dark p-6 shadow-glow sm:p-8">
-                    <div className={REJILLA} />
-                    <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/30 blur-3xl" />
-                    <p className="relative text-xs font-semibold uppercase tracking-wider text-primary-light">
-                      Desarrollo {contratadas.map((f) => f.clave).join(" + ")}
-                    </p>
-                    <p className="relative mt-3 font-display text-5xl font-bold tracking-tight text-white tabular-nums sm:text-6xl">
-                      {dinero(total, moneda)}
-                    </p>
-                    <p className="relative mt-3 text-sm text-white/60">
-                      En {c.inversion.pagos.length} {c.inversion.pagos.length === 1 ? "pago" : "pagos"} ligados a entregas concretas.
-                    </p>
-                    <div className="relative mt-10 lg:mt-auto lg:pt-10">
-                      <div className="flex h-2 gap-1 overflow-hidden rounded-full">
-                        {c.inversion.pagos
-                          .filter((x) => x.montoCentavos)
-                          .map((x, i) => (
-                            <span
-                              key={x.id}
-                              className={`h-full rounded-full ${["bg-primary-light", "bg-primary", "bg-primary-hover"][i % 3]}`}
-                              style={{ flexGrow: x.montoCentavos! }}
-                            />
-                          ))}
+                <>
+                  {/* El total y cómo se reparte entre los pagos */}
+                  <div className="relative isolate overflow-hidden rounded-3xl bg-bg-dark p-6 shadow-glow ring-1 ring-inset ring-white/10 sm:p-10">
+                    <div aria-hidden="true" className={`${REJILLA} -z-10 [mask-image:linear-gradient(to_left,black,transparent_75%)]`} />
+                    <div aria-hidden="true" className="absolute -right-16 -top-16 -z-10 h-64 w-64 rounded-full bg-primary/30 blur-3xl" />
+                    <div className="grid gap-8 lg:grid-cols-[auto_1fr] lg:items-end lg:gap-14">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+                          Desarrollo {contratadas.map((f) => f.clave).join(" + ")}
+                        </p>
+                        <p className="mt-3 font-display text-5xl font-bold tracking-tight text-white tabular-nums sm:text-7xl">
+                          {dinero(total, moneda)}
+                        </p>
+                        <p className="mt-3 text-sm text-white/60">
+                          En {pagos.length} {pagos.length === 1 ? "pago ligado a una entrega concreta" : "pagos ligados a entregas concretas"}.
+                        </p>
                       </div>
-                      <div className="mt-3 flex gap-1 text-[11px] text-white/55">
-                        {c.inversion.pagos
-                          .filter((x) => x.montoCentavos)
-                          .map((x) => (
-                            <span key={x.id} className="truncate" style={{ flexGrow: x.montoCentavos! }}>
-                              {x.nombre}
-                            </span>
-                          ))}
+                      <div className="flex gap-1.5">
+                        {pagos.map((x, i) => (
+                          <div key={x.id} style={{ flexGrow: x.montoCentavos! }} className="min-w-0 basis-0">
+                            <div className={`h-2.5 rounded-full ${["bg-primary-light", "bg-primary", "bg-primary-hover"][i % 3]}`} />
+                            {/* En celular solo la barra: los montos van en las tarjetas de abajo */}
+                            <p className="mt-3 hidden truncate text-xs text-white/55 sm:block">{x.nombre}</p>
+                            <p className="hidden truncate font-display text-xl font-semibold text-white tabular-nums sm:block">
+                              {dinero(x.montoCentavos!, moneda)}
+                            </p>
+                            <p className="hidden truncate text-xs text-white/55 sm:block">
+                              {Math.round((x.montoCentavos! / total) * 100)} %
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     </div>
+                    {totalBonificado != null && (
+                      <div className="mt-8 grid gap-x-10 gap-y-3 border-t border-line-dark pt-6 lg:grid-cols-[auto_1fr] lg:items-center">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+                            {bonificacion.nombre || "Bonificación"} · opcional
+                          </p>
+                          <p className="mt-2 font-display text-3xl font-bold tracking-tight text-white tabular-nums sm:text-4xl">
+                            {dinero(totalBonificado, moneda)}
+                          </p>
+                        </div>
+                        <p className="max-w-xl text-pretty text-sm leading-relaxed text-white/65 [&_strong]:font-semibold [&_strong]:text-white">
+                          <strong>{dinero(bonificacion.montoCentavos!, moneda)} menos en el último pago.</strong>{" "}
+                          <EnLinea texto={bonificacion.condicion} />
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <div className="grid gap-3">
-                    {c.inversion.pagos.map((x, i) => {
-                      const pct = total > 0 && x.montoCentavos ? Math.round((x.montoCentavos / total) * 100) : null
-                      return (
-                        <div key={x.id} className={`${TARJETA} flex gap-4 p-5`}>
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-light font-mono text-xs font-bold text-primary">
+
+                  {/* Cada pago: cuándo, cuánto y contra qué entrega */}
+                  <div
+                    className={`grid gap-4 ${
+                      c.inversion.pagos.length === 4
+                        ? "sm:grid-cols-2 lg:grid-cols-4"
+                        : c.inversion.pagos.length >= 3
+                          ? "lg:grid-cols-3"
+                          : "md:grid-cols-2"
+                    }`}
+                  >
+                    {c.inversion.pagos.map((x, i) => (
+                      <div key={x.id} className={`${TARJETA} flex flex-col p-6`}>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-dark font-mono text-xs font-bold text-primary-light">
                             {numero(i)}
                           </span>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                              <p className="font-semibold text-text-primary">
-                                {x.nombre}
-                                {x.cuando && <span className="font-normal text-text-muted"> · {x.cuando}</span>}
-                              </p>
-                              {x.montoCentavos != null && (
-                                <p className="font-semibold tabular-nums text-text-primary">
-                                  {dinero(x.montoCentavos, moneda)}
-                                  {pct != null && <span className="ml-1.5 text-xs font-normal text-text-muted">{pct} %</span>}
-                                </p>
-                              )}
-                            </div>
-                            {x.contra && (
-                              <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                                <EnLinea texto={x.contra} />
-                              </p>
-                            )}
-                            {pct != null && (
-                              <div className="mt-3 h-1 overflow-hidden rounded-full bg-bg-section">
-                                <div className="h-full rounded-full bg-gradient-to-r from-primary-hover to-primary" style={{ width: `${pct}%` }} />
-                              </div>
-                            )}
-                          </div>
+                          {x.cuando && (
+                            <span className="rounded-full bg-primary-light/60 px-3 py-1 text-xs font-medium text-primary-hover ring-1 ring-inset ring-primary/15">
+                              {x.cuando}
+                            </span>
+                          )}
                         </div>
-                      )
-                    })}
+                        <p className="mt-4 text-sm font-semibold text-text-secondary">{x.nombre}</p>
+                        {x.montoCentavos != null && (
+                          <p className="font-display text-3xl font-bold tracking-tight text-text-primary tabular-nums">
+                            {dinero(x.montoCentavos, moneda)}
+                          </p>
+                        )}
+                        {totalBonificado != null && x.id === pagos.at(-1)?.id && (
+                          <p className="mt-1 text-xs font-medium text-primary">
+                            o {dinero(x.montoCentavos! - bonificacion.montoCentavos!, moneda)} {conBonificacion}
+                          </p>
+                        )}
+                        {x.contra && (
+                          <div className="mt-4 border-t border-border pt-4">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+                              Se paga contra
+                            </p>
+                            <p className="mt-2 text-pretty text-sm leading-relaxed text-text-secondary [&_strong]:font-semibold [&_strong]:text-text-primary">
+                              <EnLinea texto={x.contra} />
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </div>
+                </>
               )}
 
               {c.inversion.condiciones.length > 0 && (
                 <div className={`${TARJETA} p-6 sm:p-8`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Condiciones</h3>
-                  <ul className="mt-4 space-y-3">
+                  <h3 className="font-display text-lg font-semibold text-text-primary">Condiciones</h3>
+                  <ul className="mt-4 grid gap-x-10 gap-y-4 md:grid-cols-2">
                     {c.inversion.condiciones.map((x) => (
                       <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-text-secondary">
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                        <span>
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                        <span className="text-pretty [&_strong]:font-semibold [&_strong]:text-text-primary">
                           <EnLinea texto={x.texto} />
                         </span>
                       </li>
@@ -1187,71 +1106,93 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
               )}
 
               {(mensual.montoCentavos != null || mensual.incluye.length > 0) && (
-                <div className={`${TARJETA} overflow-hidden`}>
-                  <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-6 sm:p-8">
-                    <div>
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Hospedaje y mantenimiento</h3>
-                      {mensual.descripcion && (
-                        <p className="mt-2 max-w-lg text-sm leading-relaxed text-text-secondary">
-                          <EnLinea texto={mensual.descripcion} />
-                        </p>
-                      )}
-                    </div>
+                <div className={`${TARJETA} grid overflow-hidden lg:grid-cols-[0.8fr_1.6fr]`}>
+                  <div className="border-b border-border bg-primary-light/40 p-6 sm:p-8 lg:border-b-0 lg:border-r">
+                    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                      <span className="h-px w-8 bg-primary" />
+                      Cada mes
+                    </p>
+                    <h3 className="mt-4 font-display text-lg font-semibold text-text-primary">Hospedaje y mantenimiento</h3>
                     {mensual.montoCentavos != null && (
-                      <p className="text-3xl font-bold tracking-tight text-text-primary tabular-nums">
+                      <p className="mt-2 font-display text-4xl font-bold tracking-tight text-text-primary tabular-nums sm:text-5xl">
                         {dinero(mensual.montoCentavos, moneda)}
                         <span className="text-base font-medium text-text-muted"> /mes</span>
                       </p>
                     )}
+                    {mensual.descripcion && (
+                      <p className="mt-3 text-pretty text-sm leading-relaxed text-text-secondary">
+                        <EnLinea texto={mensual.descripcion} />
+                      </p>
+                    )}
                   </div>
-                  <div className="grid sm:grid-cols-2">
-                    {(
-                      [
-                        ["Incluye", mensual.incluye, true],
-                        ["No incluye", mensual.noIncluye, false],
-                      ] as const
-                    )
-                      .filter(([, items]) => items.length > 0)
-                      .map(([etiqueta, items, si]) => (
-                        <div key={etiqueta} className="p-6 sm:p-8 sm:[&+&]:border-l sm:[&+&]:border-border max-sm:[&+&]:border-t max-sm:[&+&]:border-border">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">{etiqueta}</p>
-                          <ul className="mt-3 space-y-2.5">
-                            {items.map((x) => (
-                              <li key={x.id} className="flex gap-2.5 text-sm text-text-secondary">
-                                {si ? (
-                                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                                ) : (
-                                  <span className="mt-2 h-px w-3 shrink-0 bg-text-muted" aria-hidden="true" />
-                                )}
+                  <div className="p-6 sm:p-8">
+                    {mensual.incluye.length > 0 && (
+                      <>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">Incluye</p>
+                        <ul className="mt-3 grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                          {mensual.incluye.map((x) => (
+                            <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-secondary">
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                              <span>
                                 <EnLinea texto={x.texto} />
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    {mensual.noIncluye.length > 0 && (
+                      <div className={mensual.incluye.length > 0 ? "mt-6 border-t border-border pt-5" : ""}>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">No incluye</p>
+                        <ul className="mt-3 grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                          {mensual.noIncluye.map((x) => (
+                            <li key={x.id} className="flex gap-2.5 text-sm leading-snug text-text-muted">
+                              <span className="mt-2 h-px w-3 shrink-0 bg-text-muted" aria-hidden="true" />
+                              <span>
+                                <EnLinea texto={x.texto} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {c.inversion.terceros.length > 0 && (
                 <div className={`${TARJETA} p-6 sm:p-8`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">
-                    Pagos únicos y costos de terceros · a cargo del cliente
-                  </h3>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 className="font-display text-lg font-semibold text-text-primary">Pagos únicos y costos de terceros</h3>
+                    <p className="text-xs text-text-muted">A cargo del cliente</p>
+                  </div>
                   <ul className="mt-4 divide-y divide-border">
-                    {c.inversion.terceros.map((x) => (
-                      <li key={x.id} className="flex flex-col gap-1 py-3.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                        <div>
-                          <p className="text-sm font-semibold text-text-primary">
-                            <EnLinea texto={x.concepto} />
+                    {c.inversion.terceros.map((x) => {
+                      // "Navegación _(opcional, fase futura)_" → nombre + etiqueta
+                      const marca = /_\(([^)]*)\)_/.exec(x.concepto)
+                      return (
+                        <li key={x.id} className="flex flex-col gap-1 py-3.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                          <div>
+                            <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm font-semibold text-text-primary">
+                              <EnLinea texto={x.concepto.replace(/\s*_\([^)]*\)_/, "")} />
+                              {marca && (
+                                <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-inset ring-border first-letter:uppercase">
+                                  {marca[1]}
+                                </span>
+                              )}
+                            </p>
+                            {x.nota && (
+                              <p className="mt-0.5 text-xs text-text-muted">
+                                <EnLinea texto={x.nota} />
+                              </p>
+                            )}
+                          </div>
+                          <p className="shrink-0 text-sm font-medium text-text-primary sm:max-w-[45%] sm:text-right">
+                            <EnLinea texto={x.costo} />
                           </p>
-                          {x.nota && <p className="mt-0.5 text-xs text-text-muted"><EnLinea texto={x.nota} /></p>}
-                        </div>
-                        <p className="shrink-0 text-sm font-medium text-text-primary sm:text-right">
-                          <EnLinea texto={x.costo} />
-                        </p>
-                      </li>
-                    ))}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               )}
@@ -1259,195 +1200,128 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
           </Seccion>
         )}
 
-        {/* Lo que necesitamos de su lado */}
+        {/* Lo que necesitamos de su lado: una tarjeta por tipo */}
         {hayRequisitos && (
           <Seccion
             id="tu-lado"
             indice={num("tu-lado")}
             etiqueta="Tu parte"
-            titulo="¡Listo, empecemos!"
-            texto={c.requisitos.intro || undefined}
+            titulo="Lo que necesitamos de tu lado"
+            texto="Con esto listo, arrancamos en la fecha acordada."
           >
-            <div className="space-y-4">
-              {c.requisitos.grupos.map((g) => (
-                <Plegable
-                  key={g.id}
-                  titulo={g.nombre}
-                  subtitulo={g.cuando}
-                  extra={
-                    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-light px-2 font-mono text-xs font-semibold text-primary">
-                      {g.items.length}
-                    </span>
-                  }
-                >
-                  {g.nota && <TextoRico texto={g.nota} className="mb-4 sm:text-sm" />}
-                  <ul className="divide-y divide-border">
-                    {g.items.map((r) => (
-                      <li key={r.id} className="grid gap-1 py-4 first:pt-0 last:pb-0 sm:grid-cols-[4rem_1fr]">
-                        <span className="font-mono text-xs font-semibold text-primary">{r.clave}</span>
-                        <div>
-                          <p className="text-sm font-semibold text-text-primary">
-                            <EnLinea texto={r.que} />
-                          </p>
-                          {r.paraQue && (
-                            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                              <EnLinea texto={r.paraQue} />
-                            </p>
-                          )}
-                          {(r.formato || r.bloquea) && (
-                            <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                              {r.formato && (
-                                <span className="rounded-full bg-bg-section px-2.5 py-0.5 text-text-secondary ring-1 ring-inset ring-border">
-                                  {r.formato}
-                                </span>
+            <div className={`grid items-start gap-4 ${requisitosPorTipo.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+              {requisitosPorTipo.map(({ tipo, items }) => {
+                const { Icono, nota } = TIPO_REQUISITO[tipo]
+                return (
+                  <div key={tipo} className={`${TARJETA} p-6`}>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-primary shadow-sm">
+                        <Icono className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg font-semibold leading-tight text-text-primary">
+                          {ETIQUETA_TIPO_REQUISITO[tipo]}
+                        </h3>
+                        <p className="text-xs text-text-muted">{nota}</p>
+                      </div>
+                      <span className="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-light px-2 font-mono text-xs font-semibold text-primary">
+                        {items.length}
+                      </span>
+                    </div>
+                    <ul className="mt-5 space-y-4 border-t border-border pt-5">
+                      {items.map((r) => {
+                        // Un "✔" al inicio marca lo que el cliente ya entregó
+                        const listo = /^\s*✔/.test(r.que)
+                        return (
+                          <li key={r.id} className="flex gap-3">
+                            {listo ? (
+                              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                            ) : (
+                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+                            )}
+                            <div className={listo ? "min-w-0" : "min-w-0 pl-[5px]"}>
+                              <p className="text-pretty text-sm leading-snug text-text-primary [&_strong]:font-semibold">
+                                <EnLinea texto={r.que.replace(/^\s*✔\s*/, "")} />
+                              </p>
+                              {r.paraQue && (
+                                <p className="mt-1 text-pretty text-xs leading-relaxed text-text-muted">
+                                  <EnLinea texto={r.paraQue} />
+                                </p>
                               )}
-                              {r.bloquea && (
-                                <span className="rounded-full bg-primary-light px-2.5 py-0.5 text-primary-hover ring-1 ring-inset ring-primary/15">
-                                  Si falta, se detiene: {r.bloquea}
-                                </span>
-                              )}
+                              {listo && <p className="mt-1 text-xs font-medium text-success">Ya lo tenemos</p>}
                             </div>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </Plegable>
-              ))}
-              {c.requisitos.nuestroLado.length > 0 && (
-                <div className="relative overflow-hidden rounded-2xl bg-bg-dark p-6 shadow-glow sm:p-8">
-                  <div className={REJILLA} />
-                  <p className="relative text-xs font-semibold uppercase tracking-wider text-primary-light">
-                    Mientras tanto, de nuestro lado
-                  </p>
-                  <ol className="relative mt-4 space-y-3">
-                    {c.requisitos.nuestroLado.map((x, i) => (
-                      <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-white/80">
-                        <span className="font-mono text-xs text-primary-light">{numero(i)}</span>
-                        <span className="[&_strong]:text-white">
-                          <EnLinea texto={x.texto} />
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-          </Seccion>
-        )}
-
-        {/* Riesgos */}
-        {c.riesgos.length > 0 && (
-          <Seccion id="riesgos" indice={num("riesgos")} etiqueta="Los riesgos" titulo="Lo que puede salir mal y cómo lo evitamos">
-            <div className="grid gap-3 md:grid-cols-2">
-              {c.riesgos.map((r) => (
-                <div key={r.id} className={`${TARJETA} p-5`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-semibold leading-snug text-text-primary">
-                      <EnLinea texto={r.riesgo} />
-                    </p>
-                    {r.impacto && (
-                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset ${COLOR_IMPACTO[r.impacto]}`}>
-                        {ETIQUETA_IMPACTO[r.impacto]}
-                      </span>
-                    )}
+                          </li>
+                        )
+                      })}
+                    </ul>
                   </div>
-                  {r.mitigacion && (
-                    <p className="mt-2 flex gap-2 text-sm leading-relaxed text-text-secondary">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                      <span>
-                        <EnLinea texto={r.mitigacion} />
-                      </span>
-                    </p>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           </Seccion>
         )}
 
-        {/* Validación técnica */}
-        {hayValidacion && (
+        {/*
+          Lo que viene después: las funciones ya mapeadas de cada fase siguiente,
+          una fase por pestaña. Va después de la inversión y de lo que le toca
+          al cliente, para no mezclar lo contratado con lo que se cotiza aparte.
+        */}
+        {fasesFuturas.length > 0 && (
           <Seccion
-            id="validacion"
-            indice={num("validacion")}
-            etiqueta="Validación técnica"
-            titulo="Lo probamos en campo antes de construir"
-            texto={c.validacion.objetivo || undefined}
+            id="futuras"
+            indice={num("futuras")}
+            etiqueta="Lo que sigue"
+            titulo="Lo que viene después"
+            texto="Tu sistema va a seguir creciendo. Estas funciones ya están diseñadas y listas para cuando el negocio las necesite; se cotizan por separado, por función o por fase."
           >
-            <div className="grid gap-4 md:grid-cols-2">
-              {c.validacion.alcance.length > 0 && (
-                <div className={`${TARJETA} p-6`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Qué se prueba</h3>
-                  <ol className="mt-4 space-y-3">
-                    {c.validacion.alcance.map((x, i) => (
-                      <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-text-secondary">
-                        <span className="font-mono text-xs font-semibold text-primary">{numero(i)}</span>
-                        <span>
-                          <EnLinea texto={x.texto} />
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-              {c.validacion.criterios.length > 0 && (
-                <div className={`${TARJETA} p-6`}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Se da por buena si…</h3>
-                  <ul className="mt-4 space-y-3">
-                    {c.validacion.criterios.map((x) => (
-                      <li key={x.id} className="flex gap-3 text-sm leading-relaxed text-text-secondary">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-primary/35" aria-hidden="true" />
-                        <span>
-                          <EnLinea texto={x.texto} />
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            {c.validacion.necesita && (
-              <p className="mt-4 rounded-2xl border border-primary/20 bg-primary-light/60 px-5 py-4 text-sm leading-relaxed text-text-secondary">
-                <span className="font-semibold text-primary">Necesitamos de ti: </span>
-                <EnLinea texto={c.validacion.necesita} />
-              </p>
+            {fasesFuturas.length > 1 ? (
+              <PestanasSistema
+                nombre="Fases futuras"
+                prefijo="fase"
+                pestanas={fasesFuturas.map((f) => ({
+                  id: f.id,
+                  titulo: nombreFase(f.clave),
+                  cuenta: f.entregables.length,
+                  icono: <Sparkles className="h-4 w-4" aria-hidden="true" />,
+                  panel: <FuncionesFase fase={f} />,
+                }))}
+              />
+            ) : (
+              <FuncionesFase fase={fasesFuturas[0]} />
             )}
           </Seccion>
         )}
 
-        {/* Glosario */}
+        {/* Glosario: anexo de consulta, plegado para no alargar el camino a la firma */}
         {c.glosario.length > 0 && (
-          <Seccion id="glosario" indice={num("glosario")} etiqueta="Glosario" titulo="Hablemos el mismo idioma">
-            <dl className="grid gap-3 sm:grid-cols-2">
-              {c.glosario.map((t) => (
-                <div key={t.id} className={`${TARJETA} p-5`}>
-                  <dt className="font-semibold text-text-primary">{t.termino}</dt>
-                  <dd className="mt-1 text-sm leading-relaxed text-text-secondary">
-                    <EnLinea texto={t.definicion} />
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Seccion>
-        )}
-
-        {/* Anexos */}
-        {c.anexos.length > 0 && (
-          <Seccion id="anexos" indice={num("anexos")} etiqueta="Anexos" titulo="Los detalles, por si quieres profundizar">
-            <div className="space-y-3">
-              {c.anexos.map((a) => (
-                <Plegable key={a.id} titulo={a.titulo}>
-                  {a.texto && <TextoRico texto={a.texto} className="sm:text-sm" />}
-                  {a.tabla && (
-                    <div className={a.texto ? "mt-5" : ""}>
-                      <TablaSimple tabla={a.tabla} />
-                    </div>
-                  )}
-                </Plegable>
-              ))}
-            </div>
-          </Seccion>
+          <Revelar>
+            <details id="glosario" className={`${TARJETA} group scroll-mt-28`}>
+              <summary className="flex cursor-pointer list-none items-center gap-4 p-6 sm:px-8 [&::-webkit-details-marker]:hidden">
+                <span className="min-w-0">
+                  <span className="block font-display text-lg font-semibold text-text-primary">Glosario</span>
+                  <span className="block text-sm text-text-muted">
+                    {c.glosario.length === 1
+                      ? "El término que usamos en esta propuesta"
+                      : `Los ${c.glosario.length} términos que usamos en esta propuesta`}
+                  </span>
+                </span>
+                <ChevronDown
+                  className="ml-auto h-5 w-5 shrink-0 text-text-muted transition-transform group-open:rotate-180"
+                  aria-hidden="true"
+                />
+              </summary>
+              <dl className="grid gap-x-10 border-t border-border px-6 pb-4 sm:grid-cols-2 sm:px-8">
+                {c.glosario.map((t) => (
+                  <div key={t.id} className="border-b border-border py-4">
+                    <dt className="text-sm font-semibold text-text-primary">{t.termino}</dt>
+                    <dd className="mt-1 text-pretty text-sm leading-relaxed text-text-secondary">
+                      <EnLinea texto={t.definicion} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          </Revelar>
         )}
 
         {/* Aceptar */}
@@ -1459,31 +1333,34 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
           texto={
             p.aceptacion
               ? undefined
-              : "Si todo está claro, acepta la propuesta aquí mismo. Si algo no te convence, escríbenos y lo ajustamos."
+              : "Si todo está claro, firma la propuesta aquí mismo. Si algo no te convence, escríbenos y lo ajustamos."
           }
         >
           <AceptarPropuesta
             slug={p.slug}
             total={dinero(total, moneda)}
+            bonificacion={
+              totalBonificado != null
+                ? {
+                    nombre: bonificacion.nombre || "Bonificación",
+                    total: dinero(totalBonificado, moneda),
+                    ahorro: dinero(bonificacion.montoCentavos!, moneda),
+                    condicion: bonificacion.condicion.replace(/\*\*/g, ""),
+                  }
+                : null
+            }
+            totalAcordado={p.aceptacion ? dinero(p.aceptacion.totalCentavos, moneda) : undefined}
             aceptacion={p.aceptacion}
             sugerido={c.ficha.contactoNombre}
+            desarrollador={{
+              nombre: EMPRESA.fundador,
+              empresa: EMPRESA.nombre,
+              fecha: p.publicadoEn ?? p.fechaPropuesta,
+              firma: p.firmaDesarrollador,
+              puedeFirmar,
+            }}
           />
         </Seccion>
-      </div>
-
-      <div className="mt-8">
-        <CTAFinal
-          etiqueta={p.aceptacion ? "Siguiente paso" : "¿Dudas?"}
-          titulo={p.aceptacion ? "Preparemos el arranque" : "Platiquemos la propuesta"}
-          texto={
-            p.aceptacion
-              ? "Escríbenos para agendar la firma del contrato y la sesión de cuentas de la semana 0."
-              : "Cualquier pregunta sobre el alcance, el calendario o la inversión, la resolvemos por WhatsApp."
-          }
-          boton="Escribir por WhatsApp"
-          href={enlaceWhatsApp}
-          nota={`Horario de atención: ${EMPRESA.horario}`}
-        />
       </div>
 
       <footer className="border-t border-line-dark bg-bg-dark px-4 py-8 text-center text-xs text-white/55">

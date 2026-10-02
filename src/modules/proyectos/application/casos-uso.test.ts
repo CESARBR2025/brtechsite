@@ -3,6 +3,7 @@ import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import {
   FuenteLevantamientosEnMemoria,
   GeneradorIdSecuencial,
+  GeneradorPdfContratoEnMemoria,
   GeneradorSlugProyectoSecuencial,
   NotificadorAceptacionEnMemoria,
   RelojFijo,
@@ -13,6 +14,7 @@ import { CambiarEstadoProyecto } from "./cambiar-estado-proyecto"
 import { ConsultarProyectos } from "./consultar-proyectos"
 import { CrearProyecto } from "./crear-proyecto"
 import { GuardarProyecto } from "./guardar-proyecto"
+import { ObtenerContratoPdf } from "./obtener-contrato"
 import { ObtenerPropuestaPublica } from "./obtener-propuesta-publica"
 
 const generales = {
@@ -107,42 +109,125 @@ describe("Casos de uso de proyectos", () => {
   })
 
   describe("Aceptación", () => {
+    const trazo = "M10 10L20 20L30 10L40 20L50 10L60 20"
+    const correo = "cesar@tiobeto.mx"
+    const conBono = {
+      ...contenido,
+      inversion: {
+        pagos: [
+          { id: "a", nombre: "Anticipo", montoCentavos: 600_000 },
+          { id: "b", nombre: "Entrega", montoCentavos: 1_050_000 },
+        ],
+        bonificacion: { nombre: "Caso de éxito", montoCentavos: 250_000, condicion: "A cambio de un testimonio." },
+      },
+    }
+
+    async function publicada(c: unknown = contenido) {
+      const r = await crear.ejecutar(generales)
+      await guardar.ejecutar(r.id, { generales, contenido: c })
+      await estado.publicar(r.id)
+      return r
+    }
+
     it("el cliente acepta, se avisa y se refleja en panel y página", async () => {
       const notificador = new NotificadorAceptacionEnMemoria()
-      const aceptar = new AceptarPropuesta(repo, notificador, reloj)
-      const r = await crear.ejecutar(generales)
-      await guardar.ejecutar(r.id, { generales, contenido })
-      await estado.publicar(r.id)
+      const aceptar = new AceptarPropuesta(repo, notificador, new GeneradorPdfContratoEnMemoria(), reloj)
+      const r = await publicada()
 
-      expect(await aceptar.ejecutar(r.slug, "César Chavero")).toEqual({ aviso: "enviado" })
+      const firma = { nombre: "César Chavero", trazo }
+      expect(await aceptar.ejecutar(r.slug, { firmas: [firma], correo })).toEqual({
+        aviso: "enviado",
+        avisoCliente: "enviado",
+        errores: [],
+      })
       expect(notificador.enviados[0]).toMatchObject({
         folio: "BRP-000001",
         aceptadaPor: "César Chavero",
         totalCentavos: 1_050_000,
         moneda: "MXN",
+        correoCliente: correo,
+        bonificacion: null,
       })
       expect((await publico.ejecutar(r.slug)).aceptacion).toEqual({
         en: "2026-09-25T12:00:00.000Z",
         por: "César Chavero",
+        firmas: [firma],
+        conBonificacion: false,
+        totalCentavos: 1_050_000,
       })
       expect((await consultar.listar())[0].aceptado).toBe(true)
     })
 
-    it("un borrador no se puede aceptar", async () => {
-      const aceptar = new AceptarPropuesta(repo, new NotificadorAceptacionEnMemoria(), reloj)
-      const r = await crear.ejecutar(generales)
-      await expect(aceptar.ejecutar(r.slug, "César")).rejects.toBeInstanceOf(RecursoNoEncontrado)
+    it("al firmar, el cliente recibe su contrato con la opción que eligió", async () => {
+      const notificador = new NotificadorAceptacionEnMemoria()
+      const generador = new GeneradorPdfContratoEnMemoria()
+      const aceptar = new AceptarPropuesta(repo, notificador, generador, reloj)
+      const r = await publicada(conBono)
+
+      await aceptar.ejecutar(r.slug, { firmas: [{ nombre: "César Chavero", trazo }], correo, conBonificacion: true })
+
+      expect(generador.generados[0]).toMatchObject({ firmado: true, estado: "Firmado el 25 de septiembre de 2026" })
+      expect(notificador.alCliente[0]).toMatchObject({
+        correo,
+        folio: "BRP-000001",
+        firmantes: "César Chavero",
+        totalCentavos: 1_400_000,
+      })
+      expect(notificador.alCliente[0].contrato.nombreArchivo).toBe("Contrato-Tostadas-Tio-Beto-Soft-BRP-000001.pdf")
+      expect(notificador.enviados[0]).toMatchObject({ totalCentavos: 1_400_000, bonificacion: "Caso de éxito" })
+      expect(notificador.enviados[0].contrato).not.toBeNull()
+      // El correo del cliente se ve en el panel, nunca en la página pública
+      expect((await consultar.obtenerDetalle(r.id)).correoAceptacion).toBe(correo)
+      expect(JSON.stringify(await publico.ejecutar(r.slug))).not.toContain(correo)
     })
 
-    it("si el correo falla, la aceptación igual queda guardada", async () => {
+    it("el contrato se puede leer antes de firmar y descargar ya firmado", async () => {
+      const generador = new GeneradorPdfContratoEnMemoria()
+      const contrato = new ObtenerContratoPdf(repo, generador)
+      const r = await crear.ejecutar(generales)
+      await expect(contrato.ejecutar(r.slug)).rejects.toBeInstanceOf(RecursoNoEncontrado)
+      await guardar.ejecutar(r.id, { generales, contenido: conBono })
+      await estado.publicar(r.id)
+
+      expect((await contrato.ejecutar(r.slug)).nombreArchivo).toBe("Contrato-Tostadas-Tio-Beto-Soft-BRP-000001.pdf")
+      expect(generador.generados[0].firmado).toBe(false)
+
+      const aceptar = new AceptarPropuesta(repo, new NotificadorAceptacionEnMemoria(), generador, reloj)
+      await aceptar.ejecutar(r.slug, { firmas: [{ nombre: "César", trazo }], correo, conBonificacion: false })
+      await contrato.ejecutar(r.slug)
+      expect(generador.generados.at(-1)).toMatchObject({ firmado: true })
+    })
+
+    it("un borrador no se puede aceptar", async () => {
+      const aceptar = new AceptarPropuesta(repo, new NotificadorAceptacionEnMemoria(), new GeneradorPdfContratoEnMemoria(), reloj)
+      const r = await crear.ejecutar(generales)
+      await expect(
+        aceptar.ejecutar(r.slug, { firmas: [{ nombre: "César", trazo }], correo }),
+      ).rejects.toBeInstanceOf(RecursoNoEncontrado)
+    })
+
+    it("si los correos o el PDF fallan, la aceptación igual queda guardada", async () => {
       const notificador = new NotificadorAceptacionEnMemoria()
       notificador.falla = true
-      const aceptar = new AceptarPropuesta(repo, notificador, reloj)
-      const r = await crear.ejecutar(generales)
-      await guardar.ejecutar(r.id, { generales, contenido })
-      await estado.publicar(r.id)
-      expect((await aceptar.ejecutar(r.slug, "César")).aviso).toBe("fallido")
+      const aceptar = new AceptarPropuesta(repo, notificador, new GeneradorPdfContratoEnMemoria(), reloj)
+      const r = await publicada()
+      const resultado = await aceptar.ejecutar(r.slug, { firmas: [{ nombre: "César", trazo }], correo })
+      expect(resultado).toMatchObject({ aviso: "fallido", avisoCliente: "fallido" })
+      expect(resultado.errores).toHaveLength(2)
       expect((await publico.ejecutar(r.slug)).aceptacion?.por).toBe("César")
+
+      // Sin PDF, el aviso a BR TECH sale igual; al cliente no hay nada que enviarle
+      const sinPdf = new GeneradorPdfContratoEnMemoria()
+      sinPdf.falla = true
+      const avisos = new NotificadorAceptacionEnMemoria()
+      const otro = await publicada()
+      const r2 = await new AceptarPropuesta(repo, avisos, sinPdf, reloj).ejecutar(otro.slug, {
+        firmas: [{ nombre: "César", trazo }],
+        correo,
+      })
+      expect(r2).toMatchObject({ aviso: "enviado", avisoCliente: "fallido" })
+      expect(avisos.enviados[0].contrato).toBeNull()
+      expect(avisos.alCliente).toHaveLength(0)
     })
   })
 })

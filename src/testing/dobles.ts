@@ -24,8 +24,11 @@ import {
 } from "@/src/modules/levantamientos/domain/slug-levantamiento"
 
 import type { Proyecto } from "@/src/modules/proyectos/domain/proyecto"
+import type { DocumentoContrato } from "@/src/modules/proyectos/domain/contrato"
 import type {
+  ContratoParaCliente,
   FuenteLevantamientos,
+  GeneradorPdfContrato,
   NotificadorAceptacion,
   OrigenLevantamiento,
   PropuestaAceptada,
@@ -210,9 +213,25 @@ export class FuenteLevantamientosEnMemoria implements FuenteLevantamientos {
 
 export class NotificadorAceptacionEnMemoria implements NotificadorAceptacion {
   enviados: PropuestaAceptada[] = []
+  alCliente: ContratoParaCliente[] = []
   falla = false
   async propuestaAceptada(datos: PropuestaAceptada): Promise<void> {
     if (this.falla) throw new Error("Correo caído")
     this.enviados.push(datos)
+  }
+  async contratoParaCliente(datos: ContratoParaCliente): Promise<void> {
+    if (this.falla) throw new Error("Correo caído")
+    this.alCliente.push(datos)
+  }
+}
+
+/** "PDF" de mentira: guarda los contratos que se le pidieron. */
+export class GeneradorPdfContratoEnMemoria implements GeneradorPdfContrato {
+  generados: DocumentoContrato[] = []
+  falla = false
+  async generar(contrato: DocumentoContrato): Promise<Uint8Array> {
+    if (this.falla) throw new Error("No se pudo generar el PDF")
+    this.generados.push(contrato)
+    return new TextEncoder().encode(`%PDF ${contrato.subtitulo}`)
   }
 }

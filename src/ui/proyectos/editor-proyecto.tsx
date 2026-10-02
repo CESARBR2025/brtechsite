@@ -417,6 +417,8 @@ function AccionesProyecto({
           <p className="flex items-center gap-2 text-sm font-medium text-success">
             <Check className="h-4 w-4" />
             Aceptada por {dto.aceptacion.por} · {formatearFechaHora(dto.aceptacion.en)}
+            {dto.correoAceptacion && ` · ${dto.correoAceptacion}`}
+            {dto.aceptacion.conBonificacion && " · con bonificación"}
           </p>
           {!archivado && (
             <button

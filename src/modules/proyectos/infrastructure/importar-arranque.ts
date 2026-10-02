@@ -385,6 +385,8 @@ export function importarArranque(md: string, nuevoId: () => string): ArranqueImp
     return {
       id: id(),
       semanas: f[0],
+      titulo: "",
+      modulos: [],
       entregable: pago || !f[2] ? f[1] : `${f[1]} · ${f[2]}`,
       pagoId: pago?.id ?? null,
     }
@@ -457,6 +459,7 @@ export function importarArranque(md: string, nuevoId: () => string): ArranqueImp
           paraQue: celda(f, iPara),
           formato: celda(f, iFmt),
           bloquea: celda(f, iBlq),
+          tipo: null,
         })),
       }
     })

@@ -30,6 +30,10 @@ export const ICONOS_VISTA = [
 ] as const
 export type IconoVista = (typeof ICONOS_VISTA)[number]
 
+/** Tipos de requisito que se muestran al cliente, cada uno en su tarjeta. */
+export const TIPOS_REQUISITO = ["hardware", "licencia", "operativa"] as const
+export type TipoRequisito = (typeof TIPOS_REQUISITO)[number]
+
 // --- Esquema ---
 
 const CORTO = 300
@@ -105,6 +109,10 @@ export const esquemaContenido = z.object({
     version: texto(20),
     giro: texto(),
     tipoSistema: texto(),
+    /** Titular de la portada: el beneficio, en una línea. Vacío = se usa el nombre del producto. */
+    titular: texto(),
+    /** Foto de la portada: ruta dentro de `public/` (p. ej. "/propuestas/tio-beto.webp"). */
+    imagenHero: texto(),
     /** Frase del hero de la propuesta. */
     promesa: texto(),
     objetivo: texto(LARGO),
@@ -182,7 +190,11 @@ export const esquemaContenido = z.object({
       id,
       /** "0", "1-2", "Desde la entrega"… */
       semanas: texto(40),
+      /** Nombre corto de la etapa ("App del repartidor"). */
+      titulo: texto(),
       entregable: texto(LARGO),
+      /** Módulos que se construyen en esas semanas; si hay, se muestran en lugar del entregable. */
+      modulos: lista(renglon, 12),
       /** Pago ligado a este hito (id de `inversion.pagos`). */
       pagoId: ref,
     }),
@@ -191,6 +203,17 @@ export const esquemaContenido = z.object({
   inversion: bloque({
     moneda: texto(3).transform((m) => m.toUpperCase() || "MXN"),
     pagos: lista(esquemaPago, 12),
+    /**
+     * Descuento opcional sobre el último pago, a cambio de algo que da el
+     * cliente (p. ej. ser caso de éxito). El total sigue siendo la suma de los
+     * pagos: la bonificación se muestra aparte y se formaliza en el contrato.
+     */
+    bonificacion: bloque({
+      nombre: texto(),
+      montoCentavos: centavos,
+      /** Qué da el cliente a cambio. */
+      condicion: texto(LARGO),
+    }),
     condiciones: lista(renglon, 20),
     mensualidad: bloque({
       montoCentavos: centavos,
@@ -216,6 +239,12 @@ export const esquemaContenido = z.object({
             paraQue: texto(LARGO),
             formato: texto(),
             bloquea: texto(),
+            /** Tarjeta en la que sale en la propuesta; null = solo en el panel. */
+            // "software" fue un tipo que ya no existe: lo guardado así queda sin tarjeta
+            tipo: z.preprocess(
+              (v) => (v === "software" ? null : v),
+              z.enum(TIPOS_REQUISITO).nullable().default(null),
+            ),
           }),
           40,
         ),
@@ -343,7 +372,11 @@ export function normalizarContenido(crudo: unknown): Contenido {
       notas: sinVacios(c.arquitectura.notas),
     },
     fases,
-    calendario: sinVacios(c.calendario).map((h) => ({ ...h, pagoId: soloSi(idsPagos)(h.pagoId) })),
+    calendario: sinVacios(c.calendario).map((h) => ({
+      ...h,
+      modulos: sinVacios(h.modulos),
+      pagoId: soloSi(idsPagos)(h.pagoId),
+    })),
     inversion: {
       ...c.inversion,
       pagos,
@@ -386,6 +419,16 @@ export function contenidoVacio(): Contenido {
 /** Suma de los pagos del desarrollo, en centavos. */
 export function totalInversion(c: Pick<Contenido, "inversion">): number {
   return c.inversion.pagos.reduce((s, p) => s + (p.montoCentavos ?? 0), 0)
+}
+
+/**
+ * Total del desarrollo si el cliente toma la bonificación, en centavos.
+ * null si no hay bonificación o si no cabe en el último pago.
+ */
+export function totalConBonificacion(c: Pick<Contenido, "inversion">): number | null {
+  const monto = c.inversion.bonificacion.montoCentavos ?? 0
+  const ultimo = c.inversion.pagos.filter((p) => p.montoCentavos).at(-1)?.montoCentavos ?? 0
+  return monto > 0 && monto < ultimo ? totalInversion(c) - monto : null
 }
 
 /** Requerimientos que entran en las fases contratadas. */

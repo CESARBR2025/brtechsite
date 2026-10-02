@@ -1,6 +1,18 @@
 import type { ClaveSeccion, Contenido } from "../domain/contenido"
 import type { EstadoProyecto } from "../domain/estado-proyecto"
+import type { Firma } from "../domain/firma"
 import type { Proyecto } from "../domain/proyecto"
+
+/** Aceptación del cliente: cuándo, quiénes (nombres), la firma de cada uno y lo acordado. */
+export interface AceptacionDTO {
+  en: string
+  por: string
+  firmas: Firma[]
+  /** El cliente tomó la bonificación de la inversión. */
+  conBonificacion: boolean
+  /** Lo acordado: el total, menos la bonificación si la tomó. */
+  totalCentavos: number
+}
 
 /** Contenido tal como lo ve el cliente: sin notas internas, permisos, arquitectura ni decisiones. */
 export type ContenidoPublicoDTO = Omit<
@@ -16,7 +28,9 @@ export interface PropuestaPublicaDTO {
   proyectoNombre: string | null
   fechaPropuesta: string // YYYY-MM-DD
   publicadoEn: string | null
-  aceptacion: { en: string; por: string } | null
+  aceptacion: AceptacionDTO | null
+  /** Firma dibujada por el desarrollador; null si aún no firma. */
+  firmaDesarrollador: { trazo: string; en: string } | null
   totalCentavos: number
   contenido: ContenidoPublicoDTO
 }
@@ -53,16 +67,26 @@ export interface ProyectoDetalleDTO {
   creadoEn: string
   actualizadoEn: string
   publicadoEn: string | null
-  aceptacion: { en: string; por: string } | null
+  aceptacion: AceptacionDTO | null
+  /** Correo que dejó el cliente al aceptar. Solo para el panel: nunca sale en la vista pública. */
+  correoAceptacion: string | null
 }
 
 function fechaISO(d: Date): string {
   return d.toISOString().slice(0, 10)
 }
 
-function aceptacionDTO(p: Proyecto): { en: string; por: string } | null {
+function aceptacionDTO(p: Proyecto): AceptacionDTO | null {
   const a = p.aceptacion
-  return a ? { en: a.en.toISOString(), por: a.por } : null
+  return a
+    ? {
+        en: a.en.toISOString(),
+        por: a.por,
+        firmas: a.firmas,
+        conBonificacion: a.conBonificacion,
+        totalCentavos: p.totalAcordadoCentavos,
+      }
+    : null
 }
 
 export function aPropuestaPublicaDTO(p: Proyecto): PropuestaPublicaDTO {
@@ -84,6 +108,9 @@ export function aPropuestaPublicaDTO(p: Proyecto): PropuestaPublicaDTO {
     fechaPropuesta: fechaISO(p.fechaPropuesta),
     publicadoEn: p.publicadoEn?.toISOString() ?? null,
     aceptacion: aceptacionDTO(p),
+    firmaDesarrollador: p.firmaDesarrollador
+      ? { trazo: p.firmaDesarrollador.trazo, en: p.firmaDesarrollador.en.toISOString() }
+      : null,
     totalCentavos: p.totalCentavos,
     contenido: publico,
   }
@@ -105,6 +132,7 @@ export function aProyectoDetalleDTO(p: Proyecto): ProyectoDetalleDTO {
     actualizadoEn: p.actualizadoEn.toISOString(),
     publicadoEn: p.publicadoEn?.toISOString() ?? null,
     aceptacion: aceptacionDTO(p),
+    correoAceptacion: p.aceptacion?.correo ?? null,
   }
 }
 

@@ -5,7 +5,7 @@ import { NIVELES_IMPACTO } from "@/src/modules/proyectos/domain/contenido"
 import { Campo, ChipUnico, ListaEditable, nuevoId } from "@/src/ui/levantamientos/campos"
 import { formatearDinero } from "@/src/ui/formato"
 import { CampoDinero, CampoTabla, Casilla, Selector } from "./campos"
-import { ETIQUETA_ICONO, ETIQUETA_IMPACTO } from "./etiquetas"
+import { ETIQUETA_ICONO, ETIQUETA_IMPACTO, ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 
 export interface Generales {
   clienteNombre: string
@@ -138,12 +138,26 @@ export function CuerpoSeccion({
             />
           </div>
           <Campo
-            etiqueta="Promesa (hero de la propuesta)"
+            etiqueta="Promesa (portada, solo si no hay objetivo)"
             filas={2}
             placeholder="Cada caja, cada parada y cada peso: bajo control."
             valor={c.ficha.promesa}
             onChange={(v) => mezclar("ficha", { promesa: v })}
           />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Campo
+              etiqueta="Titular de la portada"
+              placeholder="Control total de tu operación diaria"
+              valor={c.ficha.titular}
+              onChange={(v) => mezclar("ficha", { titular: v })}
+            />
+            <Campo
+              etiqueta="Foto de la portada (ruta en public/)"
+              placeholder="/propuestas/cliente.webp"
+              valor={c.ficha.imagenHero}
+              onChange={(v) => mezclar("ficha", { imagenHero: v })}
+            />
+          </div>
           <Campo
             etiqueta="Objetivo"
             filas={3}
@@ -473,7 +487,7 @@ export function CuerpoSeccion({
         <ListaEditable
           items={c.calendario}
           onChange={(v) => fijar("calendario", v)}
-          crear={() => ({ id: nuevoId(), semanas: "", entregable: "", pagoId: null })}
+          crear={() => ({ id: nuevoId(), semanas: "", titulo: "", entregable: "", modulos: [], pagoId: null })}
           agregar="Agregar hito"
           titulo={(h) => (h.semanas ? `Semanas ${h.semanas}` : "Hito")}
         >
@@ -489,7 +503,22 @@ export function CuerpoSeccion({
                   vacio={opcionesPago.length ? "Sin pago" : "Primero captura los pagos"}
                 />
               </div>
+              <Campo
+                etiqueta="Nombre de la etapa"
+                placeholder="App del repartidor"
+                valor={h.titulo}
+                onChange={(v) => set({ titulo: v })}
+              />
               <Campo etiqueta="Entregable" filas={2} valor={h.entregable} onChange={(v) => set({ entregable: v })} />
+              <div>
+                <p className={SUBTITULO}>Módulos de esas semanas (si hay, se muestran en lugar del entregable)</p>
+                <Renglones
+                  items={h.modulos}
+                  onChange={(v) => set({ modulos: v })}
+                  agregar="Agregar módulo"
+                  etiqueta="Módulo"
+                />
+              </div>
             </>
           )}
         </ListaEditable>
@@ -532,6 +561,33 @@ export function CuerpoSeccion({
                 </>
               )}
             </ListaEditable>
+          </div>
+          <div className="space-y-4 rounded-xl border border-border p-4">
+            <div>
+              <p className="text-sm font-semibold text-text-primary">Bonificación (opcional)</p>
+              <p className="mt-0.5 text-xs text-text-muted">
+                Se descuenta del último pago a cambio de algo que da el cliente. No cambia el total.
+              </p>
+            </div>
+            <div className={REJILLA}>
+              <Campo
+                etiqueta="Nombre"
+                placeholder="Caso de éxito"
+                valor={inv.bonificacion.nombre}
+                onChange={(v) => mezclar("inversion", { bonificacion: { ...inv.bonificacion, nombre: v } })}
+              />
+              <CampoDinero
+                etiqueta="Monto"
+                centavos={inv.bonificacion.montoCentavos}
+                onChange={(v) => mezclar("inversion", { bonificacion: { ...inv.bonificacion, montoCentavos: v } })}
+              />
+            </div>
+            <Campo
+              etiqueta="A cambio de"
+              filas={2}
+              valor={inv.bonificacion.condicion}
+              onChange={(v) => mezclar("inversion", { bonificacion: { ...inv.bonificacion, condicion: v } })}
+            />
           </div>
           <div>
             <p className={SUBTITULO}>Condiciones</p>
@@ -623,6 +679,7 @@ export function CuerpoSeccion({
                     paraQue: "",
                     formato: "",
                     bloquea: "",
+                    tipo: null,
                   })}
                   agregar="Agregar requisito"
                   titulo={(r) => [r.clave, r.que.slice(0, 50)].filter(Boolean).join(" · ") || "Requisito"}
@@ -633,6 +690,12 @@ export function CuerpoSeccion({
                         <Campo etiqueta="Clave" placeholder="R-01" valor={r.clave} onChange={(v) => setR({ clave: v })} />
                         <Campo etiqueta="Qué se necesita" valor={r.que} onChange={(v) => setR({ que: v })} />
                       </div>
+                      <ChipUnico
+                        etiqueta="Tarjeta en la propuesta (sin marcar = solo en el panel)"
+                        opciones={ETIQUETA_TIPO_REQUISITO}
+                        valor={r.tipo}
+                        onChange={(v) => setR({ tipo: v })}
+                      />
                       <Campo etiqueta="Para qué" filas={2} valor={r.paraQue} onChange={(v) => setR({ paraQue: v })} />
                       <div className={REJILLA}>
                         <Campo etiqueta="Formato" valor={r.formato} onChange={(v) => setR({ formato: v })} />

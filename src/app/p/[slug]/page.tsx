@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { haySesionPanel } from "@/src/modules/panel/infrastructure/exigir-sesion"
 import { proyectos } from "@/src/modules/proyectos/infrastructure/contenedor"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
 import { Propuesta } from "@/src/ui/proyectos/propuesta"
@@ -37,5 +38,6 @@ export default async function PaginaPropuesta({ params }: Props) {
   const { slug } = await params
   const p = await cargar(slug)
   if (!p) notFound()
-  return <Propuesta p={p} />
+  // Con sesión del panel, el desarrollador puede firmar desde la misma página
+  return <Propuesta p={p} puedeFirmar={await haySesionPanel()} />
 }

@@ -44,3 +44,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# respaldos locales de contenido de proyectos (datos de clientes)
+/respaldos/

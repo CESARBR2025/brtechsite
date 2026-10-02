@@ -78,3 +78,12 @@ export async function archivarProyecto(id: string): Promise<ResultadoAccion> {
 export async function retirarAceptacion(id: string): Promise<ResultadoAccion> {
   return transicion(id, (x) => proyectos().cambiarEstado.retirarAceptacion(x))
 }
+
+/** El desarrollador firma la propuesta desde su página pública (pide sesión del panel). */
+export async function firmarComoDesarrollador(slug: string, trazo: string): Promise<ResultadoAccion> {
+  return ejecutar(async () => {
+    await proyectos().firmarComoDesarrollador.ejecutar(String(slug).slice(0, 64), String(trazo))
+    revalidatePath(`/p/${slug}`)
+    return {}
+  })
+}
