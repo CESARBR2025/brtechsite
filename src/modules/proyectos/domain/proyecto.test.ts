@@ -7,6 +7,7 @@ import { RelojFijo } from "@/src/testing/dobles"
 import {
   normalizarContenido,
   requerimientosContratados,
+  totalConBonificacion,
   totalInversion,
 } from "./contenido"
 import { Proyecto } from "./proyecto"
@@ -86,6 +87,22 @@ describe("Contenido del proyecto", () => {
     })
     expect(totalInversion(c)).toBe(2_450_000)
     expect(requerimientosContratados(c)).toBe(1)
+  })
+
+  it("la bonificación baja el último pago sin cambiar el total", () => {
+    const pagos = [
+      { id: "a", montoCentavos: 600_000 },
+      { id: "b", montoCentavos: 1_050_000 },
+    ]
+    const con = (montoCentavos: number | null) =>
+      normalizarContenido({ inversion: { pagos, bonificacion: { nombre: "Caso de éxito", montoCentavos } } })
+
+    expect(totalInversion(con(250_000))).toBe(1_650_000)
+    expect(totalConBonificacion(con(250_000))).toBe(1_400_000)
+    // Sin bonificación, o si no cabe en el último pago, no hay total alterno
+    expect(totalConBonificacion(con(null))).toBeNull()
+    expect(totalConBonificacion(con(1_050_000))).toBeNull()
+    expect(totalConBonificacion(normalizarContenido({}))).toBeNull()
   })
 })
 

@@ -44,6 +44,7 @@ import Image from "next/image"
 import type { PropuestaPublicaDTO } from "@/src/modules/proyectos/application/dtos"
 import {
   TIPOS_REQUISITO,
+  totalConBonificacion,
   type TipoRequisito,
   type IconoVista,
 } from "@/src/modules/proyectos/domain/contenido"
@@ -512,6 +513,10 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
   )
   const pago = new Map(c.inversion.pagos.map((x) => [x.id, x]))
   const total = p.totalCentavos
+  // Bonificación: lo que baja el último pago si el cliente da algo a cambio
+  const bonificacion = c.inversion.bonificacion
+  const totalBonificado = totalConBonificacion(c)
+  const conBonificacion = `con ${(bonificacion.nombre || "bonificación").toLowerCase()}`
   // Tramos de la barra del calendario: solo las etapas con semanas numéricas ("3-5")
   const tramos = c.calendario
     .map((h) => ({
@@ -1005,19 +1010,46 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
                         {pagos.map((x, i) => (
                           <div key={x.id} style={{ flexGrow: x.montoCentavos! }} className="min-w-0 basis-0">
                             <div className={`h-2.5 rounded-full ${["bg-primary-light", "bg-primary", "bg-primary-hover"][i % 3]}`} />
-                            <p className="mt-3 truncate text-xs text-white/55">{x.nombre}</p>
-                            <p className="truncate font-display text-base font-semibold text-white tabular-nums sm:text-xl">
+                            {/* En celular solo la barra: los montos van en las tarjetas de abajo */}
+                            <p className="mt-3 hidden truncate text-xs text-white/55 sm:block">{x.nombre}</p>
+                            <p className="hidden truncate font-display text-xl font-semibold text-white tabular-nums sm:block">
                               {dinero(x.montoCentavos!, moneda)}
                             </p>
-                            <p className="truncate text-xs text-white/55">{Math.round((x.montoCentavos! / total) * 100)} %</p>
+                            <p className="hidden truncate text-xs text-white/55 sm:block">
+                              {Math.round((x.montoCentavos! / total) * 100)} %
+                            </p>
                           </div>
                         ))}
                       </div>
                     </div>
+                    {totalBonificado != null && (
+                      <div className="mt-8 grid gap-x-10 gap-y-3 border-t border-line-dark pt-6 lg:grid-cols-[auto_1fr] lg:items-center">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light/80">
+                            {bonificacion.nombre || "Bonificación"} · opcional
+                          </p>
+                          <p className="mt-2 font-display text-3xl font-bold tracking-tight text-white tabular-nums sm:text-4xl">
+                            {dinero(totalBonificado, moneda)}
+                          </p>
+                        </div>
+                        <p className="max-w-xl text-pretty text-sm leading-relaxed text-white/65 [&_strong]:font-semibold [&_strong]:text-white">
+                          <strong>{dinero(bonificacion.montoCentavos!, moneda)} menos en el último pago.</strong>{" "}
+                          <EnLinea texto={bonificacion.condicion} />
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Cada pago: cuándo, cuánto y contra qué entrega */}
-                  <div className={`grid gap-4 ${c.inversion.pagos.length >= 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+                  <div
+                    className={`grid gap-4 ${
+                      c.inversion.pagos.length === 4
+                        ? "sm:grid-cols-2 lg:grid-cols-4"
+                        : c.inversion.pagos.length >= 3
+                          ? "lg:grid-cols-3"
+                          : "md:grid-cols-2"
+                    }`}
+                  >
                     {c.inversion.pagos.map((x, i) => (
                       <div key={x.id} className={`${TARJETA} flex flex-col p-6`}>
                         <div className="flex items-center justify-between gap-3">
@@ -1034,6 +1066,11 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
                         {x.montoCentavos != null && (
                           <p className="font-display text-3xl font-bold tracking-tight text-text-primary tabular-nums">
                             {dinero(x.montoCentavos, moneda)}
+                          </p>
+                        )}
+                        {totalBonificado != null && x.id === pagos.at(-1)?.id && (
+                          <p className="mt-1 text-xs font-medium text-primary">
+                            o {dinero(x.montoCentavos! - bonificacion.montoCentavos!, moneda)} {conBonificacion}
                           </p>
                         )}
                         {x.contra && (
@@ -1302,6 +1339,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
           <AceptarPropuesta
             slug={p.slug}
             total={dinero(total, moneda)}
+            notaTotal={totalBonificado != null ? `o ${dinero(totalBonificado, moneda)} ${conBonificacion}` : undefined}
             aceptacion={p.aceptacion}
             sugerido={c.ficha.contactoNombre}
             desarrollador={{

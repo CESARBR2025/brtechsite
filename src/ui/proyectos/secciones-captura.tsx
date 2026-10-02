@@ -562,6 +562,33 @@ export function CuerpoSeccion({
               )}
             </ListaEditable>
           </div>
+          <div className="space-y-4 rounded-xl border border-border p-4">
+            <div>
+              <p className="text-sm font-semibold text-text-primary">Bonificación (opcional)</p>
+              <p className="mt-0.5 text-xs text-text-muted">
+                Se descuenta del último pago a cambio de algo que da el cliente. No cambia el total.
+              </p>
+            </div>
+            <div className={REJILLA}>
+              <Campo
+                etiqueta="Nombre"
+                placeholder="Caso de éxito"
+                valor={inv.bonificacion.nombre}
+                onChange={(v) => mezclar("inversion", { bonificacion: { ...inv.bonificacion, nombre: v } })}
+              />
+              <CampoDinero
+                etiqueta="Monto"
+                centavos={inv.bonificacion.montoCentavos}
+                onChange={(v) => mezclar("inversion", { bonificacion: { ...inv.bonificacion, montoCentavos: v } })}
+              />
+            </div>
+            <Campo
+              etiqueta="A cambio de"
+              filas={2}
+              valor={inv.bonificacion.condicion}
+              onChange={(v) => mezclar("inversion", { bonificacion: { ...inv.bonificacion, condicion: v } })}
+            />
+          </div>
           <div>
             <p className={SUBTITULO}>Condiciones</p>
             <Renglones

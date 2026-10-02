@@ -238,12 +238,15 @@ function FirmaDesarrollador({ slug, d, oscuro = false }: { slug: string; d: Desa
 export function AceptarPropuesta({
   slug,
   total,
+  notaTotal,
   aceptacion,
   sugerido,
   desarrollador,
 }: {
   slug: string
   total: string
+  /** Total alterno (p. ej. con bonificación), bajo la cifra principal. */
+  notaTotal?: string
   aceptacion: AceptacionDTO | null
   /** Nombre del contacto, para precargar el primer firmante. */
   sugerido: string
@@ -320,6 +323,7 @@ export function AceptarPropuesta({
           <p className="mt-3 font-display text-5xl font-bold tracking-tight text-text-primary tabular-nums sm:text-6xl">
             {total}
           </p>
+          {notaTotal && <p className="mt-2 text-sm font-medium text-primary">{notaTotal}; se define en el contrato.</p>}
           <p className="mt-4 text-pretty text-sm leading-relaxed text-text-secondary">
             Con tu firma preparamos el contrato. Nada se cobra desde esta página.
           </p>

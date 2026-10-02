@@ -203,6 +203,17 @@ export const esquemaContenido = z.object({
   inversion: bloque({
     moneda: texto(3).transform((m) => m.toUpperCase() || "MXN"),
     pagos: lista(esquemaPago, 12),
+    /**
+     * Descuento opcional sobre el último pago, a cambio de algo que da el
+     * cliente (p. ej. ser caso de éxito). El total sigue siendo la suma de los
+     * pagos: la bonificación se muestra aparte y se formaliza en el contrato.
+     */
+    bonificacion: bloque({
+      nombre: texto(),
+      montoCentavos: centavos,
+      /** Qué da el cliente a cambio. */
+      condicion: texto(LARGO),
+    }),
     condiciones: lista(renglon, 20),
     mensualidad: bloque({
       montoCentavos: centavos,
@@ -408,6 +419,16 @@ export function contenidoVacio(): Contenido {
 /** Suma de los pagos del desarrollo, en centavos. */
 export function totalInversion(c: Pick<Contenido, "inversion">): number {
   return c.inversion.pagos.reduce((s, p) => s + (p.montoCentavos ?? 0), 0)
+}
+
+/**
+ * Total del desarrollo si el cliente toma la bonificación, en centavos.
+ * null si no hay bonificación o si no cabe en el último pago.
+ */
+export function totalConBonificacion(c: Pick<Contenido, "inversion">): number | null {
+  const monto = c.inversion.bonificacion.montoCentavos ?? 0
+  const ultimo = c.inversion.pagos.filter((p) => p.montoCentavos).at(-1)?.montoCentavos ?? 0
+  return monto > 0 && monto < ultimo ? totalInversion(c) - monto : null
 }
 
 /** Requerimientos que entran en las fases contratadas. */
