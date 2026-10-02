@@ -100,17 +100,41 @@ describe("Proyecto", () => {
     expect(listo.esPublico).toBe(true)
   })
 
-  it("el cliente acepta una sola vez y solo si está publicada", () => {
+  it("el desarrollador firma y puede volver a firmar", () => {
     const p = nuevo(publicable)
-    expect(() => p.aceptar("César", reloj)).toThrow(OperacionNoPermitida)
+    expect(p.firmaDesarrollador).toBeNull()
+    expect(() => p.firmarComoDesarrollador("M10 10", reloj)).toThrow(DatosInvalidos)
+    const trazo = "M10 10L20 20L30 10L40 20L50 10L60 20"
+    p.firmarComoDesarrollador(trazo, reloj)
+    expect(p.firmaDesarrollador).toEqual({ trazo, en: reloj.ahora() })
+    p.firmarComoDesarrollador(`${trazo}L70 10`, reloj)
+    expect(p.firmaDesarrollador?.trazo).toBe(`${trazo}L70 10`)
+  })
+
+  it("el cliente acepta una sola vez, con firma, y solo si está publicada", () => {
+    const trazo = "M10 10L20 20L30 10L40 20L50 10L60 20"
+    const cesar = { nombre: "  César Chavero ", trazo }
+    const p = nuevo(publicable)
+    expect(() => p.aceptar([cesar], reloj)).toThrow(OperacionNoPermitida)
     p.publicar(reloj)
-    expect(() => p.aceptar("   ", reloj)).toThrow(DatosInvalidos)
-    p.aceptar("  César Chavero ", reloj)
-    expect(p.aceptacion).toEqual({ en: reloj.ahora(), por: "César Chavero" })
-    expect(() => p.aceptar("Otro", reloj)).toThrow(/ya fue aceptada/)
+    expect(() => p.aceptar([], reloj)).toThrow(DatosInvalidos)
+    expect(() => p.aceptar([{ nombre: "   ", trazo }], reloj)).toThrow(DatosInvalidos)
+    expect(() => p.aceptar([{ nombre: "César", trazo: "M10 10" }], reloj)).toThrow(/firma/)
+    expect(() => p.aceptar([{ nombre: "César", trazo: "<script>" }], reloj)).toThrow(/firma/)
+    expect(() => p.aceptar([cesar, cesar, cesar, cesar], reloj)).toThrow(/hasta 3/)
+    p.aceptar([cesar, { nombre: "Ana Ruiz", trazo }], reloj)
+    expect(p.aceptacion).toEqual({
+      en: reloj.ahora(),
+      por: "César Chavero, Ana Ruiz",
+      firmas: [
+        { nombre: "César Chavero", trazo },
+        { nombre: "Ana Ruiz", trazo },
+      ],
+    })
+    expect(() => p.aceptar([cesar], reloj)).toThrow(/ya fue aceptada/)
     p.retirarAceptacion(reloj)
     expect(p.aceptacion).toBeNull()
-    p.aceptar("César", reloj)
+    p.aceptar([{ nombre: "César", trazo }], reloj)
     expect(p.aceptacion?.por).toBe("César")
   })
 

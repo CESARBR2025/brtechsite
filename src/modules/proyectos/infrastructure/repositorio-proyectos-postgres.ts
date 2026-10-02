@@ -10,7 +10,8 @@ const COLUMNAS = `
   cliente_nombre, cliente_contacto, proyecto_nombre,
   to_char(fecha_propuesta, 'YYYY-MM-DD') AS fecha_propuesta,
   contenido, esquema_version,
-  creado_en, actualizado_en, publicado_en, aceptado_en, aceptado_por
+  creado_en, actualizado_en, publicado_en, aceptado_en, aceptado_por, aceptado_firmas,
+  firma_desarrollador
 `
 
 export class RepositorioProyectosPostgres implements RepositorioProyectos {
@@ -67,8 +68,9 @@ export class RepositorioProyectosPostgres implements RepositorioProyectos {
          id, public_slug, folio, estado, levantamiento_id,
          cliente_nombre, cliente_contacto, proyecto_nombre, fecha_propuesta,
          contenido, esquema_version,
-         creado_en, actualizado_en, publicado_en, aceptado_en, aceptado_por
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+         creado_en, actualizado_en, publicado_en, aceptado_en, aceptado_por, aceptado_firmas,
+         firma_desarrollador
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
        ON CONFLICT (id) DO UPDATE SET
          estado = EXCLUDED.estado,
          cliente_nombre = EXCLUDED.cliente_nombre,
@@ -80,7 +82,9 @@ export class RepositorioProyectosPostgres implements RepositorioProyectos {
          actualizado_en = EXCLUDED.actualizado_en,
          publicado_en = EXCLUDED.publicado_en,
          aceptado_en = EXCLUDED.aceptado_en,
-         aceptado_por = EXCLUDED.aceptado_por`,
+         aceptado_por = EXCLUDED.aceptado_por,
+         aceptado_firmas = EXCLUDED.aceptado_firmas,
+         firma_desarrollador = EXCLUDED.firma_desarrollador`,
       [
         s.id,
         s.slug.valor,
@@ -98,6 +102,10 @@ export class RepositorioProyectosPostgres implements RepositorioProyectos {
         s.publicadoEn?.toISOString() ?? null,
         s.aceptadoEn?.toISOString() ?? null,
         s.aceptadoPor,
+        JSON.stringify(s.aceptadoFirmas),
+        s.firmaDesarrollador
+          ? JSON.stringify({ trazo: s.firmaDesarrollador.trazo, en: s.firmaDesarrollador.en.toISOString() })
+          : null,
       ],
     )
   }

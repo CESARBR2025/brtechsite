@@ -7,6 +7,7 @@ import { AceptarPropuesta } from "../application/aceptar-propuesta"
 import { CambiarEstadoProyecto } from "../application/cambiar-estado-proyecto"
 import { ConsultarProyectos } from "../application/consultar-proyectos"
 import { CrearProyecto } from "../application/crear-proyecto"
+import { FirmarComoDesarrollador } from "../application/firmar-como-desarrollador"
 import { GuardarProyecto } from "../application/guardar-proyecto"
 import { ObtenerPropuestaPublica } from "../application/obtener-propuesta-publica"
 import { fuenteLevantamientos } from "./fuente-levantamientos"
@@ -32,6 +33,7 @@ function construir() {
     cambiarEstado: new CambiarEstadoProyecto(repo, relojSistema),
     consultarProyectos: new ConsultarProyectos(repo, fuenteLevantamientos),
     obtenerPropuestaPublica: new ObtenerPropuestaPublica(repo),
+    firmarComoDesarrollador: new FirmarComoDesarrollador(repo, relojSistema),
     aceptarPropuesta: new AceptarPropuesta(repo, new NotificadorAceptacionResend(), relojSistema),
   }
 }

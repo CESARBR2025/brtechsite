@@ -11,13 +11,19 @@ import type { ResultadoAccion } from "./tipos"
  * panel; el slug de la propuesta publicada es la credencial.
  */
 
-const entrada = z.object({ slug: z.string().max(64), nombre: z.string().max(120) })
+const entrada = z.object({
+  slug: z.string().max(64),
+  firmas: z.array(z.object({ nombre: z.string().max(120), trazo: z.string().max(12_000) })).min(1).max(10),
+})
 
-export async function aceptarPropuesta(slug: string, nombre: string): Promise<ResultadoAccion> {
-  const datos = entrada.safeParse({ slug, nombre })
+export async function aceptarPropuesta(
+  slug: string,
+  firmas: { nombre: string; trazo: string }[],
+): Promise<ResultadoAccion> {
+  const datos = entrada.safeParse({ slug, firmas })
   if (!datos.success) return { ok: false, error: "Datos inválidos" }
   try {
-    const r = await proyectos().aceptarPropuesta.ejecutar(datos.data.slug, datos.data.nombre)
+    const r = await proyectos().aceptarPropuesta.ejecutar(datos.data.slug, datos.data.firmas)
     if (r.aviso === "fallido") {
       console.error("[propuesta] no se pudo avisar de la aceptación:", r.errorAviso)
     }

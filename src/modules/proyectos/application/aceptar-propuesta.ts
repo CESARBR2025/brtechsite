@@ -21,9 +21,12 @@ export class AceptarPropuesta {
     private readonly reloj: Reloj,
   ) {}
 
-  async ejecutar(slug: string, nombre: string): Promise<ResultadoAceptarPropuesta> {
+  async ejecutar(
+    slug: string,
+    firmas: readonly { nombre: string; trazo: string }[],
+  ): Promise<ResultadoAceptarPropuesta> {
     const proyecto = await proyectoPublicado(this.repo, slug)
-    proyecto.aceptar(nombre, this.reloj)
+    proyecto.aceptar(firmas, this.reloj)
     await this.repo.guardar(proyecto)
 
     const aceptacion = proyecto.aceptacion!

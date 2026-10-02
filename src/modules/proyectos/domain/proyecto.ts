@@ -12,6 +12,7 @@ import {
   totalInversion,
 } from "./contenido"
 import type { EstadoProyecto } from "./estado-proyecto"
+import { crearFirmas, trazoValido, type Firma, type FirmaDesarrollador } from "./firma"
 import type { SlugProyecto } from "./slug-proyecto"
 
 export interface DatosGenerales {
@@ -37,8 +38,12 @@ export interface PropsProyecto {
   actualizadoEn: Date
   publicadoEn: Date | null
   aceptadoEn: Date | null
-  /** Nombre que escribió el cliente al aceptar. */
+  /** Nombres de quienes aceptaron, separados por coma. */
   aceptadoPor: string | null
+  /** Firma de cada persona que aceptó (vacío en aceptaciones anteriores a las firmas). */
+  aceptadoFirmas: Firma[]
+  /** Firma que el desarrollador dibujó para esta propuesta. */
+  firmaDesarrollador: FirmaDesarrollador | null
 }
 
 function textoOpcional(valor: string | null | undefined): string | null {
@@ -81,6 +86,8 @@ export class Proyecto {
       publicadoEn: null,
       aceptadoEn: null,
       aceptadoPor: null,
+      aceptadoFirmas: [],
+      firmaDesarrollador: null,
     })
   }
 
@@ -129,10 +136,17 @@ export class Proyecto {
   get publicadoEn(): Date | null {
     return this.props.publicadoEn
   }
-  get aceptacion(): { en: Date; por: string } | null {
+  get aceptacion(): { en: Date; por: string; firmas: Firma[] } | null {
     return this.props.aceptadoEn
-      ? { en: this.props.aceptadoEn, por: this.props.aceptadoPor ?? "" }
+      ? {
+          en: this.props.aceptadoEn,
+          por: this.props.aceptadoPor ?? "",
+          firmas: this.props.aceptadoFirmas,
+        }
       : null
+  }
+  get firmaDesarrollador(): FirmaDesarrollador | null {
+    return this.props.firmaDesarrollador
   }
   get esPublico(): boolean {
     return this.props.estado === "publicado"
@@ -207,20 +221,29 @@ export class Proyecto {
   }
 
   /**
-   * El cliente acepta la propuesta desde su página publicada, escribiendo su
-   * nombre. Solo se acepta una vez; para volver a pedirla, el panel la retira.
+   * El cliente acepta la propuesta desde su página publicada: cada firmante
+   * escribe su nombre y dibuja su firma. Solo se acepta una vez; para volver a
+   * pedirla, el panel la retira.
    */
-  aceptar(nombre: string, reloj: Reloj): void {
+  aceptar(firmas: readonly { nombre: string; trazo: string }[], reloj: Reloj): void {
     if (!this.esPublico) {
       throw new OperacionNoPermitida("Solo se puede aceptar una propuesta publicada")
     }
     if (this.props.aceptadoEn) {
       throw new OperacionNoPermitida("Esta propuesta ya fue aceptada")
     }
-    const quien = textoRequerido(nombre, "nombre de quien acepta")
-    if (quien.length > 120) throw new DatosInvalidos("El nombre es demasiado largo")
+    const validas = crearFirmas(firmas)
     this.props.aceptadoEn = reloj.ahora()
-    this.props.aceptadoPor = quien
+    this.props.aceptadoPor = validas.map((f) => f.nombre).join(", ")
+    this.props.aceptadoFirmas = validas
+    this.tocar(reloj)
+  }
+
+  /** El desarrollador firma la propuesta; volver a firmar reemplaza la firma anterior. */
+  firmarComoDesarrollador(trazo: string, reloj: Reloj): void {
+    this.garantizarEditable()
+    if (!trazoValido(trazo)) throw new DatosInvalidos("Falta la firma del desarrollador")
+    this.props.firmaDesarrollador = { trazo, en: reloj.ahora() }
     this.tocar(reloj)
   }
 
@@ -230,6 +253,7 @@ export class Proyecto {
     if (!this.props.aceptadoEn) return
     this.props.aceptadoEn = null
     this.props.aceptadoPor = null
+    this.props.aceptadoFirmas = []
     this.tocar(reloj)
   }
 

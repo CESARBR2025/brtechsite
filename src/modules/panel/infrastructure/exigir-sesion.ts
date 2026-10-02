@@ -11,8 +11,13 @@ import { NOMBRE_COOKIE_SESION, tokenSesionValido } from "./sesion"
  * cookie de sesión por su cuenta.
  */
 export async function exigirSesionPanel(): Promise<void> {
-  const token = (await cookies()).get(NOMBRE_COOKIE_SESION)?.value
-  if (!(await tokenSesionValido(token, getEnv().PANEL_SESSION_SECRET))) {
+  if (!(await haySesionPanel())) {
     throw new OperacionNoPermitida("La sesión expiró. Vuelve a iniciar sesión.")
   }
+}
+
+/** Si quien pide la página tiene sesión del panel (p. ej. para mostrarle acciones propias). */
+export async function haySesionPanel(): Promise<boolean> {
+  const token = (await cookies()).get(NOMBRE_COOKIE_SESION)?.value
+  return tokenSesionValido(token, getEnv().PANEL_SESSION_SECRET)
 }

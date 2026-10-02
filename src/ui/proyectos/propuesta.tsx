@@ -528,7 +528,7 @@ function LineaTiempo() {
 }
 
 /** Página completa de la propuesta del proyecto. */
-export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
+export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; puedeFirmar?: boolean }) {
   const c: C = p.contenido
   const moneda = c.inversion.moneda || "MXN"
   const titulo = p.proyectoNombre ?? "Tu proyecto"
@@ -1357,7 +1357,7 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
           texto={
             p.aceptacion
               ? undefined
-              : "Si todo está claro, acepta la propuesta aquí mismo. Si algo no te convence, escríbenos y lo ajustamos."
+              : "Si todo está claro, firma la propuesta aquí mismo. Si algo no te convence, escríbenos y lo ajustamos."
           }
         >
           <AceptarPropuesta
@@ -1365,6 +1365,13 @@ export function Propuesta({ p }: { p: PropuestaPublicaDTO }) {
             total={dinero(total, moneda)}
             aceptacion={p.aceptacion}
             sugerido={c.ficha.contactoNombre}
+            desarrollador={{
+              nombre: EMPRESA.fundador,
+              empresa: EMPRESA.nombre,
+              fecha: p.publicadoEn ?? p.fechaPropuesta,
+              firma: p.firmaDesarrollador,
+              puedeFirmar,
+            }}
           />
         </Seccion>
       </div>

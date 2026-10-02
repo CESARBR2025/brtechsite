@@ -1,4 +1,5 @@
 import type { EstadoProyecto } from "../domain/estado-proyecto"
+import { firmaDesarrolladorGuardada, firmasGuardadas } from "../domain/firma"
 import { Proyecto } from "../domain/proyecto"
 import { SlugProyecto } from "../domain/slug-proyecto"
 
@@ -20,6 +21,8 @@ export interface FilaProyecto {
   publicado_en: Date | string | null
   aceptado_en: Date | string | null
   aceptado_por: string | null
+  aceptado_firmas: unknown
+  firma_desarrollador: unknown
 }
 
 function fecha(valor: Date | string): Date {
@@ -43,5 +46,7 @@ export function proyectoADominio(fila: FilaProyecto): Proyecto {
     publicadoEn: fila.publicado_en ? fecha(fila.publicado_en) : null,
     aceptadoEn: fila.aceptado_en ? fecha(fila.aceptado_en) : null,
     aceptadoPor: fila.aceptado_por,
+    aceptadoFirmas: firmasGuardadas(fila.aceptado_firmas),
+    firmaDesarrollador: firmaDesarrolladorGuardada(fila.firma_desarrollador),
   })
 }

@@ -114,7 +114,8 @@ describe("Casos de uso de proyectos", () => {
       await guardar.ejecutar(r.id, { generales, contenido })
       await estado.publicar(r.id)
 
-      expect(await aceptar.ejecutar(r.slug, "César Chavero")).toEqual({ aviso: "enviado" })
+      const firma = { nombre: "César Chavero", trazo: "M10 10L20 20L30 10L40 20L50 10L60 20" }
+      expect(await aceptar.ejecutar(r.slug, [firma])).toEqual({ aviso: "enviado" })
       expect(notificador.enviados[0]).toMatchObject({
         folio: "BRP-000001",
         aceptadaPor: "César Chavero",
@@ -124,6 +125,7 @@ describe("Casos de uso de proyectos", () => {
       expect((await publico.ejecutar(r.slug)).aceptacion).toEqual({
         en: "2026-09-25T12:00:00.000Z",
         por: "César Chavero",
+        firmas: [firma],
       })
       expect((await consultar.listar())[0].aceptado).toBe(true)
     })
@@ -131,7 +133,9 @@ describe("Casos de uso de proyectos", () => {
     it("un borrador no se puede aceptar", async () => {
       const aceptar = new AceptarPropuesta(repo, new NotificadorAceptacionEnMemoria(), reloj)
       const r = await crear.ejecutar(generales)
-      await expect(aceptar.ejecutar(r.slug, "César")).rejects.toBeInstanceOf(RecursoNoEncontrado)
+      await expect(
+        aceptar.ejecutar(r.slug, [{ nombre: "César", trazo: "M10 10L20 20L30 10L40 20L50 10L60 20" }]),
+      ).rejects.toBeInstanceOf(RecursoNoEncontrado)
     })
 
     it("si el correo falla, la aceptación igual queda guardada", async () => {
@@ -141,7 +145,8 @@ describe("Casos de uso de proyectos", () => {
       const r = await crear.ejecutar(generales)
       await guardar.ejecutar(r.id, { generales, contenido })
       await estado.publicar(r.id)
-      expect((await aceptar.ejecutar(r.slug, "César")).aviso).toBe("fallido")
+      const firma = { nombre: "César", trazo: "M10 10L20 20L30 10L40 20L50 10L60 20" }
+      expect((await aceptar.ejecutar(r.slug, [firma])).aviso).toBe("fallido")
       expect((await publico.ejecutar(r.slug)).aceptacion?.por).toBe("César")
     })
   })
