@@ -5,7 +5,7 @@ import { NIVELES_IMPACTO } from "@/src/modules/proyectos/domain/contenido"
 import { Campo, ChipUnico, ListaEditable, nuevoId } from "@/src/ui/levantamientos/campos"
 import { formatearDinero } from "@/src/ui/formato"
 import { CampoDinero, CampoTabla, Casilla, Selector } from "./campos"
-import { ETIQUETA_ICONO, ETIQUETA_IMPACTO, ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
+import { ETIQUETA_DISPOSITIVO, ETIQUETA_ICONO, ETIQUETA_IMPACTO, ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 
 export interface Generales {
   clienteNombre: string
@@ -271,6 +271,47 @@ export function CuerpoSeccion({
                 <p className={SUBTITULO}>Qué podrás hacer</p>
                 <Renglones items={x.puntos} onChange={(v) => set({ puntos: v })} agregar="Agregar" etiqueta="Punto" filas={1} />
               </div>
+            </>
+          )}
+        </ListaEditable>
+      )
+
+    case "maquetas":
+      return (
+        <ListaEditable
+          items={c.maquetas}
+          onChange={(v) => fijar("maquetas", v)}
+          crear={() => ({
+            id: nuevoId(),
+            dispositivo: c.maquetas.at(-1)?.dispositivo ?? "movil",
+            titulo: "",
+            descripcion: "",
+            imagen: "",
+          })}
+          agregar="Agregar maqueta"
+          titulo={(x) => x.titulo || "Maqueta"}
+        >
+          {(x, set) => (
+            <>
+              <ChipUnico
+                etiqueta="Se ve en"
+                opciones={ETIQUETA_DISPOSITIVO}
+                valor={x.dispositivo}
+                onChange={(v) => set({ dispositivo: v ?? x.dispositivo })}
+              />
+              <Campo etiqueta="Pantalla" placeholder="Ruta del día" valor={x.titulo} onChange={(v) => set({ titulo: v })} />
+              <Campo
+                etiqueta="Qué se ve (una línea)"
+                placeholder="Paradas en orden y botón hacia Google Maps"
+                valor={x.descripcion}
+                onChange={(v) => set({ descripcion: v })}
+              />
+              <Campo
+                etiqueta="Imagen (ruta en public/)"
+                placeholder="/propuestas/cliente-app-ruta.webp"
+                valor={x.imagen}
+                onChange={(v) => set({ imagen: v })}
+              />
             </>
           )}
         </ListaEditable>

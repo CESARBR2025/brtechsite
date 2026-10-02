@@ -55,6 +55,7 @@ import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
 import { AceptarPropuesta } from "./aceptar-propuesta"
 import { PestanasSistema } from "./pestanas-sistema"
+import { RecorridoMaquetas } from "./visor-maquetas"
 import { ETIQUETA_TIPO_REQUISITO } from "./etiquetas"
 import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
 
@@ -421,6 +422,36 @@ function ModulosGrupo({ grupo, vistas }: { grupo: string; vistas: C["vistas"] })
   )
 }
 
+const DISPOSITIVOS_GALERIA = [
+  { clave: "movil", titulo: "En el celular", Icono: Smartphone },
+  { clave: "web", titulo: "En la computadora", Icono: MonitorSmartphone },
+] as const
+
+/** Las maquetas por dispositivo: pestañas si hay de más de uno, recorrido directo si solo hay uno. */
+function GaleriaMaquetas({ maquetas }: { maquetas: C["maquetas"] }) {
+  const grupos = DISPOSITIVOS_GALERIA.map((d) => ({
+    ...d,
+    items: maquetas.filter((m) => m.dispositivo === d.clave),
+  })).filter((g) => g.items.length > 0)
+
+  if (grupos.length === 1) {
+    return <RecorridoMaquetas items={grupos[0].items} formato={grupos[0].clave} />
+  }
+  return (
+    <PestanasSistema
+      nombre="Maquetas por dispositivo"
+      prefijo="maquetas"
+      pestanas={grupos.map((g) => ({
+        id: g.clave,
+        titulo: g.titulo,
+        cuenta: g.items.length,
+        icono: <g.Icono className="h-4 w-4" aria-hidden="true" />,
+        panel: <RecorridoMaquetas items={g.items} formato={g.clave} />,
+      }))}
+    />
+  )
+}
+
 /** "F2" → "Fase 2"; cualquier otra clave se deja como está. */
 function nombreFase(clave: string): string {
   const m = /^F\s*(\d+)$/i.exec(clave.trim())
@@ -545,6 +576,7 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
     { id: "reto", titulo: "El reto", mostrar: hayAlcance },
     { id: "personas", titulo: "Personas", mostrar: roles.length > 0 },
     { id: "tu-sistema", titulo: "Tu sistema", mostrar: c.vistas.length > 0 || etapasIncluidas.length > 0 },
+    { id: "maquetas", titulo: "Cómo se vería", mostrar: c.maquetas.length > 0 },
     { id: "calendario", titulo: "Calendario", mostrar: c.calendario.length > 0 },
     { id: "inversion", titulo: "Inversión", mostrar: hayInversion },
     { id: "tu-lado", titulo: "Lo que necesitamos", mostrar: hayRequisitos },
@@ -862,6 +894,22 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
                 ))}
               </div>
             )}
+          </Seccion>
+        )}
+
+        {/* Cómo se vería: maquetas ilustrativas, por dispositivo */}
+        {c.maquetas.length > 0 && (
+          <Seccion
+            id="maquetas"
+            indice={num("maquetas")}
+            etiqueta="Así podría verse"
+            titulo="Una primera mirada a tu sistema"
+            texto="Así podrían verse las pantallas que vas a usar. Es una vista conceptual: el diseño final lo afinamos contigo durante el desarrollo."
+          >
+            <GaleriaMaquetas maquetas={c.maquetas} />
+            <p className="mt-6 text-xs leading-relaxed text-text-muted">
+              Vista conceptual. Los nombres, productos y cifras que aparecen son de ejemplo.
+            </p>
           </Seccion>
         )}
 
