@@ -3,11 +3,15 @@ import type { EstadoProyecto } from "../domain/estado-proyecto"
 import type { Firma } from "../domain/firma"
 import type { Proyecto } from "../domain/proyecto"
 
-/** Aceptación del cliente: cuándo, quiénes (nombres) y la firma de cada uno. */
+/** Aceptación del cliente: cuándo, quiénes (nombres), la firma de cada uno y lo acordado. */
 export interface AceptacionDTO {
   en: string
   por: string
   firmas: Firma[]
+  /** El cliente tomó la bonificación de la inversión. */
+  conBonificacion: boolean
+  /** Lo acordado: el total, menos la bonificación si la tomó. */
+  totalCentavos: number
 }
 
 /** Contenido tal como lo ve el cliente: sin notas internas, permisos, arquitectura ni decisiones. */
@@ -64,6 +68,8 @@ export interface ProyectoDetalleDTO {
   actualizadoEn: string
   publicadoEn: string | null
   aceptacion: AceptacionDTO | null
+  /** Correo que dejó el cliente al aceptar. Solo para el panel: nunca sale en la vista pública. */
+  correoAceptacion: string | null
 }
 
 function fechaISO(d: Date): string {
@@ -72,7 +78,15 @@ function fechaISO(d: Date): string {
 
 function aceptacionDTO(p: Proyecto): AceptacionDTO | null {
   const a = p.aceptacion
-  return a ? { en: a.en.toISOString(), por: a.por, firmas: a.firmas } : null
+  return a
+    ? {
+        en: a.en.toISOString(),
+        por: a.por,
+        firmas: a.firmas,
+        conBonificacion: a.conBonificacion,
+        totalCentavos: p.totalAcordadoCentavos,
+      }
+    : null
 }
 
 export function aPropuestaPublicaDTO(p: Proyecto): PropuestaPublicaDTO {
@@ -118,6 +132,7 @@ export function aProyectoDetalleDTO(p: Proyecto): ProyectoDetalleDTO {
     actualizadoEn: p.actualizadoEn.toISOString(),
     publicadoEn: p.publicadoEn?.toISOString() ?? null,
     aceptacion: aceptacionDTO(p),
+    correoAceptacion: p.aceptacion?.correo ?? null,
   }
 }
 

@@ -9,8 +9,10 @@ import { ConsultarProyectos } from "../application/consultar-proyectos"
 import { CrearProyecto } from "../application/crear-proyecto"
 import { FirmarComoDesarrollador } from "../application/firmar-como-desarrollador"
 import { GuardarProyecto } from "../application/guardar-proyecto"
+import { ObtenerContratoPdf } from "../application/obtener-contrato"
 import { ObtenerPropuestaPublica } from "../application/obtener-propuesta-publica"
 import { fuenteLevantamientos } from "./fuente-levantamientos"
+import { GeneradorPdfContratoPdfLib } from "./generador-pdf-contrato"
 import { generadorSlugProyectoNanoid } from "./generador-slug-nanoid"
 import { NotificadorAceptacionResend } from "./notificador-aceptacion-resend"
 import { RepositorioProyectosPostgres } from "./repositorio-proyectos-postgres"
@@ -21,6 +23,7 @@ import { RepositorioProyectosPostgres } from "./repositorio-proyectos-postgres"
  */
 function construir() {
   const repo = new RepositorioProyectosPostgres(getPool())
+  const generadorPdf = new GeneradorPdfContratoPdfLib()
   return {
     crearProyecto: new CrearProyecto(
       repo,
@@ -34,7 +37,8 @@ function construir() {
     consultarProyectos: new ConsultarProyectos(repo, fuenteLevantamientos),
     obtenerPropuestaPublica: new ObtenerPropuestaPublica(repo),
     firmarComoDesarrollador: new FirmarComoDesarrollador(repo, relojSistema),
-    aceptarPropuesta: new AceptarPropuesta(repo, new NotificadorAceptacionResend(), relojSistema),
+    obtenerContratoPdf: new ObtenerContratoPdf(repo, generadorPdf),
+    aceptarPropuesta: new AceptarPropuesta(repo, new NotificadorAceptacionResend(), generadorPdf, relojSistema),
   }
 }
 

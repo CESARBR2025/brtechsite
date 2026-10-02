@@ -1339,7 +1339,17 @@ export function Propuesta({ p, puedeFirmar = false }: { p: PropuestaPublicaDTO; 
           <AceptarPropuesta
             slug={p.slug}
             total={dinero(total, moneda)}
-            notaTotal={totalBonificado != null ? `o ${dinero(totalBonificado, moneda)} ${conBonificacion}` : undefined}
+            bonificacion={
+              totalBonificado != null
+                ? {
+                    nombre: bonificacion.nombre || "Bonificación",
+                    total: dinero(totalBonificado, moneda),
+                    ahorro: dinero(bonificacion.montoCentavos!, moneda),
+                    condicion: bonificacion.condicion.replace(/\*\*/g, ""),
+                  }
+                : null
+            }
+            totalAcordado={p.aceptacion ? dinero(p.aceptacion.totalCentavos, moneda) : undefined}
             aceptacion={p.aceptacion}
             sugerido={c.ficha.contactoNombre}
             desarrollador={{

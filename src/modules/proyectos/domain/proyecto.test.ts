@@ -22,6 +22,9 @@ function nuevo(contenido?: unknown) {
   )
 }
 
+/** Aceptación con el correo que siempre se pide al firmar. */
+const con = (firmas: { nombre: string; trazo: string }[]) => ({ firmas, correo: "cesar@tiobeto.mx" })
+
 const publicable = {
   fases: [{ id: "mvp", clave: "MVP", nombre: "Operación base", contratada: true }],
   inversion: { pagos: [{ id: "a", nombre: "Anticipo", montoCentavos: 1_050_000 }] },
@@ -132,14 +135,14 @@ describe("Proyecto", () => {
     const trazo = "M10 10L20 20L30 10L40 20L50 10L60 20"
     const cesar = { nombre: "  César Chavero ", trazo }
     const p = nuevo(publicable)
-    expect(() => p.aceptar([cesar], reloj)).toThrow(OperacionNoPermitida)
+    expect(() => p.aceptar(con([cesar]), reloj)).toThrow(OperacionNoPermitida)
     p.publicar(reloj)
-    expect(() => p.aceptar([], reloj)).toThrow(DatosInvalidos)
-    expect(() => p.aceptar([{ nombre: "   ", trazo }], reloj)).toThrow(DatosInvalidos)
-    expect(() => p.aceptar([{ nombre: "César", trazo: "M10 10" }], reloj)).toThrow(/firma/)
-    expect(() => p.aceptar([{ nombre: "César", trazo: "<script>" }], reloj)).toThrow(/firma/)
-    expect(() => p.aceptar([cesar, cesar, cesar, cesar], reloj)).toThrow(/hasta 3/)
-    p.aceptar([cesar, { nombre: "Ana Ruiz", trazo }], reloj)
+    expect(() => p.aceptar(con([]), reloj)).toThrow(DatosInvalidos)
+    expect(() => p.aceptar(con([{ nombre: "   ", trazo }]), reloj)).toThrow(DatosInvalidos)
+    expect(() => p.aceptar(con([{ nombre: "César", trazo: "M10 10" }]), reloj)).toThrow(/firma/)
+    expect(() => p.aceptar(con([{ nombre: "César", trazo: "<script>" }]), reloj)).toThrow(/firma/)
+    expect(() => p.aceptar(con([cesar, cesar, cesar, cesar]), reloj)).toThrow(/hasta 3/)
+    p.aceptar(con([cesar, { nombre: "Ana Ruiz", trazo }]), reloj)
     expect(p.aceptacion).toEqual({
       en: reloj.ahora(),
       por: "César Chavero, Ana Ruiz",
@@ -147,12 +150,59 @@ describe("Proyecto", () => {
         { nombre: "César Chavero", trazo },
         { nombre: "Ana Ruiz", trazo },
       ],
+      correo: "cesar@tiobeto.mx",
+      conBonificacion: false,
     })
-    expect(() => p.aceptar([cesar], reloj)).toThrow(/ya fue aceptada/)
+    expect(() => p.aceptar(con([cesar]), reloj)).toThrow(/ya fue aceptada/)
     p.retirarAceptacion(reloj)
     expect(p.aceptacion).toBeNull()
-    p.aceptar([{ nombre: "César", trazo }], reloj)
+    p.aceptar(con([{ nombre: "César", trazo }]), reloj)
     expect(p.aceptacion?.por).toBe("César")
+  })
+
+  it("al aceptar se pide un correo válido para enviar el contrato", () => {
+    const p = nuevo(publicable)
+    p.publicar(reloj)
+    const firmas = [{ nombre: "César", trazo: "M10 10L20 20L30 10L40 20L50 10L60 20" }]
+    expect(() => p.aceptar({ firmas, correo: "  " }, reloj)).toThrow(/correo/)
+    expect(() => p.aceptar({ firmas, correo: "cesar@tiobeto" }, reloj)).toThrow(/correo no es válido/)
+    p.aceptar({ firmas, correo: "  Cesar@TioBeto.mx " }, reloj)
+    expect(p.aceptacion?.correo).toBe("cesar@tiobeto.mx")
+    p.retirarAceptacion(reloj)
+    expect(p.aceptacion).toBeNull()
+  })
+
+  it("con bonificación, el cliente elige al firmar y eso fija el total acordado", () => {
+    const firmas = [{ nombre: "César", trazo: "M10 10L20 20L30 10L40 20L50 10L60 20" }]
+    const correo = "cesar@tiobeto.mx"
+    const conBono = {
+      ...publicable,
+      inversion: {
+        pagos: [
+          { id: "a", nombre: "Anticipo", montoCentavos: 600_000 },
+          { id: "b", nombre: "Entrega", montoCentavos: 1_050_000 },
+        ],
+        bonificacion: { nombre: "Caso de éxito", montoCentavos: 250_000 },
+      },
+    }
+    const p = nuevo(conBono)
+    p.publicar(reloj)
+    expect(() => p.aceptar({ firmas, correo }, reloj)).toThrow(/opción de inversión/)
+    p.aceptar({ firmas, correo, conBonificacion: true }, reloj)
+    expect(p.aceptacion?.conBonificacion).toBe(true)
+    expect(p.totalCentavos).toBe(1_650_000)
+    expect(p.totalAcordadoCentavos).toBe(1_400_000)
+
+    p.retirarAceptacion(reloj)
+    p.aceptar({ firmas, correo, conBonificacion: false }, reloj)
+    expect(p.totalAcordadoCentavos).toBe(1_650_000)
+
+    // Sin bonificación en la propuesta, la opción se ignora
+    const sin = nuevo(publicable)
+    sin.publicar(reloj)
+    sin.aceptar({ firmas, correo, conBonificacion: true }, reloj)
+    expect(sin.aceptacion?.conBonificacion).toBe(false)
+    expect(sin.totalAcordadoCentavos).toBe(sin.totalCentavos)
   })
 
   it("archivado no se edita y deja de ser público", () => {

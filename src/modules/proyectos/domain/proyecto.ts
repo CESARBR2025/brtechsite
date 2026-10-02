@@ -9,6 +9,7 @@ import {
   type Contenido,
   contenidoVacio,
   normalizarContenido,
+  totalConBonificacion,
   totalInversion,
 } from "./contenido"
 import type { EstadoProyecto } from "./estado-proyecto"
@@ -42,6 +43,10 @@ export interface PropsProyecto {
   aceptadoPor: string | null
   /** Firma de cada persona que aceptó (vacío en aceptaciones anteriores a las firmas). */
   aceptadoFirmas: Firma[]
+  /** Correo al que se le envía su contrato a quien aceptó (null en aceptaciones anteriores). */
+  aceptadoCorreo: string | null
+  /** El cliente tomó la bonificación de la inversión al aceptar. */
+  aceptadoConBonificacion: boolean
   /** Firma que el desarrollador dibujó para esta propuesta. */
   firmaDesarrollador: FirmaDesarrollador | null
 }
@@ -49,6 +54,24 @@ export interface PropsProyecto {
 function textoOpcional(valor: string | null | undefined): string | null {
   const t = valor?.trim()
   return t ? t : null
+}
+
+/** Lo que el cliente decide y entrega al aceptar la propuesta. */
+export interface DatosAceptacion {
+  firmas: readonly { nombre: string; trazo: string }[]
+  /** Correo al que se le envía su contrato. */
+  correo: string
+  /** Toma la bonificación de la inversión; obligatorio si la propuesta ofrece una. */
+  conBonificacion?: boolean | null
+}
+
+const CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+function correoValido(valor: string): string {
+  const t = valor.trim().toLowerCase()
+  if (!t) throw new DatosInvalidos("Escribe el correo al que te enviamos tu contrato")
+  if (t.length > 254 || !CORREO.test(t)) throw new DatosInvalidos("El correo no es válido")
+  return t
 }
 
 function textoRequerido(valor: string, campo: string): string {
@@ -87,6 +110,8 @@ export class Proyecto {
       aceptadoEn: null,
       aceptadoPor: null,
       aceptadoFirmas: [],
+      aceptadoCorreo: null,
+      aceptadoConBonificacion: false,
       firmaDesarrollador: null,
     })
   }
@@ -136,12 +161,20 @@ export class Proyecto {
   get publicadoEn(): Date | null {
     return this.props.publicadoEn
   }
-  get aceptacion(): { en: Date; por: string; firmas: Firma[] } | null {
+  get aceptacion(): {
+    en: Date
+    por: string
+    firmas: Firma[]
+    correo: string | null
+    conBonificacion: boolean
+  } | null {
     return this.props.aceptadoEn
       ? {
           en: this.props.aceptadoEn,
           por: this.props.aceptadoPor ?? "",
           firmas: this.props.aceptadoFirmas,
+          correo: this.props.aceptadoCorreo,
+          conBonificacion: this.props.aceptadoConBonificacion,
         }
       : null
   }
@@ -153,6 +186,11 @@ export class Proyecto {
   }
   get totalCentavos(): number {
     return totalInversion(this.props.contenido)
+  }
+  /** Lo que el cliente pagará por el desarrollo: el total, menos la bonificación si la tomó al aceptar. */
+  get totalAcordadoCentavos(): number {
+    const bonificado = totalConBonificacion(this.props.contenido)
+    return this.props.aceptadoConBonificacion && bonificado != null ? bonificado : this.totalCentavos
   }
   get completitud(): Record<ClaveSeccion, boolean> {
     return completitud(this.props.contenido)
@@ -222,20 +260,28 @@ export class Proyecto {
 
   /**
    * El cliente acepta la propuesta desde su página publicada: cada firmante
-   * escribe su nombre y dibuja su firma. Solo se acepta una vez; para volver a
-   * pedirla, el panel la retira.
+   * escribe su nombre y dibuja su firma, deja el correo para su contrato y, si
+   * la propuesta ofrece una bonificación, dice si la toma. Solo se acepta una
+   * vez; para volver a pedirla, el panel la retira.
    */
-  aceptar(firmas: readonly { nombre: string; trazo: string }[], reloj: Reloj): void {
+  aceptar(datos: DatosAceptacion, reloj: Reloj): void {
     if (!this.esPublico) {
       throw new OperacionNoPermitida("Solo se puede aceptar una propuesta publicada")
     }
     if (this.props.aceptadoEn) {
       throw new OperacionNoPermitida("Esta propuesta ya fue aceptada")
     }
-    const validas = crearFirmas(firmas)
+    const validas = crearFirmas(datos.firmas)
+    const correo = correoValido(datos.correo)
+    const hayBonificacion = totalConBonificacion(this.props.contenido) != null
+    if (hayBonificacion && typeof datos.conBonificacion !== "boolean") {
+      throw new DatosInvalidos("Elige la opción de inversión antes de firmar")
+    }
     this.props.aceptadoEn = reloj.ahora()
     this.props.aceptadoPor = validas.map((f) => f.nombre).join(", ")
     this.props.aceptadoFirmas = validas
+    this.props.aceptadoCorreo = correo
+    this.props.aceptadoConBonificacion = hayBonificacion && datos.conBonificacion === true
     this.tocar(reloj)
   }
 
@@ -254,6 +300,8 @@ export class Proyecto {
     this.props.aceptadoEn = null
     this.props.aceptadoPor = null
     this.props.aceptadoFirmas = []
+    this.props.aceptadoCorreo = null
+    this.props.aceptadoConBonificacion = false
     this.tocar(reloj)
   }
 

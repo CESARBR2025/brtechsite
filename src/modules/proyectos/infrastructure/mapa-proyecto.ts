@@ -22,6 +22,8 @@ export interface FilaProyecto {
   aceptado_en: Date | string | null
   aceptado_por: string | null
   aceptado_firmas: unknown
+  aceptado_correo: string | null
+  aceptado_con_bonificacion: boolean
   firma_desarrollador: unknown
 }
 
@@ -47,6 +49,8 @@ export function proyectoADominio(fila: FilaProyecto): Proyecto {
     aceptadoEn: fila.aceptado_en ? fecha(fila.aceptado_en) : null,
     aceptadoPor: fila.aceptado_por,
     aceptadoFirmas: firmasGuardadas(fila.aceptado_firmas),
+    aceptadoCorreo: fila.aceptado_correo,
+    aceptadoConBonificacion: fila.aceptado_con_bonificacion === true,
     firmaDesarrollador: firmaDesarrolladorGuardada(fila.firma_desarrollador),
   })
 }

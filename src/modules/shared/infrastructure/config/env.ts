@@ -17,6 +17,12 @@ const esquema = z.object({
     .string()
     .email()
     .default("barcenasrosalescesarivan@gmail.com"),
+  /**
+   * Remitente de los correos de propuestas. El de pruebas de Resend solo
+   * entrega al dueño de la cuenta: para escribirle a un cliente hace falta un
+   * remitente de un dominio verificado, p. ej. "BR TECH <propuestas@brtechds.com>".
+   */
+  CORREO_REMITENTE: z.string().min(3).default("BR TECH · Propuestas <onboarding@resend.dev>"),
 })
 
 export type Env = z.infer<typeof esquema>
