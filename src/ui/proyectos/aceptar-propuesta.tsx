@@ -214,7 +214,7 @@ function FirmaDesarrollador({ slug, d, oscuro = false }: { slug: string; d: Desa
         />
       ) : (
         <p
-          className={`${manuscrita.className} mt-auto truncate border-b pb-1 pt-6 text-4xl leading-none sm:text-[42px] ${
+          className={`${manuscrita.className} mt-auto truncate border-b pb-1 pt-6 text-[26px] leading-none sm:text-[34px] ${
             claro ? "border-text-primary/20 text-text-primary" : "border-white/20 text-white"
           }`}
         >
