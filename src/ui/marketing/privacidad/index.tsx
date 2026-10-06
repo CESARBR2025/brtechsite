@@ -43,12 +43,12 @@ export function AvisoPrivacidad() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-bg-dark/90 via-bg-dark/60 to-bg-dark/30" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-36 sm:px-6 sm:pb-20 sm:pt-44 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-5 pb-12 pt-28 sm:px-6 sm:pb-20 sm:pt-44 lg:px-8">
           <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-white/75 sm:gap-4 sm:text-xs">
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-primary-light/70 sm:w-14" aria-hidden="true" />
             Legal
           </p>
-          <h1 className="mt-6 font-hero text-[38px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-6xl">
+          <h1 className="mt-5 font-hero text-[32px] sm:mt-6 min-[400px]:text-[34px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-6xl">
             Aviso de privacidad
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-lg">
@@ -58,8 +58,8 @@ export function AvisoPrivacidad() {
         </div>
       </section>
 
-      <div className="bg-bg-section py-16 sm:py-24">
-        <article className="mx-auto max-w-3xl space-y-10 px-4 sm:px-6 lg:px-8">
+      <div className="bg-bg-section py-12 sm:py-24">
+        <article className="mx-auto max-w-3xl space-y-10 px-5 sm:px-6 lg:px-8">
           <Seccion titulo="Responsable de tus datos">
             <p>
               <strong className="font-semibold text-text-primary">{EMPRESA.nombre}</strong>, con domicilio en {EMPRESA.ciudad}, {EMPRESA.estado}, México, es responsable del

@@ -12,7 +12,7 @@ export function ContactoHero() {
       <div className="absolute inset-0 bg-gradient-to-r from-bg-dark/90 via-bg-dark/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-bg-dark" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-28 pt-36 sm:px-6 sm:pb-36 sm:pt-44 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-5 pb-24 pt-28 sm:px-6 sm:pb-36 sm:pt-44 lg:px-8">
         <div className="max-w-3xl">
           <p
             style={{ animationDelay: "0ms" }}
@@ -23,25 +23,25 @@ export function ContactoHero() {
           </p>
           <h1
             style={{ animationDelay: "120ms" }}
-            className="mt-6 text-balance font-hero text-[38px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-6xl motion-safe:animate-aparecer"
+            className="mt-5 text-balance font-hero text-[30px] font-semibold leading-[1.08] tracking-[-0.02em] text-white min-[400px]:text-[32px] sm:mt-6 sm:text-6xl motion-safe:animate-aparecer"
           >
             Cuéntanos sobre tu negocio y te proponemos la solución ideal
           </h1>
           <p
             style={{ animationDelay: "240ms" }}
-            className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-xl motion-safe:animate-aparecer"
+            className="mt-4 max-w-2xl text-pretty text-[15px] leading-relaxed text-white/70 sm:mt-6 sm:text-xl motion-safe:animate-aparecer"
           >
             Sin compromiso. Te asesoramos para encontrar la herramienta digital
             que tu restaurante o negocio necesita.
           </p>
           <ul
             style={{ animationDelay: "360ms" }}
-            className="mt-8 flex flex-wrap gap-2 motion-safe:animate-aparecer"
+            className="mt-6 flex flex-wrap gap-2 motion-safe:animate-aparecer sm:mt-8"
           >
             {garantias.map((g) => (
               <li
                 key={g}
-                className="inline-flex items-center gap-2 rounded-full border border-line-dark-strong bg-white/5 px-3.5 py-1.5 text-xs text-white/80 sm:text-sm"
+                className="inline-flex items-center gap-2 rounded-full border border-line-dark-strong bg-white/5 px-3 py-1.5 text-xs text-white/80 sm:text-sm"
               >
                 <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_2px_rgba(120,54,226,0.6)]" />
                 {g}

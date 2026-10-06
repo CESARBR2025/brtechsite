@@ -91,24 +91,25 @@ export function ProblemSection() {
   const enlaceWhatsApp = `https://wa.me/${WHATSAPP.telefono.replace("+", "")}?text=${encodeURIComponent(mensaje)}`
 
   return (
-    <section className="relative bg-bg-section py-16 sm:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-bg-section py-12 sm:py-24">
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <span className="h-px w-8 bg-primary" />
             ¿Te identificas?
             <span className="h-px w-8 bg-primary" />
           </p>
-          <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
+          <h2 className="mt-4 text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:mt-5 sm:text-5xl">
             Problemas que cuestan dinero todos los días
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">
+          <p className="mx-auto mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-text-secondary sm:mt-5 sm:text-lg">
             Marca lo que te pasa hoy. Si algo te suena, no es normal: es margen que se escapa por
             procesos que se pueden resolver.
           </p>
         </div>
 
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Celular: una sola lista agrupada (filas con divisor); desde sm, tarjetas sueltas en rejilla */}
+        <ul className="mt-8 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface shadow-card sm:mt-12 sm:grid sm:grid-cols-2 sm:gap-4 sm:divide-y-0 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none lg:grid-cols-3">
           {situaciones.map((s, i) => {
             const activa = marcadas.has(i)
             return (
@@ -117,28 +118,28 @@ export function ProblemSection() {
                   type="button"
                   aria-pressed={activa}
                   onClick={() => alternar(i)}
-                  className={`group relative flex h-full w-full items-start gap-4 rounded-2xl border p-5 text-left outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.99] sm:p-6 ${
+                  className={`group relative flex min-h-[60px] h-full w-full items-center gap-3 border-border p-3.5 text-left outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary active:bg-primary-light/40 sm:min-h-0 sm:items-start sm:gap-4 sm:rounded-2xl sm:border sm:p-6 sm:focus-visible:ring-offset-2 sm:active:scale-[0.99] ${
                     activa
-                      ? "border-primary/50 bg-primary-light/50 shadow-hover"
-                      : "border-border bg-surface shadow-card hover:border-primary/30 hover:shadow-hover"
+                      ? "bg-primary-light/50 sm:border-primary/50 sm:shadow-hover"
+                      : "bg-surface sm:shadow-card sm:hover:border-primary/30 sm:hover:shadow-hover"
                   }`}
                 >
                   <span
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors duration-300 ${
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-300 sm:h-11 sm:w-11 ${
                       activa ? "border-primary bg-primary text-white" : "border-border bg-bg-section text-text-secondary group-hover:text-primary"
                     }`}
                   >
                     <s.icono className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span
-                    className={`flex-1 pt-1 font-display text-base font-semibold leading-snug transition-colors ${
+                    className={`flex-1 font-display text-[15px] font-semibold leading-snug transition-colors sm:pt-1 sm:text-base ${
                       activa ? "text-text-primary" : "text-text-primary/85"
                     }`}
                   >
                     {s.texto}
                   </span>
                   <span
-                    className={`mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-300 sm:mt-1 ${
                       activa ? "scale-100 border-primary bg-primary text-white" : "border-border text-transparent group-hover:border-primary/40"
                     }`}
                     aria-hidden="true"
@@ -154,11 +155,11 @@ export function ProblemSection() {
         {/* Cierre: cambia según lo que marcó */}
         <div
           aria-live="polite"
-          className={`mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border transition-all duration-500 ${
+          className={`mx-auto mt-5 max-w-4xl overflow-hidden rounded-3xl border transition-all duration-500 sm:mt-8 ${
             n > 0 ? "border-primary/30 bg-bg-dark shadow-[0_30px_60px_-30px_rgba(71,31,163,0.6)]" : "border-border bg-surface"
           }`}
         >
-          <div className="flex flex-col items-center gap-6 p-6 text-center sm:p-8 md:flex-row md:text-left">
+          <div className="flex flex-col items-center gap-4 p-5 text-center sm:gap-6 sm:p-8 md:flex-row md:text-left">
             <div className="flex-1">
               {n > 0 ? (
                 <>
@@ -187,7 +188,7 @@ export function ProblemSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 {...evento("whatsapp", { origen: "autodiagnostico", marcadas: n })}
-                className={`group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold outline-none transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] ${
+                className={`group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold outline-none transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] ${
                   n > 0
                     ? "bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary-hover focus-visible:ring-offset-bg-dark"
                     : "border border-border bg-surface text-text-primary hover:border-primary/40 hover:text-primary"
@@ -200,7 +201,7 @@ export function ProblemSection() {
               </a>
               <Link
                 href="/servicios"
-                className={`group inline-flex items-center justify-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary ${
+                className={`group inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary ${
                   n > 0 ? "text-white/80 hover:text-white" : "text-primary hover:text-primary-hover"
                 }`}
               >

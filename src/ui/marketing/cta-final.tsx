@@ -27,7 +27,7 @@ export function CTAFinal({
   enlaceSecundario,
 }: Props) {
   return (
-    <section className="relative bg-bg-section px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+    <section className="relative bg-bg-section px-5 py-12 sm:px-6 sm:py-24 lg:px-8">
       <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl border border-line-dark bg-bg-deep shadow-[0_40px_80px_-40px_rgba(71,31,163,0.55)]">
         {/* Eco del hero: las mismas ondas de marca, con el centro oscurecido para leer */}
         <div className="absolute inset-0">
@@ -36,7 +36,7 @@ export function CTAFinal({
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_60%_at_50%_45%,rgba(0,0,0,0.6),transparent_75%)]" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
-        <div className="relative px-6 py-20 text-center sm:px-12 sm:py-28">
+        <div className="relative px-5 py-14 text-center sm:px-12 sm:py-28">
           <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-wider text-white/55">
             <span className="h-px w-8 bg-primary" />
             {etiqueta}

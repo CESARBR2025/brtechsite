@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
 import localFont from "next/font/local"
 import "@/src/styles/globals.css"
@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   title: EMPRESA.nombre,
   description: EMPRESA.descripcion,
 }
+
+// viewport-fit=cover habilita env(safe-area-inset-*) para barras fijas en iPhone con muesca
+export const viewport: Viewport = { viewportFit: "cover" }
 
 export default function RootLayout({
   children,

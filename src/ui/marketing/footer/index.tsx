@@ -44,7 +44,7 @@ const socialLinks = [
 ]
 
 const enlace =
-  "rounded-sm text-sm text-white/65 transition-colors hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-primary"
+  "inline-flex min-h-11 items-center rounded-sm text-sm text-white/65 transition-colors hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-0"
 
 export function Footer() {
   return (
@@ -53,9 +53,9 @@ export function Footer() {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
       <div className="absolute left-1/2 top-0 h-48 w-[36rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-3xl" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pt-16 sm:px-6 sm:pt-20 lg:px-8">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
-          <div className="sm:col-span-2 lg:col-span-1">
+      <div className="relative mx-auto max-w-7xl px-5 pt-12 sm:px-6 sm:pt-20 lg:px-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div className="col-span-2 lg:col-span-1">
             <Image
               src="/logo.png"
               alt="BR TECH Digital Systems"
@@ -70,7 +70,7 @@ export function Footer() {
             <Link
               href="/contacto"
               {...evento("agendar-consulta", { origen: "footer" })}
-              className="group mt-6 inline-flex items-center gap-1.5 rounded-sm text-sm font-semibold text-white outline-none transition-colors hover:text-primary-light focus-visible:ring-2 focus-visible:ring-primary"
+              className="group mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-sm text-sm font-semibold text-white sm:mt-6 outline-none transition-colors hover:text-primary-light focus-visible:ring-2 focus-visible:ring-primary"
             >
               Agendar consulta
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -78,11 +78,15 @@ export function Footer() {
           </div>
 
           {columnas.map((col) => (
-            <nav key={col.titulo} aria-label={col.titulo}>
+            <nav
+              key={col.titulo}
+              aria-label={col.titulo}
+              className={col.titulo === "Servicios" ? "order-4 col-span-2 sm:order-none sm:col-span-1" : "order-2 sm:order-none"}
+            >
               <h4 className="text-xs font-semibold uppercase tracking-wider text-white/55">
                 {col.titulo}
               </h4>
-              <ul className="mt-5 space-y-3">
+              <ul className="mt-2 sm:mt-5 sm:space-y-3">
                 {col.enlaces.map((e) => (
                   <li key={e.href}>
                     <Link href={e.href} className={enlace}>
@@ -94,11 +98,11 @@ export function Footer() {
             </nav>
           ))}
 
-          <div>
+          <div className="order-3 sm:order-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-white/55">
               Contacto
             </h4>
-            <ul className="mt-5 space-y-3 text-sm text-white/65">
+            <ul className="mt-2 text-sm text-white/65 sm:mt-5 sm:space-y-3">
               <li>
                 <Link href="/contacto" className={enlace}>
                   Escríbenos
@@ -115,18 +119,18 @@ export function Footer() {
                   WhatsApp {WHATSAPP.visible}
                 </a>
               </li>
-              <li>
+              <li className="max-sm:py-2">
                 {EMPRESA.ciudad}, {EMPRESA.estado}
               </li>
-              <li>{EMPRESA.horario}</li>
+              <li className="max-sm:py-2">{EMPRESA.horario}</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col-reverse items-center justify-between gap-4 border-t border-line-dark py-6 sm:flex-row">
+        <div className="mt-10 flex flex-col-reverse items-center justify-between gap-4 border-t border-line-dark pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:mt-16 sm:flex-row sm:py-6">
           <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-white/55">
             <span>&copy; {new Date().getFullYear()} BR TECH Digital Systems</span>
-            <Link href="/privacidad" className="rounded-sm outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-primary">
+            <Link href="/privacidad" className="inline-flex min-h-11 items-center rounded-sm outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-primary">
               Aviso de privacidad
             </Link>
           </p>
@@ -139,7 +143,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 aria-label={s.label}
                 {...(s.href === WHATSAPP.url ? evento("whatsapp", { origen: "footer-redes" }) : {})}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-line-dark text-white/65 outline-none transition-colors hover:border-line-dark-strong hover:bg-surface-dark-hover hover:text-white focus-visible:ring-2 focus-visible:ring-primary"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-line-dark text-white/65 sm:h-9 sm:w-9 outline-none transition-colors hover:border-line-dark-strong hover:bg-surface-dark-hover hover:text-white focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
                   <path d={s.path} fillRule="evenodd" />

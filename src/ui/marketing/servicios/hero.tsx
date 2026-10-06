@@ -13,7 +13,7 @@ export function ServiciosHero() {
       <div className="absolute inset-0 bg-gradient-to-r from-bg-dark/90 via-bg-dark/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-bg-dark" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-6 sm:pb-28 sm:pt-44 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-28 sm:px-6 sm:pb-28 sm:pt-44 lg:px-8">
         <div className="max-w-3xl">
           <p
             style={{ animationDelay: "0ms" }}
@@ -24,13 +24,13 @@ export function ServiciosHero() {
           </p>
           <h1
             style={{ animationDelay: "120ms" }}
-            className="mt-6 text-balance font-hero text-[38px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-6xl motion-safe:animate-aparecer"
+            className="mt-5 text-balance font-hero text-[32px] font-semibold leading-[1.08] tracking-[-0.02em] text-white min-[400px]:text-[34px] sm:mt-6 sm:text-6xl motion-safe:animate-aparecer"
           >
             Soluciones hechas a la medida de tu operación
           </h1>
           <p
             style={{ animationDelay: "240ms" }}
-            className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-xl motion-safe:animate-aparecer"
+            className="mt-4 max-w-2xl text-pretty text-[15px] leading-relaxed text-white/70 sm:mt-6 sm:text-xl motion-safe:animate-aparecer"
           >
             Software para restaurantes, control de inventarios y presencia digital,
             diseñados alrededor de cómo trabaja tu negocio, no al revés.
@@ -41,7 +41,7 @@ export function ServiciosHero() {
         <nav
           aria-label="Servicios en esta página"
           style={{ animationDelay: "360ms" }}
-          className="mt-14 grid gap-4 motion-safe:animate-aparecer sm:grid-cols-3"
+          className="mt-8 grid gap-2.5 motion-safe:animate-aparecer sm:mt-14 sm:grid-cols-3 sm:gap-4"
         >
           {servicios.map((s) => (
             <a
@@ -49,7 +49,7 @@ export function ServiciosHero() {
               href={`#${s.ancla}`}
               className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] outline-none backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <span className="relative block aspect-[3/1] overflow-hidden sm:aspect-[16/9]">
+              <span className="relative hidden aspect-[16/9] overflow-hidden sm:block">
                 <Image
                   src={s.foto.src}
                   alt=""
@@ -59,7 +59,7 @@ export function ServiciosHero() {
                 />
                 <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-bg-deep/70 to-transparent" />
               </span>
-              <span className="flex items-center gap-3 px-4 py-3.5">
+              <span className="flex min-h-14 items-center gap-3 px-4 py-3">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/20">
                   <s.icono className="h-4 w-4 text-primary-light" aria-hidden="true" />
                 </span>

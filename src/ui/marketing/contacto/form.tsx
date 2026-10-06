@@ -21,7 +21,7 @@ const intereses = [
 ]
 
 const campo =
-  "w-full rounded-xl border border-border bg-bg-section py-3 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted/70 transition-all hover:border-primary/30 focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10"
+  "w-full rounded-xl border border-border bg-bg-section py-3.5 pl-10 pr-3 text-base text-text-primary placeholder:text-text-muted/70 transition-all hover:border-primary/30 focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10 sm:py-3 sm:text-sm"
 
 const etiqueta = "mb-2 block text-xs font-semibold text-text-secondary"
 
@@ -136,7 +136,7 @@ export function ContactForm({ interesInicial }: { interesInicial?: string }) {
             {intereses.map((i) => (
               <label
                 key={i.valor}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:border-primary/30 hover:text-text-primary has-[:checked]:border-primary has-[:checked]:bg-primary-light has-[:checked]:text-primary-hover has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary"
+                className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary transition-all hover:border-primary/30 hover:text-text-primary has-[:checked]:border-primary has-[:checked]:bg-primary-light has-[:checked]:text-primary-hover has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary"
               >
                 <input
                   type="radio"
@@ -188,7 +188,7 @@ export function ContactForm({ interesInicial }: { interesInicial?: string }) {
           <BotonEspecular
             type="submit"
             disabled={isPending}
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70 sm:w-auto"
+            className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70 sm:w-auto"
           >
             {isPending ? (
               <>
