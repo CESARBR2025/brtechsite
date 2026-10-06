@@ -26,14 +26,14 @@ export function HeroSection() {
       </div>
 
       {/* Foto: arriba en celular; a la derecha en escritorio, fundida hacia el texto */}
-      <div className="absolute inset-x-0 top-0 -z-10 h-[62%] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[74%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)]">
+      <div className="absolute inset-x-0 top-0 -z-10 h-[62%] [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:inset-y-0 lg:left-auto lg:right-0 lg:h-full lg:w-[74%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_22%)]">
         <Image
-          src="/hero-inicio.webp"
-          alt="Tablet, celular e impresora con el sistema en el mostrador de un negocio, con el almacén, el equipo y la camioneta de reparto conectados al fondo"
+          src="/hero-inicio-v2.webp"
+          alt="Tablet con tablero de ventas, celular e impresora de tickets sobre el mostrador de un negocio al anochecer; al fondo, la camioneta de reparto y el almacén conectados por un hilo de luz violeta"
           fill
           priority
           sizes="(min-width: 1024px) 74vw, 100vw"
-          className="object-cover object-[72%_center] lg:object-center"
+          className="object-cover object-[88%_center] lg:object-[80%_center]"
         />
       </div>
 
