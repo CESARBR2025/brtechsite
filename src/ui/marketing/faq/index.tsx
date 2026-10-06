@@ -37,7 +37,7 @@ export function FAQSection() {
   const base = useId()
 
   return (
-    <section id="faq" className="relative scroll-mt-24 overflow-clip bg-surface py-24 sm:py-32">
+    <section id="faq" className="relative scroll-mt-24 overflow-clip bg-bg-section py-16 sm:py-24">
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Encabezado centrado; las preguntas van debajo */}
         <div className="mx-auto max-w-3xl text-center">

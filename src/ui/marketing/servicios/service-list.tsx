@@ -28,7 +28,7 @@ export function ServiceList() {
             key={s.ancla}
             id={s.ancla}
             aria-labelledby={`${s.ancla}-titulo`}
-            className={`relative scroll-mt-24 py-24 sm:py-32 ${par ? "bg-bg-section" : "bg-surface"}`}
+            className="relative scroll-mt-24 bg-bg-section py-16 sm:py-24"
           >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               {/* Qué es y para quién */}

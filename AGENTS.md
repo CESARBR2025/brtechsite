@@ -15,6 +15,8 @@
 
 ## 2. PALETA DE COLORES
 
+> **Vigente:** los neutros (texto, bordes, lienzo) están tintados de violeta y el contenido claro va sobre un lienzo único; ver `DESIGNS.md` §1 y §2 ("Superficies y papeles"). Los HEX de texto/fondo gris listados abajo son el spec original de FinPay y ya no se usan.
+
 ### Primary
 
 - **HEX:** `#7836E2`
@@ -111,10 +113,11 @@ colors: {
   success:           '#10B981',   // emerald-500
   'success-light':   '#D1FAE5',   // emerald-100
   'bg-dark':         '#151127',   // custom deep dark (indigo frío)
-  'text-primary':    '#111827',   // gray-900
-  'text-secondary':  '#374151',   // gray-700
-  'text-muted':      '#6B7280',   // gray-500
-  'bg-section':      '#F9FAFB',   // gray-50
+  'text-primary':    '#15121F',   // neutro tintado de violeta (vigente)
+  'text-secondary':  '#3E3A4F',   // idem
+  'text-muted':      '#6F6A82',   // idem
+  'border':          '#EAE7F1',   // idem
+  'bg-section':      '#F7F6FA',   // lienzo de todo el contenido claro
   surface:           '#FFFFFF',   // white
   warning:           '#F59E0B',   // amber-500
 }
