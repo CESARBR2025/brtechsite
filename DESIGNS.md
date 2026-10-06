@@ -3,10 +3,12 @@
 Guía única de estilos para el sitio. **Toda feature nueva se construye con estos tokens y recetas.**
 No inventes colores, radios ni sombras fuera de esta tabla; si algo falta, se agrega aquí primero.
 
-Base: `src/styles/globals.css` (`@theme` de Tailwind v4) + spec FinPay Dashboard de `AGENTS.md`.
-Fuente: **Inter** (cargada en `src/app/layout.tsx` vía `next/font`, expuesta como `--font-inter`).
-`--font-sans` apunta a esa variable en `globals.css`, así que `font-sans` usa Inter con su fallback
-métrico (`Inter Fallback`, evita saltos de layout). No declares `font-family` a mano.
+Base: `src/styles/globals.css` (`@theme` de Tailwind v4). **Si este documento y `globals.css` difieren,
+manda `globals.css`** y hay que corregir este archivo. Los valores de la paleta FinPay de `AGENTS.md` son
+el punto de partida histórico: los neutros vigentes son los de abajo, tintados de violeta.
+Fuentes (`src/app/layout.tsx`, vía `next/font`): **Poppins** para texto y títulos (`font-sans` / `font-display`) y
+**Clash Display Semibold**, autoalojada, solo para el título principal de los heros y del CTA final
+(`font-hero`). No declares `font-family` a mano.
 
 ---
 
@@ -22,18 +24,18 @@ métrico (`Inter Fallback`, evita saltos de layout). No declares `font-family` a
 | `success` | `#10B981` | `bg-success` `text-success` | Estado OK, "Publicado", "Pagado", indicadores positivos |
 | `success-light` | `#D1FAE5` | `bg-success-light` | Fondo de pills de estado positivo |
 | `warning` | `#F59E0B` | `bg-warning` `text-warning` | "Pendiente", alertas, ratings |
-| `bg-dark` | `#151127` | `bg-bg-dark` | **Fondo de todas las secciones oscuras** (con rejilla + resplandor), footer, heros de páginas internas, tinte del navbar de vidrio, bloque "Conoce más" |
-| `bg-deep` | `#000000` | `bg-bg-deep` | **Solo donde vive el velo:** hero de Inicio y el panel del CTA final (su eco). Negro puro para maximizar el contraste del violeta; el hero funde a `bg-dark` |
+| `bg-dark` | `#151127` | `bg-bg-dark` | **Pieza protagonista oscura** (ver §2), footer, heros de páginas internas, tinte del navbar de vidrio, bloque "Conoce más" |
+| `bg-deep` | `#000000` | `bg-bg-deep` | **Solo donde viven las ondas:** hero de Inicio y de la propuesta, y el panel del CTA final (su eco). Negro puro para maximizar el contraste del violeta |
 | `surface-dark` | `white / 3%` | `bg-surface-dark` | Tarjetas y paneles sobre fondo oscuro |
 | `surface-dark-hover` | `white / 6%` | `hover:bg-surface-dark-hover` | Hover de tarjeta o botón-ícono sobre oscuro |
 | `line-dark` | `white / 8%` | `border-line-dark` `divide-line-dark` | Bordes finos y divisores sobre oscuro |
 | `line-dark-strong` | `white / 16%` | `hover:border-line-dark-strong` | Borde en hover/foco sobre oscuro |
-| `text-primary` | `#111827` | `text-text-primary` | Títulos, montos grandes |
-| `text-secondary` | `#374151` | `text-text-secondary` | Párrafos, labels de formulario |
-| `text-muted` | `#6B7280` | `text-text-muted` | Texto atenuado, placeholders, metadatos |
-| `border` | `#E5E7EB` | `border-border` | Bordes de cards, divisores de tabla |
-| `bg-section` | `#F9FAFB` | `bg-bg-section` | Fondo de sección alterna, hover de filas |
-| `background` | `#F9FAFB` | — | Fondo del `body` |
+| `text-primary` | `#15121F` | `text-text-primary` | Títulos, montos grandes |
+| `text-secondary` | `#3E3A4F` | `text-text-secondary` | Párrafos, labels de formulario |
+| `text-muted` | `#6F6A82` | `text-text-muted` | Texto atenuado, placeholders, metadatos |
+| `border` | `#EAE7F1` | `border-border` | Bordes de cards, divisores de tabla |
+| `bg-section` | `#F7F6FA` | `bg-bg-section` | **Lienzo** de todo el contenido claro (ver §2), chips neutros, hover de filas |
+| `background` | `#F7F6FA` | — | Fondo del `body` (igual que el lienzo) |
 | `surface` | `#FFFFFF` | `bg-surface` | Cards, modales, inputs, panel |
 
 **Rojo de error** (no está en `@theme`, se usa Tailwind base): `text-red-500`, `bg-red-500/10`, `border-red-500/20`.
@@ -67,12 +69,13 @@ esas landings de venta personalizadas. Ninguna otra feature usa acento distinto 
 
 | Elemento | Clases |
 |---|---|
-| H1 (hero de Inicio / display) | `text-[40px] sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-[-0.035em] text-white` |
+| H1 (hero de Inicio) | Poppins `font-display text-[36px] sm:text-[56px] lg:text-[64px] font-semibold leading-[1.12] tracking-[-0.03em] text-white` |
+| H1 (hero de página interna, propuesta, CTA final) | `font-hero text-[38px] sm:text-6xl font-semibold leading-[1.05] tracking-[-0.02em] text-white` |
 | H1 (hero oscuro interno) | `text-[28px] sm:text-4xl md:text-5xl font-bold leading-tight text-white` |
 | H1 (página clara) | `text-[28px] sm:text-4xl font-bold text-text-primary` |
-| H2 (sección) | `text-[22px] sm:text-3xl font-bold text-text-primary` |
+| H2 (sección) | `font-display text-[28px] sm:text-[44px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary` |
 | H3 (card) | `text-lg font-semibold text-text-primary` |
-| Eyebrow / label | `text-xs font-semibold uppercase tracking-wider text-primary` |
+| Eyebrow / label | `text-xs font-semibold uppercase tracking-[0.18em] text-primary` (con número `01` y guion, ver §2) |
 | Párrafo | `text-sm sm:text-base leading-relaxed text-text-secondary` |
 | Metadato / caption | `text-xs text-text-muted` |
 | Monto grande | `text-lg font-bold text-text-primary` (o `text-2xl`/`text-3xl` para el total) |
@@ -83,19 +86,19 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 
 ## 2. Layout
 
-> **Dirección (sept 2026): Inicio es un lienzo oscuro continuo.** El hero es negro total (`bg-deep`);
-> todo lo demás, footer incluido, va sobre `bg-dark` con rejilla desvanecida + un resplandor. El ritmo
-> entre secciones lo dan la tipografía, el espacio y las superficies `surface-dark`, no el cambio de
-> color de fondo. Nada de secciones blancas, grises o moradas planas en Inicio.
-> **Todo el sitio de marketing** (Inicio, Servicios, Contacto) usa este sistema oscuro. Las recetas claras
-> de abajo (card blanca, input claro) quedan para el panel y el ticket público.
+> **Dirección (oct 2026): hero oscuro + lienzo claro único.** Todo el sitio de marketing (Inicio,
+> Servicios, Contacto, casos de éxito, Privacidad) y los documentos públicos (`/p`, `/d`, `/t`) siguen la
+> misma fórmula: **hero oscuro** (negro con las ondas violeta) → **un solo lienzo claro** (`bg-section`)
+> con tarjetas blancas → **cierre oscuro** (CTA final + footer). **Ya no se alternan franjas** blanco/gris
+> entre secciones: el ritmo lo dan el espacio, los encabezados numerados y el peso de las piezas (§2).
+> Referencia viva: la propuesta de `/p/[slug]` (`src/ui/proyectos/propuesta.tsx`).
 > **Sin montos en el sitio de marketing:** la inversión se cotiza. En Servicios solo se listan los
 > factores que definen la inversión (sin precios); el contenido vive en `servicios/datos.ts`.
 
 ```tsx
 // Sección estándar
-<section className="relative overflow-hidden py-16 sm:py-24">
-  {/* variantes de fondo: (nada) | bg-bg-section | bg-bg-dark  (bg-bg-deep solo en hero de Inicio) */}
+<section className="relative bg-bg-section py-16 sm:py-24">
+  {/* fondo: siempre bg-bg-section (lienzo). Oscuro solo en heros, CTA final y footer */}
   <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     {/* contenido */}
   </div>
@@ -103,11 +106,53 @@ Móvil primero: se fija el tamaño chico y se escala con `sm:` / `md:`.
 ```
 
 - **Contenedor:** `mx-auto max-w-7xl px-4 sm:px-6 lg:px-8` (usa `max-w-6xl` / `max-w-3xl` para texto centrado o documentos angostos como un ticket).
-- **Ritmo vertical de sección:** `py-16 sm:py-24`.
+- **Ritmo vertical de sección:** `py-16 sm:py-24` (en la propuesta, que va dentro de un contenedor, `py-12 sm:py-20`). Con lienzo único los rellenos se suman: no uses `py-24 sm:py-32`.
 - **Grid de cards:** `grid gap-6 sm:grid-cols-2 lg:grid-cols-3`.
-- **Encabezado de sección:** bloque centrado `mx-auto max-w-2xl text-center` con eyebrow pill + H2.
+- **Encabezado de sección:** eyebrow en versalitas con guion + H2 + párrafo (receta en §2). Centrado en Inicio, a la izquierda en documentos.
 - **Navbar flotante:** el header es `fixed` (no ocupa espacio en el flujo). Todo hero bajo el layout de
   marketing arranca con `pt-36 sm:pt-44` (o `sm:pt-40`) para no quedar debajo de la píldora.
+
+### Superficies y papeles (lo que se estandarizó en la propuesta de `/p`)
+
+No hay una paleta distinta por sección: **cada color tiene un trabajo fijo** y todas las secciones lo repiten.
+Las secciones solo cambian de *peso*.
+
+| Capa | Token | Papel |
+|---|---|---|
+| Portada | `bg-deep` + `OndasGradiente`, texto `text-white` / `text-white/55–90` | Solo el hero. Rótulo en versalitas, título `font-hero`, una línea de apoyo |
+| **Lienzo** | `bg-bg-section` `#F7F6FA` | Fondo de **todo** el contenido claro. Sin franjas alternas |
+| **Contenedor** | `bg-surface` + `border-border` + `shadow-card` (`rounded-2xl`) | Toda tarjeta. Hover interactivo: `hover:border-primary/30 hover:shadow-hover` |
+| **Pieza protagonista** | `bg-bg-dark` (+ rejilla, resplandor `bg-primary/30 blur-3xl`, `shadow-glow`, `ring-white/10` para el bloque grande) | Lo que pesa: encabezado de módulo o fase, el total de la inversión, el resultado de un autodiagnóstico, el caso destacado, el cierre. **Una por sección, como mucho** |
+| **Tile de ícono oscuro** | `bg-bg-dark text-primary-light` (`rounded-xl`, `h-11 w-11`) | Ícono de un problema, rol o pago dentro de una tarjeta blanca |
+| **Tile de ícono claro** | `bg-surface border-border text-primary shadow-sm` | Íconos de listas y requisitos |
+| **Chip neutro** | `bg-bg-section text-text-muted ring-1 ring-inset ring-border` | Metadatos y etiquetas. Sobre el lienzo, dentro de una tarjeta blanca (si no, desaparece) |
+
+| Color | Papel (y solo ese) |
+|---|---|
+| `primary` | **Guía y acción:** rótulo de sección, botones, hover de tarjeta, nodos activos, chip de lo contratado (`bg-primary text-white`) |
+| `primary-light` | **"Esto importa":** notas y callouts (`bg-primary-light/40–60 text-primary-hover ring-1 ring-inset ring-primary/15`); sobre oscuro, íconos y cifras. Barras de pago en secuencia `primary-light → primary → primary-hover` |
+| `success` | **Confirmado:** palomita (`CheckCircle2`), "Ya lo tenemos", chip de estado (`bg-success/15 text-success`). Nunca decora |
+| `warning` / rojo | Solo alertas reales (no aparecen en el flujo normal de una propuesta) |
+| `text-text-primary` / `secondary` / `muted` | Títulos y montos / párrafos / metadatos y números en `font-mono` |
+
+**Encabezado de sección sobre el lienzo** (componente `Seccion` de la propuesta):
+```tsx
+<p className="flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+  <span className="tabular-nums">01</span>
+  <span className="h-0.5 w-3 rounded-full bg-current" aria-hidden="true" /> El reto
+</p>
+<h2 className="mt-4 max-w-2xl font-display text-balance text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-[44px]">…</h2>
+<p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">…</p>
+```
+En Inicio y Servicios el mismo encabezado va centrado y con guiones a ambos lados, sin número.
+
+**Cómo elegir el peso de una pieza:** ¿es lo que el lector debe recordar? → pieza protagonista oscura.
+¿Agrupa información? → contenedor blanco. ¿Aclara o califica? → chip o callout violeta claro. ¿Confirma? → verde.
+Si todo es oscuro nada destaca; si nada lo es, la página se ve plana.
+
+**Regla de oro:** todos los neutros están tintados de violeta (`#15121F`, `#3E3A4F`, `#6F6A82`, `#EAE7F1`,
+`#F7F6FA`). No mezcles grises de Tailwind (`gray-*`, `slate-*`) ni `#fff`/`#000` como color de texto o de superficie
+(salvo `bg-surface` para tarjetas y `bg-deep` para el fondo de las ondas).
 
 ---
 
@@ -213,7 +258,7 @@ Alineado a la izquierda, sin pill: etiqueta con guion violeta + H2 grande + pár
 <h2 className="mt-5 text-balance text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl">…</h2>
 <p className="mt-5 text-pretty text-base leading-relaxed text-white/65 sm:text-lg">…</p>
 ```
-Ritmo de sección oscura: `relative overflow-hidden bg-bg-dark py-24 sm:py-32` + la rejilla sutil de
+Ritmo de un bloque oscuro dentro de una pieza protagonista (heros internos y bloques "Conoce más"): `relative overflow-hidden bg-bg-dark py-24 sm:py-32` + la rejilla sutil de
 "Decoración" con `[mask-image:radial-gradient(ellipse_at_X%_Y%,black_5%,transparent_60%)]` (varía X/Y por
 sección para que no se repita) + un blob `bg-primary/10 blur-3xl`. Si la sección tiene un bloque `sticky`, usa
 `overflow-clip` en lugar de `overflow-hidden` (hidden crea un contenedor de scroll y rompe el sticky). Listas: `divide-y divide-line-dark border-y border-line-dark`
@@ -243,22 +288,23 @@ Uso: casos de éxito con 3–5 fotos reales. Fotos en `public/clientes/<cliente>
 Mockups de apps móviles (PNG/WebP con el teléfono y fondo transparente): `ajuste: "contener"` — se
 muestran completos y centrados sobre un resplandor violeta, sin recortar.
 
-### Pasos / línea de tiempo sobre oscuro (`home/process.tsx`)
-`<ol>` en `lg:grid-cols-5` (vertical en móvil) con una línea que une nodos redondos
-(`h-12 w-12 rounded-full border-line-dark-strong bg-bg-dark text-primary-light`; en hover se llenan de
-`primary`). Debajo: número `01` en mono, título y descripción. Nada de tarjetas por paso.
+### Método sobre el lienzo (`home/process.tsx`)
+Dos columnas en escritorio: a la izquierda, título fijo (`lg:sticky`) con barra de progreso y lista de los cinco
+pasos (el activo = fila `bg-surface shadow-card`, los hechos con palomita violeta); a la derecha, una tarjeta
+blanca (`rounded-3xl`) por paso con ícono, título, párrafo y una foto con la insignia "Lo que recibes".
+La tarjeta activa lleva `border-primary` y el nodo se llena de `primary`. En móvil, una línea vertical une los pasos.
 
-### Acordeón de preguntas sobre oscuro (`faq/index.tsx`)
-Título fijo a la izquierda (`lg:sticky`, sección con `overflow-clip`) y preguntas a la derecha en
-`divide-y divide-line-dark border-y`, sin tarjetas. Botón con `aria-expanded`/`aria-controls`; ícono `+`
-en círculo que rota 45° a `×` y se llena de `primary` al abrir. Respuesta con transición
-`grid-rows-[0fr] → [1fr]` e `inert` mientras está cerrada. La primera pregunta abre por defecto.
+### Preguntas frecuentes sobre el lienzo (`faq/index.tsx`)
+Encabezado centrado y rejilla de dos columnas de tarjetas blancas (`rounded-2xl border-border shadow-card`); cada
+pregunta abre por separado. Botón con `aria-expanded`/`aria-controls`; ícono `+` en círculo que rota 45° a `×` y se llena de `primary`
+al abrir (la tarjeta abierta toma `border-primary/30 shadow-hover`). Respuesta con transición `grid-rows-[0fr] → [1fr]` e
+`inert` mientras está cerrada. La primera pregunta abre por defecto.
 
 ### CTA final (`src/ui/marketing/cta-final.tsx`, `<CTAFinal />` con textos por página)
-El sitio cierra como abrió: panel `rounded-2xl border-line-dark bg-bg-deep` dentro de la sección
-`bg-dark`, con la imagen fija del velo **invertida** (`-scale-y-100`, bajada `translate-y-[15%]` para que
-la luz nazca bajo el botón), filo de luz violeta arriba, etiqueta centrada con guiones, H2 de 60 px,
-botón especular morado y una línea de confianza (`text-white/55`). Un solo CTA.
+El sitio cierra como abrió: una **pieza protagonista oscura** (`rounded-3xl border-line-dark bg-bg-deep`) sobre
+el lienzo claro (`bg-bg-section`), con las ondas de marca como eco del hero (`OndasGradiente` + centro
+oscurecido para leer), filo de luz violeta arriba, etiqueta centrada con guiones, H2 `font-hero` de 60 px,
+botón primario con degradado y una línea de confianza (`text-white/55`). Un solo CTA. Después va el footer oscuro.
 
 ### Footer (`src/ui/marketing/footer/index.tsx`)
 Oscuro (`bg-dark`) en todas las páginas: filo de luz violeta arriba, logo + promesa + enlace
@@ -341,6 +387,13 @@ de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
   de la captura, barra de progreso de lectura, índice lateral de puntos (`xl`) y aparición de cada
   sección al hacer scroll (`Revelar`). Encabezados con número gigante en contorno a la derecha.
   Todo respeta `prefers-reduced-motion`.
+
+### Propuesta (`/p/[slug]`, `src/ui/proyectos/propuesta.tsx`)
+Es la **implementación de referencia** de §2: portada oscura con ondas (texto a la izquierda, foto fundida a la
+derecha), cuerpo en lienzo `bg-section` con secciones numeradas `01…` (`Seccion`) y tarjetas `TARJETA`
+(`rounded-2xl border-border bg-surface shadow-card`). Piezas oscuras: encabezado de cada grupo de módulos y de fase,
+el total de la inversión (rejilla + resplandor + `shadow-glow`) y el footer. Violeta contenido, verde solo para
+palomitas y estados. Si una pantalla nueva se parece a un documento, empieza copiando su estructura.
 
 ### Panel de captura (`/panel/...`)
 - Fondo `bg-bg-section`, contenido en cards `bg-surface`.
