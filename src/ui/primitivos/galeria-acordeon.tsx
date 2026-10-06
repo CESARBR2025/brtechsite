@@ -7,7 +7,8 @@
  * - Paneles como <button> con aria-pressed; flechas del teclado para moverse.
  * - Hover solo con mouse (en táctil se activa con toque).
  * - next/image con `fill` y `sizes`.
- * - Móvil (< sm): acordeón vertical, sin inclinación ni desplazamiento.
+ * - Móvil (< sm): carrusel horizontal con snap y puntos (sin inclinación ni
+ *   desplazamiento); el panel activo sigue al deslizamiento.
  * - `prefers-reduced-motion`: cambia de panel sin animar.
  * - `ajuste: "contener"`: la imagen se muestra completa y centrada sobre un
  *   resplandor (p. ej. un mockup de celular con fondo transparente), sin recortar.
@@ -64,6 +65,24 @@ export function GaleriaAcordeon({
     return () => ro.disconnect()
   }, [n, r])
 
+  // Móvil: el panel activo es el que queda centrado al deslizar el carrusel
+  const alDeslizar = () => {
+    const el = ref.current
+    if (!el || window.matchMedia("(min-width: 640px)").matches) return
+    const centro = el.scrollLeft + el.clientWidth / 2
+    let mejor = 0
+    let dist = Infinity
+    Array.from(el.children).forEach((h, i) => {
+      const c = h as HTMLElement
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - centro)
+      if (d < dist) {
+        dist = d
+        mejor = i
+      }
+    })
+    setActivo(mejor)
+  }
+
   const alTeclado = (i: number, e: KeyboardEvent) => {
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault()
@@ -78,11 +97,13 @@ export function GaleriaAcordeon({
     "duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
 
   return (
+    <>
     <div
       ref={ref}
       role="group"
       aria-label="Galería del sistema en operación"
-      className={`flex flex-col [perspective:1400px] sm:flex-row ${alturas} ${className}`}
+      onScroll={alDeslizar}
+      className={`flex snap-x snap-mandatory flex-row overflow-x-auto [scrollbar-width:none] [perspective:1400px] sm:snap-none sm:overflow-visible ${alturas} ${className}`}
       style={{ gap: GAP }}
     >
       {elementos.map((el, i) => {
@@ -99,7 +120,7 @@ export function GaleriaAcordeon({
             onClick={() => setActivo(i)}
             onFocus={() => setActivo(i)}
             onKeyDown={(e) => alTeclado(i, e)}
-            className={`group relative min-h-0 min-w-0 flex-[1_1_0] cursor-pointer overflow-hidden rounded-2xl border border-line-dark bg-bg-deep outline-none transition-[flex-grow,transform,border-color] [transform-style:preserve-3d] focus-visible:ring-2 focus-visible:ring-primary max-sm:![transform:none] ${transicion} ${
+            className={`group relative min-h-0 min-w-0 flex-[1_1_0] cursor-pointer snap-center overflow-hidden max-sm:!flex-none max-sm:w-[86%] max-sm:shrink-0 rounded-2xl border border-line-dark bg-bg-deep outline-none transition-[flex-grow,transform,border-color] [transform-style:preserve-3d] focus-visible:ring-2 focus-visible:ring-primary max-sm:![transform:none] ${transicion} ${
               esActivo ? "border-line-dark-strong" : ""
             }`}
             style={
@@ -128,8 +149,8 @@ export function GaleriaAcordeon({
               </span>
             ) : (
               <span
-                className={`absolute left-1/2 top-1/2 h-full w-[var(--ag-mw)] transition-[translate,filter] [translate:-50%_-50%] sm:[translate:calc(-50%_+_var(--ag-mw)*var(--ag-d))_-50%] max-sm:h-[var(--ag-mh)] max-sm:w-full ${transicion} ${
-                  esActivo ? "grayscale-0" : "grayscale"
+                className={`absolute left-1/2 top-1/2 h-full w-[var(--ag-mw)] transition-[translate,filter] [translate:-50%_-50%] sm:[translate:calc(-50%_+_var(--ag-mw)*var(--ag-d))_-50%] max-sm:inset-0 max-sm:h-full max-sm:w-full max-sm:[translate:none] ${transicion} ${
+                  esActivo ? "grayscale-0" : "grayscale max-sm:grayscale-0"
                 }`}
                 style={{ "--ag-d": esActivo ? 0 : deriva * 0.03 } as CSSProperties}
               >
@@ -148,14 +169,14 @@ export function GaleriaAcordeon({
             <span
               aria-hidden="true"
               className={`pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent from-45% to-bg-deep/80 transition-[background-color] ${transicion} ${
-                esActivo ? "bg-transparent" : "bg-bg-deep/35"
+                esActivo ? "bg-transparent" : "bg-bg-deep/35 max-sm:bg-transparent"
               }`}
             />
 
             <span
               aria-hidden="true"
               className={`pointer-events-none absolute bottom-5 left-5 right-5 flex items-center gap-3 transition-[opacity,translate] ${transicion} ${
-                esActivo ? "translate-x-0 opacity-100" : "-translate-x-3.5 opacity-0"
+                esActivo ? "translate-x-0 opacity-100" : "-translate-x-3.5 opacity-0 max-sm:translate-x-0 max-sm:opacity-100"
               }`}
             >
               <span className="h-[26px] w-[3px] flex-none rounded-full bg-primary shadow-[0_0_12px_rgba(120,54,226,0.7)]" />
@@ -167,5 +188,12 @@ export function GaleriaAcordeon({
         )
       })}
     </div>
+    {/* Puntos del carrusel (solo celular) */}
+    <div className="mt-3 flex justify-center gap-1.5 sm:hidden" aria-hidden="true">
+      {elementos.map((el, i) => (
+        <span key={el.src} className={`h-1.5 rounded-full transition-all ${i === activo ? "w-5 bg-primary" : "w-1.5 bg-white/25"}`} />
+      ))}
+    </div>
+    </>
   )
 }

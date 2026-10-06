@@ -18,20 +18,20 @@ const focusRing =
 
 export function ProyectosRecientesSection() {
   return (
-    <section id="proyectos" className="relative scroll-mt-24 bg-bg-section py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="proyectos" className="relative scroll-mt-24 bg-bg-section py-12 sm:py-24">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <span className="h-px w-8 bg-primary" />
             Proyecto destacado
             <span className="h-px w-8 bg-primary" />
           </p>
-          <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
+          <h2 className="mt-4 text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:mt-5 sm:text-5xl">
             Lo último que hemos construido
           </h2>
         </div>
 
-        <div className="mt-14 space-y-8">
+        <div className="mt-8 space-y-8 sm:mt-14">
           {proyectos.map((p) => {
             // Ficha en una sola línea: giro · alcance · plataformas
             const meta = ["giro", "alcance", "plataforma"]
@@ -51,14 +51,14 @@ export function ProyectosRecientesSection() {
                 />
                 <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
-                <div className="grid items-center gap-8 p-4 sm:p-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:p-8">
+                <div className="grid items-center gap-5 p-3 sm:gap-8 sm:p-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:p-8">
                   <GaleriaAcordeon
                     elementos={p.galeria}
                     proporcion={0.6}
-                    alturas="h-[440px] sm:h-[360px] lg:h-[480px]"
+                    alturas="h-[260px] sm:h-[360px] lg:h-[480px]"
                   />
 
-                  <div className="px-2 pb-4 sm:px-2 lg:py-4 lg:pr-4">
+                  <div className="px-2 pb-3 sm:px-2 sm:pb-4 lg:py-4 lg:pr-4">
                     <div className="flex flex-wrap items-center gap-3">
                       {p.logo && (
                         <span className="flex h-12 items-center rounded-xl bg-white px-3.5">
@@ -74,13 +74,13 @@ export function ProyectosRecientesSection() {
                       </span>
                     </div>
 
-                    <h3 className="mt-6 text-balance font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                    <h3 className="mt-5 text-balance font-display text-[22px] font-bold tracking-tight text-white sm:mt-6 sm:text-3xl">
                       {p.titulo}
                     </h3>
-                    <p className="mt-2 text-pretty text-base text-white/70">{p.subtitulo}</p>
+                    <p className="mt-1.5 text-pretty text-[15px] text-white/70 sm:mt-2 sm:text-base">{p.subtitulo}</p>
                     {meta && <p className="mt-3 text-sm text-white/45">{meta}</p>}
 
-                    <ul className="mt-6 space-y-3 border-t border-white/10 pt-6">
+                    <ul className="mt-5 space-y-3 border-t border-white/10 pt-5 sm:mt-6 sm:pt-6">
                       {p.puntos.slice(0, 3).map((x) => (
                         <li key={x} className="flex gap-3 text-sm leading-relaxed text-white/85 sm:text-base">
                           <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/20">
@@ -92,7 +92,7 @@ export function ProyectosRecientesSection() {
                     </ul>
 
                     {p.modulos.length > 0 && (
-                      <ul className="mt-6 flex flex-wrap gap-2" aria-label="Lo que incluye">
+                      <ul className="mt-5 flex flex-wrap gap-2 sm:mt-6" aria-label="Lo que incluye">
                         {p.modulos.map((m) => {
                           const Icono = iconoModulo(m.titulo)
                           return (
@@ -109,10 +109,10 @@ export function ProyectosRecientesSection() {
                       </ul>
                     )}
 
-                    <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <div className="mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:gap-3">
                       <Link
                         href={`/proyectos/${p.slug}`}
-                        className={`group/caso inline-flex whitespace-nowrap items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:bg-primary-hover active:scale-[0.98] ${focusRing}`}
+                        className={`group/caso inline-flex min-h-12 whitespace-nowrap items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:bg-primary-hover active:scale-[0.98] ${focusRing}`}
                       >
                         Ver caso completo
                         <ArrowRight className="h-4 w-4 transition-transform group-hover/caso:translate-x-1" />
@@ -120,7 +120,7 @@ export function ProyectosRecientesSection() {
                       <Link
                         href="/contacto"
                         {...evento("agendar-consulta", { origen: "proyecto-destacado" })}
-                        className={`group/enlace inline-flex whitespace-nowrap items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white transition-all hover:border-primary/60 hover:bg-primary/20 ${focusRing}`}
+                        className={`group/enlace inline-flex min-h-12 whitespace-nowrap items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-sm font-semibold text-white transition-all hover:border-primary/60 hover:bg-primary/20 ${focusRing}`}
                       >
                         Quiero un sistema así
                         <ArrowRight className="h-4 w-4 text-primary-light transition-transform group-hover/enlace:translate-x-1" />

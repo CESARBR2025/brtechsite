@@ -24,7 +24,17 @@ const focusRing =
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  // En celular el vidrio es más opaco: el texto de debajo no debe transparentarse
+  const [movil, setMovil] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    const alCambiar = () => setMovil(mq.matches)
+    alCambiar()
+    mq.addEventListener("change", alCambiar)
+    return () => mq.removeEventListener("change", alCambiar)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -62,7 +72,7 @@ export function Navbar() {
         <GlassSurface
           borderRadius={28}
           tint={TINTE_BG_DARK}
-          tintOpacity={scrolled || mobileOpen ? 0.72 : 0.4}
+          tintOpacity={movil ? (scrolled || mobileOpen ? 0.9 : 0.55) : scrolled || mobileOpen ? 0.72 : 0.4}
           saturation={1.5}
           brightness={50}
           opacity={0.93}
@@ -106,7 +116,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className={`flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white md:hidden ${focusRing}`}
+              className={`flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white md:hidden ${focusRing}`}
               aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={mobileOpen}
               aria-controls="menu-movil"
@@ -132,7 +142,7 @@ export function Navbar() {
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       aria-current={isActive(item.href) ? "page" : undefined}
-                      className={tabClass(item.href)}
+                      className={`${tabClass(item.href)} flex min-h-12 items-center text-base`}
                     >
                       {item.label}
                     </Link>
@@ -142,7 +152,7 @@ export function Navbar() {
                   href="/contacto"
                   onClick={() => setMobileOpen(false)}
                   {...evento("agendar-consulta", { origen: "navbar-movil" })}
-                  className={`group mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8)] transition-colors hover:bg-primary-hover ${focusRing}`}
+                  className={`group mt-3 flex min-h-12 w-full items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(120,54,226,0.8)] transition-colors hover:bg-primary-hover ${focusRing}`}
                 >
                   Agendar consulta
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

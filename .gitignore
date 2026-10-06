@@ -47,3 +47,10 @@ next-env.d.ts
 
 # respaldos locales de contenido de proyectos (datos de clientes)
 /respaldos/
+
+# Material de trabajo local que no se publica (el repo es público)
+# - Borradores de contratos con datos y términos comerciales de clientes
+/contratos/
+# - Espacio de trabajo de redes: ~390 MB de imágenes generadas y perfiles de Chrome
+#   (cookies y datos de sesión) de la automatización de capturas
+/marketing/redes/

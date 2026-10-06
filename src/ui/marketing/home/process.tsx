@@ -78,7 +78,17 @@ const pasos: Paso[] = [
 
 export function ProcessSection() {
   const [activo, setActivo] = useState(0)
+  // Celular: paso visible en el carrusel (para los puntos)
+  const [pagina, setPagina] = useState(0)
   const refs = useRef<(HTMLLIElement | null)[]>([])
+
+  function alDeslizar(e: React.UIEvent<HTMLOListElement>) {
+    const lista = e.currentTarget
+    if (window.matchMedia("(min-width: 640px)").matches) return
+    const paso = (lista.children[1] as HTMLElement | undefined)?.offsetLeft ?? 1
+    const primero = (lista.children[0] as HTMLElement).offsetLeft
+    setPagina(Math.min(pasos.length - 1, Math.max(0, Math.round((lista.scrollLeft) / Math.max(1, paso - primero)))))
+  }
 
   useEffect(() => {
     const els = refs.current.filter((el): el is HTMLLIElement => el !== null)
@@ -98,18 +108,18 @@ export function ProcessSection() {
   const avance = ((activo + 1) / pasos.length) * 100
 
   return (
-    <section className="relative bg-bg-section py-16 sm:py-24">
-      <div className="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-8">
+    <section className="relative bg-bg-section py-12 sm:py-24">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:gap-14 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-8">
         {/* Encabezado y avance (fijo en escritorio) */}
         <div className="lg:sticky lg:top-32 lg:self-start">
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <span className="h-px w-8 bg-primary" />
             Nuestro método
           </p>
-          <h2 className="mt-5 text-balance font-display text-[32px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-5xl">
+          <h2 className="mt-4 text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:mt-5 sm:text-5xl">
             Así construimos tu sistema
           </h2>
-          <p className="mt-5 max-w-md text-pretty text-base leading-relaxed text-text-secondary sm:text-lg">
+          <p className="mt-4 max-w-md text-pretty text-[15px] leading-relaxed text-text-secondary sm:mt-5 sm:text-lg">
             Cada paso deja algo en tus manos: siempre sabes en qué vamos y qué recibes antes de avanzar al
             siguiente.
           </p>
@@ -161,12 +171,11 @@ export function ProcessSection() {
         </div>
 
         {/* Pasos con su entregable */}
-        <ol className="relative space-y-6">
-          {/* Hilo que une los pasos en celular */}
-          <span
-            aria-hidden="true"
-            className="absolute bottom-10 left-[1.9rem] top-10 w-px bg-gradient-to-b from-primary/40 via-primary/20 to-transparent lg:hidden"
-          />
+        <div className="min-w-0">
+        <ol
+          onScroll={alDeslizar}
+          className="relative -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-5 px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:block sm:snap-none sm:space-y-6 sm:overflow-visible sm:px-0 sm:pb-0"
+        >
           {pasos.map((p, i) => {
             const actual = i === activo
             return (
@@ -177,14 +186,14 @@ export function ProcessSection() {
                 ref={(el) => {
                   refs.current[i] = el
                 }}
-                className={`relative scroll-mt-32 rounded-3xl border bg-surface p-6 transition-all duration-500 sm:p-8 ${
-                  actual ? "border-primary/30 shadow-hover" : "border-border shadow-card"
+                className={`relative w-[84%] shrink-0 snap-start scroll-mt-32 rounded-3xl border bg-surface p-4 transition-all duration-500 sm:w-auto sm:shrink sm:p-8 ${
+                  actual ? "border-border shadow-card sm:border-primary/30 sm:shadow-hover" : "border-border shadow-card"
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <span
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors duration-500 ${
-                      actual ? "border-primary bg-primary text-white" : "border-border bg-surface text-primary"
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-500 sm:h-11 sm:w-11 ${
+                      actual ? "border-border bg-surface text-primary sm:border-primary sm:bg-primary sm:text-white" : "border-border bg-surface text-primary"
                     }`}
                   >
                     <p.icono className="h-5 w-5" aria-hidden="true" />
@@ -193,23 +202,23 @@ export function ProcessSection() {
                     <span className="font-mono text-xs font-semibold tabular-nums text-primary/60">
                       Paso {numero(i)}
                     </span>
-                    <h3 className="mt-0.5 font-display text-xl font-semibold tracking-tight text-text-primary sm:text-2xl">
+                    <h3 className="mt-0.5 font-display text-lg font-semibold tracking-tight text-text-primary sm:text-2xl">
                       {p.titulo}
                     </h3>
                   </div>
                 </div>
-                <p className="mt-4 text-pretty text-sm leading-relaxed text-text-secondary sm:text-base">
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-text-secondary sm:mt-4 sm:text-base">
                   {p.descripcion}
                 </p>
 
                 {/* Foto del paso con el entregable en una etiqueta de vidrio */}
-                <div className="relative mt-6 overflow-hidden rounded-2xl bg-bg-dark">
-                  <div className="relative aspect-[4/3] sm:aspect-[16/10]">
+                <div className="relative mt-4 overflow-hidden rounded-2xl bg-bg-dark sm:mt-6">
+                  <div className="relative aspect-[16/10]">
                     <Image
                       src={p.foto.src}
                       alt={p.foto.alt}
                       fill
-                      sizes="(min-width: 1024px) 640px, 100vw"
+                      sizes="(min-width: 1024px) 640px, 84vw"
                       className="object-cover"
                     />
                     <div
@@ -217,15 +226,22 @@ export function ProcessSection() {
                       className="absolute inset-0 bg-gradient-to-b from-bg-deep/40 via-transparent to-transparent"
                     />
                   </div>
-                  <p className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-bg-dark/60 px-3.5 py-2 text-xs font-medium text-white shadow-lg backdrop-blur-md sm:left-5 sm:top-5">
+                  <p className="absolute left-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-1.5 rounded-full border border-white/15 bg-bg-dark/70 px-3 py-1.5 text-[11px] font-medium text-white shadow-lg backdrop-blur-md sm:left-5 sm:top-5 sm:gap-2 sm:px-3.5 sm:py-2 sm:text-xs">
                     <Check className="h-3.5 w-3.5 text-success" strokeWidth={3} aria-hidden="true" />
-                    <span className="text-white/60">Lo que recibes:</span> {p.entregable}
+                    <span className="hidden text-white/60 sm:inline">Lo que recibes:</span> {p.entregable}
                   </p>
                 </div>
               </li>
             )
           })}
         </ol>
+        {/* Puntos del carrusel (solo celular) */}
+        <div className="mt-3 flex justify-center gap-1.5 sm:hidden" aria-hidden="true">
+          {pasos.map((p, i) => (
+            <span key={p.titulo} className={`h-1.5 rounded-full transition-all ${i === pagina ? "w-5 bg-primary" : "w-1.5 bg-border"}`} />
+          ))}
+        </div>
+        </div>
       </div>
     </section>
   )
