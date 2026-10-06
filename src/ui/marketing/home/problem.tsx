@@ -91,7 +91,7 @@ export function ProblemSection() {
   const enlaceWhatsApp = `https://wa.me/${WHATSAPP.telefono.replace("+", "")}?text=${encodeURIComponent(mensaje)}`
 
   return (
-    <section className="relative bg-surface py-24 sm:py-32">
+    <section className="relative bg-bg-section py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
@@ -155,7 +155,7 @@ export function ProblemSection() {
         <div
           aria-live="polite"
           className={`mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border transition-all duration-500 ${
-            n > 0 ? "border-primary/30 bg-bg-dark shadow-[0_30px_60px_-30px_rgba(71,31,163,0.6)]" : "border-border bg-bg-section"
+            n > 0 ? "border-primary/30 bg-bg-dark shadow-[0_30px_60px_-30px_rgba(71,31,163,0.6)]" : "border-border bg-surface"
           }`}
         >
           <div className="flex flex-col items-center gap-6 p-6 text-center sm:p-8 md:flex-row md:text-left">

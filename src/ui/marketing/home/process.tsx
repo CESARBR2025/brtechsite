@@ -98,7 +98,7 @@ export function ProcessSection() {
   const avance = ((activo + 1) / pasos.length) * 100
 
   return (
-    <section className="relative bg-bg-section py-24 sm:py-32">
+    <section className="relative bg-bg-section py-16 sm:py-24">
       <div className="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-8">
         {/* Encabezado y avance (fijo en escritorio) */}
         <div className="lg:sticky lg:top-32 lg:self-start">

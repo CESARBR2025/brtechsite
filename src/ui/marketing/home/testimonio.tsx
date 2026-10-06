@@ -30,7 +30,7 @@ export function TestimonioSection() {
   if (!testimonio.cita) return null
 
   return (
-    <section className="relative overflow-hidden py-16 sm:py-24">
+    <section className="relative overflow-hidden bg-bg-section py-16 sm:py-24">
       <div className="absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">

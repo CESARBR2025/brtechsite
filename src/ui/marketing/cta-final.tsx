@@ -27,7 +27,7 @@ export function CTAFinal({
   enlaceSecundario,
 }: Props) {
   return (
-    <section className="relative bg-bg-section px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+    <section className="relative bg-bg-section px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl border border-line-dark bg-bg-deep shadow-[0_40px_80px_-40px_rgba(71,31,163,0.55)]">
         {/* Eco del hero: las mismas ondas de marca, con el centro oscurecido para leer */}
         <div className="absolute inset-0">

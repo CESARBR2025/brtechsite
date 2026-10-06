@@ -131,12 +131,12 @@ export function CasoExito({ proyecto: p }: { proyecto: Proyecto }) {
       </section>
 
       {/* Antes → Después */}
-      <section className="relative bg-surface py-24 sm:py-32">
+      <section className="relative bg-bg-section py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <Encabezado etiqueta="La transformación" titulo="Lo que cambió en la operación" texto={p.reto.texto} />
 
           <div className="mt-14 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-3xl border border-border bg-bg-section p-6 sm:p-8">
+            <div className="rounded-3xl border border-border bg-surface p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted">Antes</p>
               <ul className="mt-6 space-y-4">
                 {p.reto.puntos.map((x) => (
@@ -173,7 +173,7 @@ export function CasoExito({ proyecto: p }: { proyecto: Proyecto }) {
 
       {/* La solución: módulos */}
       {p.modulos.length > 0 && (
-        <section className="relative bg-bg-section py-24 sm:py-32">
+        <section className="relative bg-bg-section py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Encabezado etiqueta="La solución" titulo="Un sistema para toda la operación" />
 
@@ -200,7 +200,7 @@ export function CasoExito({ proyecto: p }: { proyecto: Proyecto }) {
 
       {/* Cómo lo construimos: línea de tiempo (horizontal en escritorio) */}
       {p.fases.length > 0 && (
-        <section className="relative bg-surface py-24 sm:py-32">
+        <section className="relative bg-bg-section py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Encabezado
               etiqueta="Cómo lo construimos"

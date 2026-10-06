@@ -18,7 +18,7 @@ const focusRing =
 
 export function ProyectosRecientesSection() {
   return (
-    <section id="proyectos" className="relative scroll-mt-24 bg-surface py-24 sm:py-32">
+    <section id="proyectos" className="relative scroll-mt-24 bg-bg-section py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">

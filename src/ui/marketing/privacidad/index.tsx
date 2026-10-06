@@ -58,7 +58,7 @@ export function AvisoPrivacidad() {
         </div>
       </section>
 
-      <div className="bg-surface py-16 sm:py-24">
+      <div className="bg-bg-section py-16 sm:py-24">
         <article className="mx-auto max-w-3xl space-y-10 px-4 sm:px-6 lg:px-8">
           <Seccion titulo="Responsable de tus datos">
             <p>
