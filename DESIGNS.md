@@ -154,6 +154,51 @@ Si todo es oscuro nada destaca; si nada lo es, la página se ve plana.
 `#F7F6FA`). No mezcles grises de Tailwind (`gray-*`, `slate-*`) ni `#fff`/`#000` como color de texto o de superficie
 (salvo `bg-surface` para tarjetas y `bg-deep` para el fondo de las ondas).
 
+### Móvil (se diseña a 390 px; se verifica a 360 y 430)
+
+La vista de celular **no es el escritorio apilado**: se compone aparte para que se sienta como una app.
+Clase base = móvil; `sm:` (640) en adelante escala.
+
+| Valor | Móvil | Desde `sm` |
+|---|---|---|
+| Margen lateral | `px-5` | `sm:px-6 lg:px-8` |
+| Espacio entre secciones | `py-12` | `sm:py-24` |
+| H1 de hero | `text-[32px]` (`min-[400px]:text-[34px]`) | `sm:text-6xl` |
+| H2 de sección | `text-[28px]` | `sm:text-5xl` |
+| Párrafo | `text-[15px]` (16 en formularios) | `sm:text-base/lg` |
+| Texto mínimo | 12 px; rótulos en versalitas 11 px (solo una línea) | — |
+| Objetivo táctil | **mínimo 44 px** (`min-h-11`/`h-11`) y 8 px entre ellos | — |
+| Campos de formulario | `text-base` (16 px): con menos, iOS hace zoom al enfocar | `sm:text-sm` |
+| Botón principal | ancho completo, `min-h-12` | `sm:w-auto` |
+
+**Patrones (en vez de apilar tarjetas):**
+- **Lista agrupada** (estilo ajustes de iOS): varias tarjetas de una misma idea → una sola tarjeta con filas separadas por
+  `divide-y divide-border`, filas de ~60 px. En `sm+` vuelven a ser tarjetas sueltas en rejilla. Se usa en "¿Te identificas?",
+  Preguntas frecuentes y módulos del caso.
+- **Carrusel con snap**: contenido repetitivo con foto (`GaleriaAcordeon`, pasos del método) → `flex snap-x snap-mandatory
+  overflow-x-auto`, tarjetas de ~84–86 % del ancho (la siguiente asoma) y **puntos** debajo. En `sm+`, el diseño de escritorio.
+- **Ver todo**: listas largas (`ListaChecks`) muestran 4 elementos y "Ver todo (+n)"; bloques secundarios (`PlegableMovil`) van
+  plegados tras una fila con chevron. En `sm+` se ven completos y sin botón.
+- **Pestañas (≤ 3 opciones): control segmentado**, nunca píldoras que se deslizan: una pestaña oculta fuera de pantalla no se
+  descubre y, al elegirla, la activa queda invisible. `grid grid-cols-3` con ícono arriba y nombre debajo (`min-h-[68px]`), la activa
+  en `bg-primary text-white`; desde `sm`, la fila de píldoras de escritorio. Al cambiar de pestaña, si el control quedó arriba de la
+  pantalla se vuelve a él (`scrollIntoView`), y el panel entra sin desenfoque en celular (`sm:motion-safe:animate-aparecer`).
+  Con más de 3 opciones, usa lista o carrusel con snap (no pestañas).
+- **Ficha clave-valor** como fila de ajustes: etiqueta a la izquierda, valor a la derecha (`flex justify-between`).
+- **Hero**: la foto es un bloque propio arriba (`h-[40svh]`, funde hacia abajo) y el texto va **debajo**, nunca encima de la foto.
+  La primera pantalla debe mostrar foto, título y el botón principal.
+
+**Barra de acción inferior** (`src/ui/marketing/barra-movil.tsx`): sustituye al botón flotante de WhatsApp en celular. "Agendar
+consulta" + WhatsApp en una barra de vidrio oscuro; aparece al salir del hero, se esconde cuando el footer entra en pantalla y
+no se muestra en `/contacto`. Respeta `env(safe-area-inset-bottom)` (la raíz declara `viewport-fit=cover`). El botón flotante
+redondo solo existe desde `sm`.
+
+**Navbar en celular:** vidrio más opaco (el texto de debajo no debe transparentarse), botón de menú de 44 px y filas de menú de 48 px.
+**Footer en celular:** Navegación y Contacto en dos columnas, Servicios a todo el ancho, enlaces de 44 px.
+
+**Cómo verificar:** capturar cada página a 360, 390 y 430 px de ancho (CDP/Chrome headless), revisar que no haya desborde
+horizontal (`scrollWidth == innerWidth`), que ningún objetivo táctil mida menos de 44 px y que la página no pase de ~8 pantallas.
+
 ---
 
 ## 3. Recetas de componentes
