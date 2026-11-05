@@ -78,8 +78,28 @@
   }
 }
 
+/* La guardia decide antes de hidratar; sin JavaScript el recibo queda visible. */
+html[data-entrada] #entrada-recibo {
+  display: block;
+  animation: entrada-seguro 0s linear 6s forwards;
+}
+
+@keyframes entrada-seguro {
+  to { visibility: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #entrada-recibo {
+    display: none !important;
+  }
+}
+
 /* Impresión / guardar como PDF (tickets de servicio) */
 @media print {
+  #entrada-recibo {
+    display: none !important;
+  }
+
   .no-print {
     display: none !important;
   }
