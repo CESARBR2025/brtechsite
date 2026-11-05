@@ -19,6 +19,11 @@ CONTACT_TO_EMAIL=barcenasrosalescesarivan@gmail.com
 NODE_ENV=production
 ```
 
+Para mostrar transferencia bancaria en las notas de servicio, configura también
+`PAGO_BANCO`, `PAGO_TITULAR` y `PAGO_CLABE` (18 dígitos, con verificador válido).
+Son opcionales: si falta alguna o la CLABE es inválida, la página invita a pedir
+los datos por WhatsApp. Sus valores se definen en Dokploy, nunca en el código.
+
 El `<PASSWORD>` de `brtech_app` es el generado al crear el rol (guardado aparte,
 no está en el repo). Si se perdió, rotarlo:
 `docker exec -it parrillasoft-db psql -U parrillasoft -c "ALTER ROLE brtech_app WITH PASSWORD '...';"`

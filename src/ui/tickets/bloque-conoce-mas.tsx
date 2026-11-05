@@ -10,28 +10,25 @@ export function BloqueConoceMas() {
       <div className="absolute -bottom-24 -right-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-lg">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-white/5 to-primary/10 px-4 py-1.5 text-xs font-medium text-text-muted shadow-lg">
+        <div className="inline-flex items-center gap-2 rounded-full border border-line-dark bg-surface-dark px-4 py-1.5 text-xs font-medium text-primary-light">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           Conoce más
         </div>
 
-        <h2 className="mt-5 text-[22px] font-bold leading-tight text-white sm:text-2xl">
-          Este ticket lo generó{" "}
-          <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-            nuestro sistema
-          </span>
+        <h2 className="mt-5 font-hero text-[22px] font-semibold leading-tight text-white sm:text-2xl">
+          Esta nota la generó nuestro sistema
         </h2>
-        <p className="mt-3 text-sm text-text-muted">
+        <p className="mt-3 text-sm text-white/65">
           En BR TECH construimos software a la medida para negocios como el tuyo:
           puntos de venta, inventarios, sitios web y automatización.
         </p>
 
         <Link
           href="/?ref=ticket"
-          className="group mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98]"
+          className="group mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-hover px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/30 motion-safe:transition-all hover:shadow-lg hover:shadow-primary/40 motion-safe:active:scale-[0.98]"
         >
           Ver qué hacemos
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-4 w-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-1" />
         </Link>
       </div>
     </section>

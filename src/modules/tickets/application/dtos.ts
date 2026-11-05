@@ -1,6 +1,12 @@
 import type { EstadoTicket } from "../domain/estado-ticket"
 import type { Ticket } from "../domain/ticket"
 
+export interface DatosPagoDTO {
+  banco: string
+  titular: string
+  clabe: string
+}
+
 /** Ítem tal como lo consume la presentación (montos en unidades, no centavos). */
 export interface ItemDTO {
   id: string

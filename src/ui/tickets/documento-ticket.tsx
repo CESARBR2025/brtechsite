@@ -1,4 +1,3 @@
-import Image from "next/image"
 import {
   ClipboardList,
   Lightbulb,
@@ -10,6 +9,7 @@ import {
 import type { LucideIcon } from "lucide-react"
 import type { TicketPublicoDTO } from "@/src/modules/tickets/application/dtos"
 import { formatearDinero } from "@/src/ui/formato"
+import { SimboloBrTech } from "@/src/ui/marca/simbolo-brtech"
 
 function SeccionTitulo({
   icono: Icono,
@@ -20,7 +20,7 @@ function SeccionTitulo({
 }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary-light to-primary/10 text-primary">
+      <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-surface text-primary shadow-sm">
         <Icono className="h-4 w-4" />
       </span>
       <h2 className="text-sm font-bold text-text-primary">{children}</h2>
@@ -45,25 +45,14 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
     <div>
       {/* Membrete solo para impresión / PDF */}
       <div className="hidden items-center gap-3 border-b border-border px-8 pb-4 pt-6 print:flex">
-        <span className="inline-flex rounded-md bg-bg-dark px-2 py-1.5">
-          <Image
-            src="/logo.png"
-            alt="BR TECH"
-            width={566}
-            height={191}
-            className="h-6 w-auto"
-          />
-        </span>
+        <SimboloBrTech className="h-10 w-10" titulo="BR TECH" />
         <div className="border-l border-border pl-3">
           <p className="text-[11px] uppercase tracking-wider text-text-muted">
-            Nota de servicio
+            {ticket.pagado ? "Recibo de pago" : "Nota de servicio"}
           </p>
           <p className="text-sm font-bold text-text-primary">{ticket.folio}</p>
         </div>
       </div>
-
-      {/* Filo superior de marca (pantalla) */}
-      <div className="h-1 bg-gradient-to-r from-primary to-primary-hover print:hidden" />
 
       {/* Subtítulo (pantalla) */}
       <p className="border-b border-border px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.2em] text-text-muted print:hidden sm:px-8">
@@ -87,7 +76,7 @@ export function DocumentoTicket({ ticket }: { ticket: TicketPublicoDTO }) {
                     key={paso.titulo}
                     className="relative flex items-start gap-4"
                   >
-                    <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-hover text-white shadow-lg shadow-primary/20">
+                    <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-bg-dark text-primary-light">
                       <paso.icono className="h-5 w-5" />
                     </span>
                     <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface p-4">

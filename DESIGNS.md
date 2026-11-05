@@ -433,6 +433,16 @@ de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
   sección al hacer scroll (`Revelar`). Encabezados con número gigante en contorno a la derecha.
   Todo respeta `prefers-reduced-motion`.
 
+### Recibo (`/t/[slug]`, `src/ui/tickets/recibo/` y `entrada/`)
+Abre con la entrada del diafragma (`entrada-recibo.tsx`, 2.9 s): las aspas del símbolo llegan, encajan con destellos, el
+hueco se abre y la cámara entra hasta mostrar la página. Sale una vez por recibo en cada dispositivo, se puede saltar y no
+aparece con movimiento reducido ni al imprimir. Las ondas arrancan hasta que termina, para no competir por el GPU.
+El símbolo vive en SVG (`src/ui/marca/`) y es el mismo dibujo en la entrada, la portada, el membrete impreso y la vista previa.
+Orden: portada oscura → total en tarjeta oscura → cómo pagar → desglose → "Conoce más". Pagado: sin cómo pagar, con sello
+`success` que cae una sola vez. Lo caricaturesco acompaña; el monto y los datos de pago se quedan sobrios.
+Datos de pago solo en entorno (`PAGO_BANCO`, `PAGO_TITULAR`, `PAGO_CLABE`). La vista previa (`opengraph-image.tsx`) no
+lleva monto, folio ni apellidos, y usa Poppins porque `ImageResponse` no lee woff2 y la licencia de Clash prohíbe convertirla.
+
 ### Propuesta (`/p/[slug]`, `src/ui/proyectos/propuesta.tsx`)
 Es la **implementación de referencia** de §2: portada oscura con ondas (texto a la izquierda, foto fundida a la
 derecha), cuerpo en lienzo `bg-section` con secciones numeradas `01…` (`Seccion`) y tarjetas `TARJETA`
