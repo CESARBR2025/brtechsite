@@ -33,7 +33,8 @@ import { formatearFechaHora } from "./fechas"
 import { NavbarDocumento } from "@/src/ui/primitivos/navbar-documento"
 import { OndasGradiente } from "@/src/ui/primitivos/ondas-gradiente"
 import { TextoDesenfocado } from "@/src/ui/primitivos/texto-desenfocado"
-import { BarraLectura, Contador, Revelar } from "./efectos-diagnostico"
+import { BarraLectura, Revelar } from "./efectos-diagnostico"
+import { Contador } from "@/src/ui/primitivos/contador"
 import { PreguntasCliente } from "./preguntas-cliente"
 
 /*
