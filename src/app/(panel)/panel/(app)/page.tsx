@@ -9,6 +9,7 @@ import {
   Wrench,
 } from "lucide-react"
 import { getEnv } from "@/src/modules/shared/infrastructure/config/env"
+import { ETIQUETA_CATEGORIA } from "@/src/modules/tickets/domain/clasificacion"
 import { tickets } from "@/src/modules/tickets/infrastructure/contenedor"
 import { formatearDinero, formatearFecha } from "@/src/ui/formato"
 import { CopiarEnlace } from "@/src/ui/panel/copiar-enlace"
@@ -141,6 +142,9 @@ export default async function PaginaPanel() {
                   <h3 className="relative mt-0.5 truncate text-base font-semibold text-text-primary">
                     {t.clienteNombre}
                   </h3>
+                  <p className="relative mt-1 text-xs text-text-muted">
+                    {ETIQUETA_CATEGORIA[t.equipoCategoria]}
+                  </p>
                   <p className="relative mt-1 flex items-center gap-1.5 text-sm text-text-secondary">
                     <Laptop className="h-3.5 w-3.5 shrink-0 text-text-muted" />
                     <span className="truncate">{t.equipoTipo}</span>

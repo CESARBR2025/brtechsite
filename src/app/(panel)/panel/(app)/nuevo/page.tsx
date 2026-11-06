@@ -4,7 +4,7 @@ import { FormularioTicket } from "@/src/ui/tickets/formulario-ticket"
 
 export default function PaginaNuevoTicket() {
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-6xl">
       <Link
         href="/panel"
         className="inline-flex items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-primary"
