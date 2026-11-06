@@ -4,6 +4,7 @@ import {
   OperacionNoPermitida,
 } from "@/src/modules/shared/domain/errors"
 import type { Reloj } from "@/src/modules/shared/domain/reloj"
+import { type CategoriaEquipo, esCategoriaEquipo, ETIQUETA_CATEGORIA, ETIQUETA_PIEZA, GARANTIA_MAX_DIAS, PIEZAS_POR_CATEGORIA } from "./clasificacion"
 import type { EstadoTicket } from "./estado-ticket"
 import { ItemTicket } from "./item-ticket"
 import { SlugTicket } from "./slug-ticket"
@@ -14,7 +15,8 @@ export interface DatosCliente {
 }
 
 export interface DatosEquipo {
-  tipo: string
+  categoria: CategoriaEquipo
+  tipo?: string | null
   detalle?: string | null
 }
 
@@ -32,6 +34,7 @@ export interface DatosNuevoTicket {
   equipo: DatosEquipo
   detalle?: DetalleServicio
   moneda?: string
+  garantiaDias?: number | null
   impuesto?: Dinero
   fechaServicio: Date
   items?: ItemTicket[]
@@ -44,6 +47,8 @@ export interface PropsTicket {
   estado: EstadoTicket
   clienteNombre: string
   clienteContacto: string | null
+  equipoCategoria: CategoriaEquipo
+  garantiaDias: number | null
   equipoTipo: string
   equipoDetalle: string | null
   problemaReportado: string | null
@@ -86,14 +91,18 @@ export class Ticket {
   ): Ticket {
     const ahora = deps.reloj.ahora()
     const d = datos.detalle ?? {}
-    return new Ticket({
+    validarCategoria(datos.equipo.categoria)
+    validarGarantia(datos.garantiaDias ?? null)
+    const ticket = new Ticket({
       id: deps.id,
       folio: deps.folio,
       slug: deps.slug,
       estado: "borrador",
       clienteNombre: textoRequerido(datos.cliente.nombre, "nombre del cliente"),
       clienteContacto: textoOpcional(datos.cliente.contacto),
-      equipoTipo: textoRequerido(datos.equipo.tipo, "tipo de equipo"),
+      equipoCategoria: datos.equipo.categoria,
+      garantiaDias: datos.garantiaDias ?? null,
+      equipoTipo: textoOpcional(datos.equipo.tipo) ?? ETIQUETA_CATEGORIA[datos.equipo.categoria],
       equipoDetalle: textoOpcional(datos.equipo.detalle),
       problemaReportado: textoOpcional(d.problemaReportado),
       diagnostico: textoOpcional(d.diagnostico),
@@ -104,11 +113,13 @@ export class Ticket {
       impuesto: datos.impuesto ?? Dinero.cero(),
       pagado: false,
       fechaServicio: datos.fechaServicio,
-      items: datos.items ?? [],
+      items: [...(datos.items ?? [])],
       creadoEn: ahora,
       actualizadoEn: ahora,
       publicadoEn: null,
     })
+    ticket.validarClasificacion()
+    return ticket
   }
 
   /** Rehidrata desde persistencia sin re-ejecutar reglas de alta. */
@@ -160,8 +171,11 @@ export class Ticket {
       contacto: this.props.clienteContacto,
     }
   }
-  get equipo(): { tipo: string; detalle: string | null } {
-    return { tipo: this.props.equipoTipo, detalle: this.props.equipoDetalle }
+  get equipo(): { categoria: CategoriaEquipo; tipo: string; detalle: string | null } {
+    return { categoria: this.props.equipoCategoria, tipo: this.props.equipoTipo, detalle: this.props.equipoDetalle }
+  }
+  get garantiaDias(): number | null {
+    return this.props.garantiaDias
   }
   get detalle(): Required<DetalleServicio> {
     return {
@@ -209,9 +223,44 @@ export class Ticket {
   }
 
   actualizarEquipo(datos: DatosEquipo, reloj: Reloj): void {
+    this.actualizarEquipoYConceptos(datos, this.props.items, reloj)
+  }
+
+  actualizarEquipoYConceptos(equipo: DatosEquipo, items: ItemTicket[], reloj: Reloj): void {
     this.garantizarEditable()
-    this.props.equipoTipo = textoRequerido(datos.tipo, "tipo de equipo")
-    this.props.equipoDetalle = textoOpcional(datos.detalle)
+    validarCategoria(equipo.categoria)
+    const anteriores = this.props
+    this.props = {
+      ...anteriores,
+      equipoCategoria: equipo.categoria,
+      equipoTipo: textoOpcional(equipo.tipo) ?? ETIQUETA_CATEGORIA[equipo.categoria],
+      equipoDetalle: textoOpcional(equipo.detalle),
+      items: [...items],
+    }
+    try {
+      this.validarClasificacion()
+    } catch (error) {
+      this.props = anteriores
+      throw error
+    }
+    this.tocar(reloj)
+  }
+
+  private validarClasificacion(): void {
+    for (const item of this.props.items) {
+      if (item.pieza !== null && !PIEZAS_POR_CATEGORIA[this.props.equipoCategoria].includes(item.pieza)) {
+        throw new DatosInvalidos(`La pieza "${ETIQUETA_PIEZA[item.pieza]}" no aplica a ${ETIQUETA_CATEGORIA[this.props.equipoCategoria]}`)
+      }
+      if (item.clase === "ensamble" && this.props.equipoCategoria !== "pc") {
+        throw new DatosInvalidos("El ensamble solo aplica a PC de escritorio")
+      }
+    }
+  }
+
+  fijarGarantia(dias: number | null, reloj: Reloj): void {
+    this.garantizarEditable()
+    validarGarantia(dias)
+    this.props.garantiaDias = dias
     this.tocar(reloj)
   }
 
@@ -244,9 +293,7 @@ export class Ticket {
 
   /** Sustituye la lista completa de ítems (el panel siempre manda todo). */
   reemplazarItems(items: ItemTicket[], reloj: Reloj): void {
-    this.garantizarEditable()
-    this.props.items = [...items]
-    this.tocar(reloj)
+    this.actualizarEquipoYConceptos(this.equipo, items, reloj)
   }
 
   marcarPagado(pagado: boolean, reloj: Reloj): void {
@@ -284,5 +331,15 @@ export class Ticket {
   /** Snapshot plano para el repositorio. No se usa desde presentación. */
   instantanea(): PropsTicket {
     return { ...this.props, items: [...this.props.items] }
+  }
+}
+
+function validarCategoria(categoria: CategoriaEquipo): void {
+  if (!esCategoriaEquipo(categoria)) throw new DatosInvalidos("La categoría del equipo no es válida")
+}
+
+function validarGarantia(dias: number | null): void {
+  if (dias !== null && (!Number.isInteger(dias) || dias < 0 || dias > GARANTIA_MAX_DIAS)) {
+    throw new DatosInvalidos(`La garantía debe ser un número entero entre 0 y ${GARANTIA_MAX_DIAS} días`)
   }
 }

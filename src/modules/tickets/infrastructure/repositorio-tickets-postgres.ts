@@ -13,7 +13,7 @@ import {
 
 const COLUMNAS_TICKET = `
   id, public_slug, folio, estado,
-  cliente_nombre, cliente_contacto, equipo_tipo, equipo_detalle,
+  cliente_nombre, cliente_contacto, equipo_tipo, equipo_detalle, equipo_categoria, garantia_dias,
   problema_reportado, diagnostico, trabajo_realizado, recomendaciones,
   nota_garantia, moneda, impuesto_centavos, pagado,
   to_char(fecha_servicio, 'YYYY-MM-DD') AS fecha_servicio,
@@ -52,7 +52,7 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
 
     const filaTicket = rows[0]
     const { rows: filasItems } = await this.pool.query<FilaItem>(
-      `SELECT id, ticket_id, posicion, concepto, detalle, cantidad, precio_unitario_centavos
+      `SELECT id, ticket_id, posicion, concepto, detalle, cantidad, precio_unitario_centavos, clase, pieza, etiqueta, pieza_anterior
        FROM service_ticket_item WHERE ticket_id = $1 ORDER BY posicion`,
       [filaTicket.id],
     )
@@ -90,7 +90,7 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
 
     const ids = rows.map((r) => r.id)
     const { rows: filasItems } = await this.pool.query<FilaItem>(
-      `SELECT id, ticket_id, posicion, concepto, detalle, cantidad, precio_unitario_centavos
+      `SELECT id, ticket_id, posicion, concepto, detalle, cantidad, precio_unitario_centavos, clase, pieza, etiqueta, pieza_anterior
        FROM service_ticket_item WHERE ticket_id = ANY($1) ORDER BY posicion`,
       [ids],
     )
@@ -115,9 +115,9 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
            cliente_nombre, cliente_contacto, equipo_tipo, equipo_detalle,
            problema_reportado, diagnostico, trabajo_realizado, recomendaciones,
            nota_garantia, moneda, impuesto_centavos, pagado, fecha_servicio,
-           creado_en, actualizado_en, publicado_en
+           creado_en, actualizado_en, publicado_en, equipo_categoria, garantia_dias
          ) VALUES (
-           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20
+           $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22
          )
          ON CONFLICT (id) DO UPDATE SET
            public_slug = EXCLUDED.public_slug,
@@ -125,6 +125,8 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
            estado = EXCLUDED.estado,
            cliente_nombre = EXCLUDED.cliente_nombre,
            cliente_contacto = EXCLUDED.cliente_contacto,
+           equipo_categoria = EXCLUDED.equipo_categoria,
+           garantia_dias = EXCLUDED.garantia_dias,
            equipo_tipo = EXCLUDED.equipo_tipo,
            equipo_detalle = EXCLUDED.equipo_detalle,
            problema_reportado = EXCLUDED.problema_reportado,
@@ -159,6 +161,8 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
           s.creadoEn.toISOString(),
           s.actualizadoEn.toISOString(),
           s.publicadoEn ? s.publicadoEn.toISOString() : null,
+          s.equipoCategoria,
+          s.garantiaDias,
         ],
       )
 
@@ -171,9 +175,9 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
         const valores: string[] = []
         const params: unknown[] = []
         s.items.forEach((item, i) => {
-          const base = i * 7
+          const base = i * 11
           valores.push(
-            `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7})`,
+            `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11})`,
           )
           params.push(
             item.id,
@@ -183,11 +187,15 @@ export class RepositorioTicketsPostgres implements RepositorioTickets {
             item.detalle,
             item.cantidad,
             item.precioUnitario.centavos,
+            item.clase,
+            item.pieza,
+            item.etiqueta,
+            item.piezaAnterior,
           )
         })
         await client.query(
           `INSERT INTO service_ticket_item
-             (id, ticket_id, posicion, concepto, detalle, cantidad, precio_unitario_centavos)
+             (id, ticket_id, posicion, concepto, detalle, cantidad, precio_unitario_centavos, clase, pieza, etiqueta, pieza_anterior)
            VALUES ${valores.join(", ")}`,
           params,
         )

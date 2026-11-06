@@ -179,3 +179,19 @@ src/app/           Solo routing y composición: la página llama a un caso de us
 con parrilla). Rol `brtech_app` con `CONNECTION LIMIT 5` y `statement_timeout`.
 En dev se llega por túnel SSH a `127.0.0.1:5433`. En prod (Dokploy) el host es
 `parrillasoft-db:5432` por la red `dokploy-network`.
+
+## Agentes de código (Codex)
+
+Cuando un agente trabaja por encargo con una guía (p. ej. `docs/guias/*.md`):
+
+- **Nada de git para escribir:** ni commit, push, checkout, reset, stash ni ramas. El commit lo hace Claude
+  después de revisar el diff.
+- Toca solo lo que pide la guía y la fase indicada; lo que la guía deja abierto, decídelo de forma conservadora
+  y repórtalo.
+- Código, nombres y textos en **español** (sentence case, sin anglicismos en la interfaz), con el estilo del
+  proyecto: sin ORM, dinero en centavos, contenedor por módulo, server actions delgadas.
+- No agregues dependencias. No corras migraciones ni pruebas que necesiten base de datos o red
+  (`RUN_DB_TESTS=1`, `npm run migrate:*`): las corre Claude.
+- Verificación: `npx tsc --noEmit`, `npm run lint`, `npm test` (y `npm run build` cuando la guía lo pida).
+- Termina con un resumen: archivos cambiados, decisiones no cubiertas por la guía y pruebas corridas con su
+  resultado.

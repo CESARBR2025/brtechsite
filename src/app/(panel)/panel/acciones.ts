@@ -7,6 +7,7 @@ import {
   crearTokenSesion,
   NOMBRE_COOKIE_SESION,
 } from "@/src/modules/panel/infrastructure/sesion"
+import { exigirSesionPanel } from "@/src/modules/panel/infrastructure/exigir-sesion"
 import { ErrorDominio } from "@/src/modules/shared/domain/errors"
 import { getEnv } from "@/src/modules/shared/infrastructure/config/env"
 import type { DatosTicketEntrada } from "@/src/modules/tickets/application/entrada"
@@ -61,6 +62,7 @@ export async function guardarTicket(
   datos: DatosTicketEntrada,
 ): Promise<EstadoFormulario> {
   try {
+    await exigirSesionPanel()
     if (id) {
       await tickets().actualizarTicket.ejecutar(id, datos)
       revalidatePath(`/panel/${id}`)
@@ -80,6 +82,7 @@ async function transicion(
   id: string,
 ): Promise<EstadoFormulario> {
   try {
+    await exigirSesionPanel()
     await accion(id)
     revalidatePath(`/panel/${id}`)
     revalidatePath("/panel")

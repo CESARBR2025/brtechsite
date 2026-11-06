@@ -8,6 +8,8 @@ import type {
   TicketDetalleDTO,
 } from "@/src/modules/tickets/application/dtos"
 import type { DatosTicketEntrada } from "@/src/modules/tickets/application/entrada"
+import { sugerirClasificacion } from "@/src/modules/tickets/application/sugerir-clasificacion"
+import { PIEZAS_POR_CATEGORIA } from "@/src/modules/tickets/domain/clasificacion"
 import { formatearDinero } from "@/src/ui/formato"
 
 interface FilaItem {
@@ -106,12 +108,22 @@ export function FormularioTicket({
 
     const itemsLimpios = items
       .filter((it) => it.concepto.trim() && it.precioUnitario.trim())
-      .map((it) => ({
-        concepto: it.concepto.trim(),
-        detalle: it.detalle.trim() || null,
-        cantidad: Number(it.cantidad),
-        precioUnitario: Number(it.precioUnitario),
-      }))
+      .map((it) => {
+        const anterior = inicial?.items.find((item) => item.id === it.key)
+        const conservar = anterior && anterior.concepto === it.concepto.trim() && (anterior.detalle ?? "") === it.detalle.trim()
+        const sugerencia = sugerirClasificacion(it.concepto, it.detalle)
+        const categoria = inicial?.equipo.categoria ?? "otro"
+        return {
+          clase: conservar ? anterior.clase : sugerencia.clase === "ensamble" && categoria !== "pc" ? "otro" : sugerencia.clase,
+          pieza: conservar ? anterior.pieza : sugerencia.pieza && PIEZAS_POR_CATEGORIA[categoria].includes(sugerencia.pieza) ? sugerencia.pieza : null,
+          etiqueta: anterior?.etiquetaPropia ?? null,
+          piezaAnterior: conservar ? anterior.piezaAnterior : null,
+          concepto: it.concepto.trim(),
+          detalle: it.detalle.trim() || null,
+          cantidad: Number(it.cantidad),
+          precioUnitario: Number(it.precioUnitario),
+        }
+      })
 
     if (itemsLimpios.length === 0) {
       setError("Agrega al menos un concepto con precio.")
@@ -124,6 +136,7 @@ export function FormularioTicket({
         contacto: clienteContacto.trim() || null,
       },
       equipo: {
+        categoria: inicial?.equipo.categoria ?? "otro",
         tipo: equipoTipo.trim(),
         detalle: equipoDetalle.trim() || null,
       },
@@ -132,6 +145,7 @@ export function FormularioTicket({
       trabajoRealizado: trabajo.trim() || null,
       recomendaciones: recomendaciones.trim() || null,
       notaGarantia: garantia.trim() || null,
+      garantiaDias: inicial?.garantiaDias ?? null,
       moneda: moneda.trim() || "MXN",
       impuesto: Number(impuesto) || 0,
       fechaServicio,

@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { DatosPagoDTO, TicketPublicoDTO } from "@/src/modules/tickets/application/dtos"
 import { RecursoNoEncontrado } from "@/src/modules/shared/domain/errors"
+import { derivarEscena } from "@/src/modules/tickets/application/escena-servicio"
 import { formatearDinero } from "@/src/ui/formato"
 
 const dobles = vi.hoisted(() => ({ obtener: vi.fn(), datos: vi.fn() }))
@@ -20,10 +21,11 @@ const ticket: TicketPublicoDTO = {
   folio: "BRT-999999", slug: "recibo-ficticio", moneda: "MXN", fechaServicio: "2026-11-05",
   publicadoEn: null, pagado: false,
   cliente: { nombre: "Andrea Apellido de prueba", contacto: null },
-  equipo: { tipo: "Computadora portátil", detalle: "Equipo de prueba" },
+  equipo: { categoria: "laptop", tipo: "Computadora portátil", detalle: "Equipo de prueba" },
   problemaReportado: "El equipo se apaga.", diagnostico: "Requiere mantenimiento.",
   trabajoRealizado: "Limpieza del equipo.", recomendaciones: null, notaGarantia: null,
-  items: [{ id: "uno", concepto: "Mantenimiento", detalle: null, cantidad: 1, precioUnitario: 1234.5, importe: 1234.5 }],
+  garantiaDias: null, escena: derivarEscena("laptop", []), desglose: { manoDeObra: 1234.5, piezas: 0 }, totalEnLetra: null,
+  items: [{ clase: "mantenimiento", pieza: null, etiqueta: "Mantenimiento", etiquetaPropia: null, piezaAnterior: null, id: "uno", concepto: "Mantenimiento", detalle: null, cantidad: 1, precioUnitario: 1234.5, importe: 1234.5 }],
   subtotal: 1234.5, impuesto: 0, total: 1234.5,
 }
 const props = { params: Promise.resolve({ slug: ticket.slug }) }
