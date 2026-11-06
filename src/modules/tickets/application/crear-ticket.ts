@@ -5,7 +5,7 @@ import type { RepositorioTickets } from "../domain/repositorio-tickets"
 import type { GeneradorSlug } from "../domain/slug-ticket"
 import { Ticket } from "../domain/ticket"
 import type { DatosTicketEntrada } from "./entrada"
-import { construirItems, parsearFechaServicio } from "./ensamblado"
+import { construirItems, parsearCategoria, parsearFechaServicio } from "./ensamblado"
 
 export interface ResultadoCrearTicket {
   id: string
@@ -28,7 +28,8 @@ export class CrearTicket {
     const ticket = Ticket.crear(
       {
         cliente: datos.cliente,
-        equipo: datos.equipo,
+        equipo: { ...datos.equipo, categoria: parsearCategoria(datos.equipo.categoria) },
+        garantiaDias: datos.garantiaDias,
         detalle: {
           problemaReportado: datos.problemaReportado,
           diagnostico: datos.diagnostico,

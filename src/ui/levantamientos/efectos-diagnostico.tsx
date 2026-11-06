@@ -9,10 +9,6 @@
 
 import { useEffect, useRef, useState } from "react"
 
-function sinMovimiento(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
-}
-
 /** Hace aparecer su contenido (subiendo y con fundido) al entrar en pantalla. */
 export function Revelar({
   children,
@@ -52,42 +48,6 @@ export function Revelar({
     >
       {children}
     </div>
-  )
-}
-
-/** Número que cuenta desde 0 al entrar en pantalla. */
-export function Contador({ valor, duracionMs = 1400 }: { valor: number; duracionMs?: number }) {
-  const ref = useRef<HTMLSpanElement>(null)
-  const [mostrado, setMostrado] = useState(valor)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el || sinMovimiento() || valor === 0) return
-    let cuadro = 0
-    const obs = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return
-      obs.disconnect()
-      const inicio = performance.now()
-      const paso = (t: number) => {
-        const p = Math.min(1, (t - inicio) / duracionMs)
-        const suave = 1 - Math.pow(1 - p, 3)
-        setMostrado(Math.round(valor * suave))
-        if (p < 1) cuadro = requestAnimationFrame(paso)
-      }
-      setMostrado(0)
-      cuadro = requestAnimationFrame(paso)
-    })
-    obs.observe(el)
-    return () => {
-      obs.disconnect()
-      cancelAnimationFrame(cuadro)
-    }
-  }, [valor, duracionMs])
-
-  return (
-    <span ref={ref} className="tabular-nums">
-      {mostrado}
-    </span>
   )
 }
 

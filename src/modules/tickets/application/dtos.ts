@@ -1,8 +1,23 @@
+import { Dinero } from "@/src/modules/shared/domain/dinero"
+import { montoEnLetra } from "@/src/modules/shared/domain/monto-en-letra"
+import type { CategoriaEquipo, ClaseConcepto, TipoPieza } from "../domain/clasificacion"
+import { derivarEscena, etiquetaDe, type EscenaServicio } from "./escena-servicio"
 import type { EstadoTicket } from "../domain/estado-ticket"
 import type { Ticket } from "../domain/ticket"
 
+export interface DatosPagoDTO {
+  banco: string
+  titular: string
+  clabe: string
+}
+
 /** Ítem tal como lo consume la presentación (montos en unidades, no centavos). */
 export interface ItemDTO {
+  clase: ClaseConcepto
+  pieza: TipoPieza | null
+  etiqueta: string
+  etiquetaPropia: string | null
+  piezaAnterior: string | null
   id: string
   concepto: string
   detalle: string | null
@@ -20,11 +35,15 @@ export interface TicketPublicoDTO {
   publicadoEn: string | null
   pagado: boolean
   cliente: { nombre: string; contacto: string | null }
-  equipo: { tipo: string; detalle: string | null }
+  equipo: { categoria: CategoriaEquipo; tipo: string; detalle: string | null }
   problemaReportado: string | null
   diagnostico: string | null
   trabajoRealizado: string | null
   recomendaciones: string | null
+  garantiaDias: number | null
+  escena: EscenaServicio
+  desglose: { manoDeObra: number; piezas: number }
+  totalEnLetra: string | null
   notaGarantia: string | null
   items: ItemDTO[]
   subtotal: number
@@ -39,6 +58,7 @@ export interface TicketResumenDTO {
   slug: string
   estado: EstadoTicket
   clienteNombre: string
+  equipoCategoria: CategoriaEquipo
   equipoTipo: string
   total: number
   moneda: string
@@ -61,6 +81,11 @@ function fechaISO(d: Date): string {
 
 function itemsDTO(ticket: Ticket): ItemDTO[] {
   return ticket.items.map((item) => ({
+    clase: item.clase,
+    pieza: item.pieza,
+    etiqueta: etiquetaDe(item),
+    etiquetaPropia: item.etiqueta,
+    piezaAnterior: item.piezaAnterior,
     id: item.id,
     concepto: item.concepto,
     detalle: item.detalle,
@@ -71,7 +96,13 @@ function itemsDTO(ticket: Ticket): ItemDTO[] {
 }
 
 export function aTicketPublicoDTO(ticket: Ticket): TicketPublicoDTO {
+  const piezas = ticket.items.filter((item) => item.clase === "pieza").reduce((suma, item) => suma.mas(item.importe), Dinero.cero())
+  const manoDeObra = ticket.items.filter((item) => item.clase !== "pieza").reduce((suma, item) => suma.mas(item.importe), Dinero.cero())
   return {
+    garantiaDias: ticket.garantiaDias,
+    escena: derivarEscena(ticket.equipo.categoria, ticket.items),
+    desglose: { piezas: piezas.unidades, manoDeObra: manoDeObra.unidades },
+    totalEnLetra: montoEnLetra(ticket.total, ticket.moneda),
     folio: ticket.folio,
     slug: ticket.slug.valor,
     moneda: ticket.moneda,
@@ -109,6 +140,7 @@ export function aTicketResumenDTO(ticket: Ticket): TicketResumenDTO {
     slug: ticket.slug.valor,
     estado: ticket.estado,
     clienteNombre: ticket.cliente.nombre,
+    equipoCategoria: ticket.equipo.categoria,
     equipoTipo: ticket.equipo.tipo,
     total: ticket.total.unidades,
     moneda: ticket.moneda,

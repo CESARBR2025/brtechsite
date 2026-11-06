@@ -8,6 +8,7 @@ import { CambiarEstadoTicket } from "../application/cambiar-estado-ticket"
 import { ConsultarTickets } from "../application/consultar-tickets"
 import { CrearTicket } from "../application/crear-ticket"
 import { ObtenerTicketPublico } from "../application/obtener-ticket-publico"
+import { obtenerDatosPago } from "./datos-pago-env"
 import { generadorSlugNanoid } from "./generador-slug-nanoid"
 import { RepositorioTicketsPostgres } from "./repositorio-tickets-postgres"
 
@@ -18,6 +19,7 @@ import { RepositorioTicketsPostgres } from "./repositorio-tickets-postgres"
 function construir() {
   const repo = new RepositorioTicketsPostgres(getPool())
   return {
+    datosPago: obtenerDatosPago,
     crearTicket: new CrearTicket(
       repo,
       generadorIdCrypto,

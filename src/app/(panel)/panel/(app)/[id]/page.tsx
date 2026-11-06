@@ -30,7 +30,7 @@ export default async function PaginaEditarTicket({ params }: Props) {
   const urlPublica = `${base}/t/${ticket.slug}`
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-6xl">
       <Link
         href="/panel"
         className="inline-flex items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text-primary"

@@ -408,13 +408,8 @@ de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
 ## 5. Aplicación a features nuevas
 
 ### Ticket público de servicio (`/t/[slug]`)
-- Documento angosto: contenedor `mx-auto max-w-3xl px-4 py-10`.
-- Encabezado: logo + folio (`text-xs uppercase tracking-wider text-text-muted`) + fecha. Estado con **Badge de estado** (`published`→positivo, `is_paid`→positivo / si no, `warning` "Pendiente de pago").
-- Datos de cliente / equipo: grid `sm:grid-cols-2 gap-4`, cada dato como `text-xs text-text-muted` (label) + `text-sm text-text-primary` (valor).
-- Tabla de conceptos: filas separadas por `divide-y divide-border`; concepto a la izquierda, importe alineado a la derecha con `tabular-nums`.
-- Totales: bloque a la derecha, subtotal/impuesto en `text-text-secondary`, **Total** en `text-2xl font-bold text-text-primary`.
-- Bloque "Conoce más": sección `bg-bg-dark` con blob violeta, H2 en blanco, botón secundario sobre oscuro → enlaza a `/` con `?ref=ticket`.
-- Moneda: formatear con `Intl.NumberFormat("es-MX", { style: "currency", currency })`.
+Usa el expediente descrito en **Recibo**, abajo. Moneda con
+`Intl.NumberFormat("es-MX", { style: "currency", currency })`.
 
 ### Diagnóstico de tu proyecto (`/d/[slug]`, `src/ui/levantamientos/diagnostico.tsx`)
 - Mismo lenguaje que el ticket: **hero oscuro** (`bg-dark` + rejilla + resplandor, H1 = nombre del
@@ -432,6 +427,93 @@ de 120 ms: badge → H1 → párrafo → botones. Solo en heros.
   de la captura, barra de progreso de lectura, índice lateral de puntos (`xl`) y aparición de cada
   sección al hacer scroll (`Revelar`). Encabezados con número gigante en contorno a la derecha.
   Todo respeta `prefers-reduced-motion`.
+
+### Recibo (`/t/[slug]`, `src/ui/tickets/recibo/` y `entrada/`)
+Abre con la entrada del diafragma (`entrada-recibo.tsx`, 2.9 s): las aspas del símbolo llegan, encajan con destellos, el
+hueco se abre y la cámara entra hasta mostrar la página. Sale una vez por recibo en cada dispositivo, se puede saltar y no
+aparece con movimiento reducido ni al imprimir. La ilustración arranca cuando termina la entrada.
+El símbolo vive en SVG (`src/ui/marca/`) y es el mismo dibujo en la entrada, la portada, el membrete impreso y la vista previa.
+
+- **Portada** (`PortadaExpediente`): material de tarjeta bancaria, sin ondas: degradado
+  `#2A1670 → bg-dark → #24145A`, luz radial, líneas diagonales y velo inferior (`.exp-portada`, `.exp-velo`).
+  Marca y "Descargar comprobante" arriba; saludo `font-hero` de `clamp(56px, 8vw, 104px)` con
+  `TextoDesenfocado`, apoyo y metadatos de equipo, fecha y entrega. Texto a la izquierda e ilustración 3D
+  sobre luz suave a la derecha desde `lg`; apilados en móvil.
+- **Cuerpo:** lienzo `bg-section`, contenedor de hasta 1120 px (`.exp-contenedor`), montado 120 px sobre
+  la portada. Rejilla `lg:grid-cols-[minmax(0,1fr)_372px]` con `gap-7`; columna lateral `sticky top-6`
+  desde `lg`, antes del expediente en móvil (`order-first`). Cierra con "Conoce más" oscuro y luz del cursor
+  sobre la cuadrícula.
+- **Expediente** (`ExpedienteServicio`): tarjeta blanca con borde de luz que recorre la orilla cada 9 s
+  (`.exp-con-luz`, `--exp-a`). Título, subtítulo y folio solo si hay historia. Hasta tres pasos con los textos
+  reales de problema, diagnóstico y trabajo; se omiten los vacíos. En ensamble cambian los títulos; en solo
+  diagnóstico el último es "Lo que sigue" y usa recomendaciones si falta trabajo. Riel y nodos se activan
+  al hacer scroll; chips violeta de trabajo y ámbar para la pieza con falla.
+- **Conceptos y cuentas:** concepto, detalle, cantidad, precio e importe; en móvil solo concepto e importe.
+  "Pieza nueva" en verde para clase `pieza`, resplandor al pasar el cursor y `Contador` en los importes.
+  Subtotal, impuesto si > 0 y total `font-hero` de 28 px en `text-text-primary`. Recomendaciones debajo:
+  ícono `Lightbulb` y "Para que dure: …". Sin historia, se conservan conceptos, cuentas y recomendaciones.
+- **Columna lateral:** `ResumenCuenta` oscuro con rosetas deterministas (guilloché), estado, total
+  `font-hero` de 48 px (símbolo y centavos pequeños), monto en letra si existe y desglose de mano de obra
+  ("Diagnóstico" si es solo diagnóstico), piezas e impuesto cuando > 0. Pendiente: `ComoPagar`, tarjeta
+  bancaria que se inclina con el cursor, CLABE/monto/concepto copiables con aviso y envío de comprobante
+  por WhatsApp. Sin datos bancarios: "Pedir datos de pago". Pagado: `PagoRecibido` y `SelloPagado`
+  `success` en el resumen, con caída una sola vez por folio y dispositivo. Cierra con `AyudaWhatsApp`.
+- **Garantía** (`TarjetaGarantia`): con días > 0, medalla holográfica reactiva al cursor, nota o texto por
+  defecto, barra de días restantes y vigencia desde la fecha de servicio (fechas civiles de México).
+  Vencida: barra vacía y fecha de vencimiento. Días nulos/0 con nota: tarjeta sencilla con escudo;
+  sin nota no sale. En solo diagnóstico no se muestra ninguna garantía.
+- **Impresión:** "Descargar comprobante" abre la impresión del navegador. Membrete, datos, todos los pasos
+  disponibles, tabla completa, cuentas, resumen y garantía en texto; fondos planos y colores exactos
+  (`print-color-adjust: exact`). Oculta entrada, ilustración, decoraciones, cómo pagar, ayuda y "Conoce más";
+  desactiva animaciones. Reglas `.exp-*` en `globals.css`.
+
+Datos de pago solo en entorno (`PAGO_BANCO`, `PAGO_TITULAR`, `PAGO_CLABE`). La vista previa (`opengraph-image.tsx`) no
+lleva monto, folio ni apellidos, y usa Poppins porque `ImageResponse` no lee woff2 y la licencia de Clash prohíbe convertirla.
+
+#### Ilustración del servicio
+
+`derivarEscena` (`src/modules/tickets/application/escena-servicio.ts`) es pura y compartida por el recibo
+y la vista previa del panel. Reglas, en orden:
+
+- **Solo diagnóstico:** hay conceptos y todos son `diagnostico`. **Ensamble:** categoría `pc` con algún
+  concepto `ensamble`; cuenta los conceptos `pieza`, sin sumar cantidades.
+- **Pieza protagonista:** primer concepto `pieza` compatible con la categoría y con imagen suelta
+  (`disco | ram | bateria | ventilador | fuente`); en ensamble no hay protagonista.
+- **Interior:** `otro` → `null` (símbolo BR TECH y pastilla genérica). En las demás categorías:
+  ensamble → solo diagnóstico → pieza protagonista → mantenimiento → `null`.
+- **Pantalla**, independiente del interior: sistema y programas → `sistema_y_programas`; solo sistema →
+  `sistema`; solo programas → `programas`; ninguno → `logo`. Usa el primer sistema y hasta tres programas
+  en orden; `totalProgramas` conserva el total.
+- **Clase principal** para los textos: ensamble → solo diagnóstico → cualquier concepto `pieza` →
+  mantenimiento → sistema → programa → `otro` (incluye mano de obra).
+- **Etiquetas y falla:** `etiquetaDe` prefiere la etiqueta capturada; si falta, quita prefijos de instalación
+  o activación en sistema/programa. Recorta a 24 caracteres con «…». La pieza usa esa etiqueta como nueva y
+  `piezaAnterior` o un texto por defecto como anterior; `falla` viene del primer diagnóstico (si es nula,
+  la ilustración marca la placa).
+- **Chips:** sin mano de obra ni diagnóstico, únicos y hasta seis; en solo diagnóstico, vacíos.
+  En ensamble: número de piezas, "Armado y pruebas" y etiquetas de sistema/programas.
+
+Componentes en `recibo/ilustracion/`: SVG de 520 × 400 con imágenes WebP, guías, marcas, pastillas y efectos;
+pantalla local de 300 × 180 en una capa HTML con `matrix3d`, escalada con `ResizeObserver`. Pieza compara
+antes/nuevo; mantenimiento muestra limpieza y polvo; diagnóstico escanea y marca la falla en ámbar;
+ensamble anima las seis piezas de `ORDEN_ENSAMBLE`, muestra la PC completa y después activa la pantalla.
+Partículas deterministas. CSS y animaciones con prefijo `ilus-` en `globals.css`; `Activador` espera
+`brtech:entrada-fin` (`siempre` en el panel). Con movimiento reducido o sin JavaScript se muestra el estado
+final sin capas transitorias; al imprimir se oculta la ilustración.
+
+**Imágenes y calibración** (`recibo/ilustracion/geometria.ts`):
+
+1. Archivos de producción: `public/recibo/3d/*.webp` (18 actuales, con transparencia), servidos desde
+   `/recibo/3d/`. Los PNG de `marketing/maquetas/recibo/3d/` son originales de trabajo, locales y fuera de git.
+2. Mantener el formato cuadrado de 1254 × 1254 (`LADO_ORIGINAL`). Medir la caja del objeto visible sin
+   márgenes transparentes: `[x0, y0, x1, y1]` en píxeles de la imagen original; registrarla en `CAJAS` y
+   el nombre en `NombreImagen`. `encajar` conserva la proporción, centra esa caja en `destino` y transforma puntos.
+3. Para una base, medir las esquinas de pantalla en orden superior izquierda, superior derecha, inferior
+   derecha e inferior izquierda, y los puntos de zona de cada pieza, en esos mismos píxeles originales.
+   Registrar en `BASES_3D` junto con `destino` y posiciones de tarjetas/pastilla (estas sí, en el lienzo).
+   `encajar(...).punto` convierte al lienzo y `homografia` proyecta la pantalla local.
+4. Para piezas sueltas, registrar el par nueva/anterior en `PIEZAS_3D`; para ensamble, `ENSAMBLE_3D`.
+   Verificar archivo y zonas con `geometria.test.ts`, y combinaciones de escenas con `ilustracion.test.ts`.
 
 ### Propuesta (`/p/[slug]`, `src/ui/proyectos/propuesta.tsx`)
 Es la **implementación de referencia** de §2: portada oscura con ondas (texto a la izquierda, foto fundida a la

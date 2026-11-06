@@ -162,7 +162,8 @@ src/app/           Solo routing y composición: la página llama a un caso de us
 
 ### Módulos actuales
 
-- `tickets/` — tickets de servicio. Público en `/t/[slug]`, captura en `/panel`.
+- `tickets/` — tickets de servicio. Público en `/t/[slug]`, captura en `/panel`. Categoría de equipo
+  (`laptop | pc | todo_en_uno | otro`), clase por concepto y garantía en días (0–365; nula en tickets antiguos).
 - `levantamientos/` — requisitos del primer acercamiento con un cliente nuevo. Captura con
   guardado automático en `/panel/levantamientos`; página pública "Diagnóstico de tu proyecto"
   en `/d/[slug]`. El contenido es JSONB validado por el dominio (`domain/contenido.ts`, zod,
@@ -179,3 +180,19 @@ src/app/           Solo routing y composición: la página llama a un caso de us
 con parrilla). Rol `brtech_app` con `CONNECTION LIMIT 5` y `statement_timeout`.
 En dev se llega por túnel SSH a `127.0.0.1:5433`. En prod (Dokploy) el host es
 `parrillasoft-db:5432` por la red `dokploy-network`.
+
+## Agentes de código (Codex)
+
+Cuando un agente trabaja por encargo con una guía (p. ej. `docs/guias/*.md`):
+
+- **Nada de git para escribir:** ni commit, push, checkout, reset, stash ni ramas. El commit lo hace Claude
+  después de revisar el diff.
+- Toca solo lo que pide la guía y la fase indicada; lo que la guía deja abierto, decídelo de forma conservadora
+  y repórtalo.
+- Código, nombres y textos en **español** (sentence case, sin anglicismos en la interfaz), con el estilo del
+  proyecto: sin ORM, dinero en centavos, contenedor por módulo, server actions delgadas.
+- No agregues dependencias. No corras migraciones ni pruebas que necesiten base de datos o red
+  (`RUN_DB_TESTS=1`, `npm run migrate:*`): las corre Claude.
+- Verificación: `npx tsc --noEmit`, `npm run lint`, `npm test` (y `npm run build` cuando la guía lo pida).
+- Termina con un resumen: archivos cambiados, decisiones no cubiertas por la guía y pruebas corridas con su
+  resultado.

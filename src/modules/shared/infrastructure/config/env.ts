@@ -13,6 +13,9 @@ const esquema = z.object({
     .min(16, "PANEL_SESSION_SECRET debe tener 16+ caracteres"),
   SITE_URL: z.string().url().default("http://localhost:3000"),
   RESEND_API_KEY: z.string().optional(),
+  PAGO_BANCO: z.string().optional(),
+  PAGO_TITULAR: z.string().optional(),
+  PAGO_CLABE: z.string().optional(),
   CONTACT_TO_EMAIL: z
     .string()
     .email()

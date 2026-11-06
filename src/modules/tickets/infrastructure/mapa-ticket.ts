@@ -1,4 +1,5 @@
 import { Dinero } from "@/src/modules/shared/domain/dinero"
+import { esCategoriaEquipo, esClaseConcepto, esTipoPieza } from "../domain/clasificacion"
 import type { EstadoTicket } from "../domain/estado-ticket"
 import { ItemTicket } from "../domain/item-ticket"
 import { SlugTicket } from "../domain/slug-ticket"
@@ -11,6 +12,8 @@ export interface FilaTicket {
   estado: string
   cliente_nombre: string
   cliente_contacto: string | null
+  equipo_categoria: string
+  garantia_dias: number | null
   equipo_tipo: string
   equipo_detalle: string | null
   problema_reportado: string | null
@@ -32,6 +35,10 @@ export interface FilaItem {
   id: string
   ticket_id: string
   posicion: number
+  clase: string
+  pieza: string | null
+  etiqueta: string | null
+  pieza_anterior: string | null
   concepto: string
   detalle: string | null
   cantidad: string | number
@@ -47,7 +54,12 @@ function fechaSoloDia(iso: string): Date {
 }
 
 export function itemADominio(fila: FilaItem): ItemTicket {
+  const clase = esClaseConcepto(fila.clase) ? fila.clase : "otro"
   return new ItemTicket({
+    clase,
+    pieza: (clase === "pieza" || clase === "diagnostico") && fila.pieza !== null && esTipoPieza(fila.pieza) ? fila.pieza : null,
+    etiqueta: fila.etiqueta,
+    piezaAnterior: clase === "pieza" ? fila.pieza_anterior : null,
     id: fila.id,
     concepto: fila.concepto,
     detalle: fila.detalle,
@@ -71,6 +83,8 @@ export function ticketADominio(
     estado: fila.estado as EstadoTicket,
     clienteNombre: fila.cliente_nombre,
     clienteContacto: fila.cliente_contacto,
+    equipoCategoria: esCategoriaEquipo(fila.equipo_categoria) ? fila.equipo_categoria : "otro",
+    garantiaDias: fila.garantia_dias,
     equipoTipo: fila.equipo_tipo,
     equipoDetalle: fila.equipo_detalle,
     problemaReportado: fila.problema_reportado,
