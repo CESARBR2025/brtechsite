@@ -366,7 +366,7 @@ Porta de la maqueta las funciones `ilustrar`, `escenaPantalla`, `pastilla`, `gui
 | `escenas.tsx` | Una función por escena interior: `escenaPieza`, `escenaMantenimiento`, `escenaDiagnostico`, `escenaEnsamble`, y `escenaGenerica` (categoría `otro`: símbolo `SimboloBrTech` de ~120 px centrado sobre luz suave + pastilla). |
 | `escena-pantalla.tsx` | `logo`, `sistema`, `programas`, `sistema_y_programas` dibujadas en `0 0 300 180` (`PANTALLA_LOCAL`). Textos: "Instalando {sistema}", "{sistema} listo", "Programas instalados", tarjetas de hasta 3 programas con su inicial. |
 | `capa-pantalla-3d.tsx` | `"use client"`. Div absoluto sobre el SVG con un lienzo de 520 × 400 px escalado por `ResizeObserver` (`scale(ancho / 520)`); dentro, un div de 300 × 180 con `transform: matrix3d(...)` y `transform-origin: 0 0` que contiene el SVG de la pantalla. |
-| `activador.tsx` | `"use client"`. Pone `data-activa` en su contenedor cuando termina la entrada del diafragma (mismo patrón que `entrada/ondas-diferidas.tsx`: evento `brtech:entrada-fin` / `window.__brtechEntradaFin`). Prop `siempre` para el panel. |
+| `activador.tsx` | `"use client"`. Pone `data-activa` en su contenedor cuando termina la entrada del diafragma (mismo patrón que `src/ui/tickets/entrada/ondas-diferidas.tsx`: evento `brtech:entrada-fin` / `window.__brtechEntradaFin`). Prop `siempre` para el panel. |
 
 Reglas de render (iguales a la maqueta):
 
@@ -559,7 +559,7 @@ clase/pieza) y que las piezas de cada plantilla pertenezcan a sus categorías.
 
 ## Qué no tocar
 
-- Entrada del diafragma (`entrada/`), `SelloPagado` (solo se reusa), `opengraph-image.tsx` (solo tipos),
+- Entrada del diafragma (`src/ui/tickets/entrada/`), `SelloPagado` (solo se reusa), `opengraph-image.tsx` (solo tipos),
   ondas del resto del sitio, otros módulos (`levantamientos`, `proyectos`, `contacto`), migraciones existentes.
 - No agregar dependencias. No usar git para escribir. No correr migraciones ni pruebas con base de datos.
 
