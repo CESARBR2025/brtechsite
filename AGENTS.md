@@ -162,7 +162,8 @@ src/app/           Solo routing y composición: la página llama a un caso de us
 
 ### Módulos actuales
 
-- `tickets/` — tickets de servicio. Público en `/t/[slug]`, captura en `/panel`.
+- `tickets/` — tickets de servicio. Público en `/t/[slug]`, captura en `/panel`. Categoría de equipo
+  (`laptop | pc | todo_en_uno | otro`), clase por concepto y garantía en días (0–365; nula en tickets antiguos).
 - `levantamientos/` — requisitos del primer acercamiento con un cliente nuevo. Captura con
   guardado automático en `/panel/levantamientos`; página pública "Diagnóstico de tu proyecto"
   en `/d/[slug]`. El contenido es JSONB validado por el dominio (`domain/contenido.ts`, zod,
